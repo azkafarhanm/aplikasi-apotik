@@ -204,7 +204,40 @@
     <script>
         // Inisialisasi data obat saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function () {
-            Obat.renderTable("obatTableBody");
+            Obat.renderTable();
+
+            // Form handler untuk Tambah Obat
+            const btnSimpanObat = document.getElementById("btnSimpanObat");
+            btnSimpanObat.addEventListener("click", function () {
+                const namaObat = document.getElementById("namaObat").value.trim();
+                const kategoriObat = document.getElementById("kategoriObat").value.trim();
+                const hargaObat = document.getElementById("hargaObat").value.trim();
+                const stokObat = document.getElementById("stokObat").value.trim();
+
+                // Validasi semua field harus diisi
+                if (!namaObat || !kategoriObat || !hargaObat || !stokObat) {
+                    alert("Semua field harus diisi!");
+                    return;
+                }
+
+                // Simpan data obat dengan konversi ke number
+                Obat.addObat({
+                    nama: namaObat,
+                    kategori: kategoriObat,
+                    harga: Number(hargaObat),
+                    stok: Number(stokObat)
+                });
+
+                // Refresh tabel
+                Obat.renderTable();
+
+                // Reset form
+                document.getElementById("formTambahObat").reset();
+
+                // Tutup modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalTambahObat"));
+                modal.hide();
+            });
         });
     </script>
 </body>
