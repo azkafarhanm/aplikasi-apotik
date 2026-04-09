@@ -131,20 +131,34 @@ const Obat = {
      * Render tabel obat
      * @param {string} containerId - ID container untuk tabel
      */
-    renderTable: function (containerId) {
+    renderTable: function () {
         try {
-            const container = document.getElementById(containerId);
-            if (!container) return;
+            const tbody = document.getElementById("obatTableBody");
+
+            if (!tbody) return;
 
             const allObat = this.getAllObat();
-            let html = "<table><thead><tr><th>ID</th><th>Nama</th><th>Kategori</th><th>Stok</th><th>Harga</th></tr></thead><tbody>";
+            let html = "";
 
-            allObat.forEach(obat => {
-                html += `<tr><td>${obat.id}</td><td>${obat.nama}</td><td>${obat.kategori}</td><td>${obat.stok}</td><td>${obat.harga}</td></tr>`;
+            allObat.forEach((obat, index) => {
+                html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${obat.id}</td>
+                <td>${obat.nama}</td>
+                <td>${obat.kategori}</td>
+                <td>${obat.harga}</td>
+                <td>${obat.stok}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="if(confirm('Yakin ingin menghapus obat ${obat.nama}?')){Obat.delete('${obat.id}');Obat.renderTable();}">
+                        <i class="bi bi-trash me-1"></i>Hapus
+                    </button>
+                </td>
+            </tr>
+            `;
             });
 
-            html += "</tbody></table>";
-            container.innerHTML = html;
+            tbody.innerHTML = html;
         } catch (error) {
             console.error("Error rendering obat table:", error);
         }
