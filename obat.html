@@ -202,11 +202,46 @@
     <script src="assets/js/obat.js"></script>
 
     <script>
+        // Flag untuk menandai apakah sedang mode edit
+        let currentEditId = null;
+
+        // Fungsi untuk mengisi form dan membuka modal dalam mode edit
+        function editObat(id) {
+            const obat = Obat.getById(id);
+            if (!obat) return;
+
+            currentEditId = id;
+
+            document.getElementById("namaObat").value = obat.nama;
+            document.getElementById("kategoriObat").value = obat.kategori;
+            document.getElementById("hargaObat").value = obat.harga;
+            document.getElementById("stokObat").value = obat.stok;
+
+            // Ubah judul modal dan tombol
+            document.querySelector("#modalTambahObat .modal-title").innerHTML =
+                '<i class="bi bi-pencil-square me-2"></i>Edit Obat';
+            document.getElementById("btnSimpanObat").innerHTML =
+                '<i class="bi bi-save me-2"></i>Update';
+
+            const modal = new bootstrap.Modal(document.getElementById("modalTambahObat"));
+            modal.show();
+        }
+
         // Inisialisasi data obat saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function () {
             Obat.renderTable();
 
-            // Form handler untuk Tambah Obat
+            // Reset modal ke mode tambah saat ditutup
+            document.getElementById("modalTambahObat").addEventListener("hidden.bs.modal", function () {
+                currentEditId = null;
+                document.getElementById("formTambahObat").reset();
+                document.querySelector("#modalTambahObat .modal-title").innerHTML =
+                    '<i class="bi bi-plus-circle me-2"></i>Tambah Obat Baru';
+                document.getElementById("btnSimpanObat").innerHTML =
+                    '<i class="bi bi-save me-2"></i>Simpan';
+            });
+
+            // Form handler untuk Simpan / Update Obat
             const btnSimpanObat = document.getElementById("btnSimpanObat");
             btnSimpanObat.addEventListener("click", function () {
                 const namaObat = document.getElementById("namaObat").value.trim();
@@ -220,18 +255,27 @@
                     return;
                 }
 
-                // Simpan data obat dengan konversi ke number
-                Obat.addObat({
+                const data = {
                     nama: namaObat,
                     kategori: kategoriObat,
                     harga: Number(hargaObat),
                     stok: Number(stokObat)
-                });
+                };
+
+                // === LOGIKA UTAMA: Edit atau Tambah ===
+                if (currentEditId) {
+                    // Mode edit → update data yang sudah ada
+                    Obat.update(currentEditId, data);
+                } else {
+                    // Mode tambah → simpan data baru
+                    Obat.addObat(data);
+                }
 
                 // Refresh tabel
                 Obat.renderTable();
 
-                // Reset form
+                // Reset form & flag
+                currentEditId = null;
                 document.getElementById("formTambahObat").reset();
 
                 // Tutup modal

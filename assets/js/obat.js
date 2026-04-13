@@ -150,6 +150,9 @@ const Obat = {
                 <td>${obat.harga}</td>
                 <td>${obat.stok}</td>
                 <td>
+                    <button class="btn btn-warning btn-sm me-1" onclick="editObat('${obat.id}')">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </button>
                     <button class="btn btn-danger btn-sm" onclick="if(confirm('Yakin ingin menghapus obat ${obat.nama}?')){Obat.delete('${obat.id}');Obat.renderTable();}">
                         <i class="bi bi-trash me-1"></i>Hapus
                     </button>
