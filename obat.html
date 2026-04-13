@@ -231,6 +231,17 @@
         document.addEventListener("DOMContentLoaded", function () {
             Obat.renderTable();
 
+            // === SEARCH: Filter tabel secara real-time ===
+            document.getElementById("searchObat").addEventListener("input", function () {
+                const keyword = this.value.trim();
+                if (keyword) {
+                    const hasil = Obat.search(keyword);
+                    Obat.renderTable(hasil);
+                } else {
+                    Obat.renderTable(); // Kosong → tampilkan semua data
+                }
+            });
+
             // Reset modal ke mode tambah saat ditutup
             document.getElementById("modalTambahObat").addEventListener("hidden.bs.modal", function () {
                 currentEditId = null;

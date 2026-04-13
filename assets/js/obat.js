@@ -131,13 +131,14 @@ const Obat = {
      * Render tabel obat
      * @param {string} containerId - ID container untuk tabel
      */
-    renderTable: function () {
+    renderTable: function (dataList) {
         try {
             const tbody = document.getElementById("obatTableBody");
 
             if (!tbody) return;
 
-            const allObat = this.getAllObat();
+            // Gunakan dataList jika diberikan, jika tidak ambil semua data
+            const allObat = dataList || this.getAllObat();
             let html = "";
 
             allObat.forEach((obat, index) => {
