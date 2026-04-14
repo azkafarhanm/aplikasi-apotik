@@ -139,6 +139,18 @@ const Obat = {
 
             // Gunakan dataList jika diberikan, jika tidak ambil semua data
             const allObat = dataList || this.getAllObat();
+
+            if (allObat.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            Tidak ada data ditemukan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
             let html = "";
 
             allObat.forEach((obat, index) => {
@@ -166,8 +178,54 @@ const Obat = {
         } catch (error) {
             console.error("Error rendering obat table:", error);
         }
+    },
+    renderTableFromData: function (data) {
+        try {
+            const tbody = document.getElementById("obatTableBody");
+            if (!tbody) return;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            Tidak ada data ditemukan
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = "";
+
+            data.forEach((obat, index) => {
+                html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${obat.id}</td>
+                    <td>${obat.nama}</td>
+                    <td>${obat.kategori}</td>
+                    <td>${obat.harga}</td>
+                    <td>${obat.stok}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-1" onclick="editObat('${obat.id}')">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="if(confirm('Yakin ingin menghapus obat ${obat.nama}?')){Obat.delete('${obat.id}'); applyFilters();}">
+                            <i class="bi bi-trash me-1"></i>Hapus
+                        </button>
+                    </td>
+                </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+
+        } catch (error) {
+            console.error("Error render search:", error);
+        }
     }
 };
+
 
 // Inisialisasi modul obat
 document.addEventListener('DOMContentLoaded', function () {

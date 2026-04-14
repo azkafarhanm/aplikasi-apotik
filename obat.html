@@ -227,20 +227,55 @@
             modal.show();
         }
 
+        // === SEARCH & FILTER: Filter tabel secara real-time ===
+        function applyFilters() {
+            const searchInput = document.getElementById("searchObat");
+            const filterKategoriInput = document.getElementById("filterKategori");
+            const filterStokInput = document.getElementById("filterStok");
+
+            // Safeguard if elements aren't ready yet
+            if (!searchInput || !filterKategoriInput || !filterStokInput) return;
+
+            const search = searchInput.value.trim().toLowerCase();
+            const kategori = filterKategoriInput.value;
+            const stokStatus = filterStokInput.value;
+
+            // Ambil semua data asli
+            let allData = Obat.getAllObat();
+
+            // Terapkan filter gabungan
+            const filtered = allData.filter(obat => {
+                // Filter Nama
+                const matchSearch = !search || obat.nama.toLowerCase().includes(search);
+                
+                // Filter Kategori
+                const matchKategori = !kategori || obat.kategori === kategori;
+                
+                // Filter Stok
+                let matchStok = true;
+                if (stokStatus === "tersedia") {
+                    matchStok = obat.stok > 10;
+                } else if (stokStatus === "menipis") {
+                    matchStok = obat.stok > 0 && obat.stok <= 10;
+                } else if (stokStatus === "habis") {
+                    matchStok = obat.stok === 0;
+                }
+
+                return matchSearch && matchKategori && matchStok;
+            });
+
+            // Render tabel dengan data yang sudah difilter menggunakan fungsi baru
+            Obat.renderTableFromData(filtered);
+        }
+
         // Inisialisasi data obat saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function () {
             Obat.renderTable();
 
-            // === SEARCH: Filter tabel secara real-time ===
-            document.getElementById("searchObat").addEventListener("input", function () {
-                const keyword = this.value.trim();
-                if (keyword) {
-                    const hasil = Obat.search(keyword);
-                    Obat.renderTable(hasil);
-                } else {
-                    Obat.renderTable(); // Kosong → tampilkan semua data
-                }
-            });
+            // Event listener untuk input pencarian dan dropdown filter
+            document.getElementById("searchObat").addEventListener("input", applyFilters);
+            document.getElementById("filterKategori").addEventListener("change", applyFilters);
+            document.getElementById("filterStok").addEventListener("change", applyFilters);
 
             // Reset modal ke mode tambah saat ditutup
             document.getElementById("modalTambahObat").addEventListener("hidden.bs.modal", function () {
