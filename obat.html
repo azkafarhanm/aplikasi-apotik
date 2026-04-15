@@ -116,10 +116,10 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Kode Obat</th>
-                                    <th>Nama Obat</th>
+                                    <th onclick="handleSort('nama')" style="cursor: pointer">Nama Obat <i class="bi bi-sort-alpha-down"></i></th>
                                     <th>Kategori</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
+                                    <th onclick="handleSort('harga')" style="cursor: pointer">Harga <i class="bi bi-sort-numeric-down"></i></th>
+                                    <th onclick="handleSort('stok')" style="cursor: pointer">Stok <i class="bi bi-sort-numeric-down"></i></th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -227,6 +227,19 @@
             modal.show();
         }
 
+        // 1. STATE & FUNCTION HARUS DI GLOBAL SCOPE
+        let currentSort = { column: null, direction: 'asc' };
+
+        function handleSort(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            applyFilters();
+        }
+
         // === SEARCH & FILTER: Filter tabel secara real-time ===
         function applyFilters() {
             const searchInput = document.getElementById("searchObat");
@@ -247,10 +260,10 @@
             const filtered = allData.filter(obat => {
                 // Filter Nama
                 const matchSearch = !search || obat.nama.toLowerCase().includes(search);
-                
+
                 // Filter Kategori
                 const matchKategori = !kategori || obat.kategori === kategori;
-                
+
                 // Filter Stok
                 let matchStok = true;
                 if (stokStatus === "tersedia") {
@@ -263,6 +276,21 @@
 
                 return matchSearch && matchKategori && matchStok;
             });
+
+            // 2. SISIPKAN LOGIKA SORTING SEBELUM RENDER
+            if (currentSort.column) {
+                filtered.sort((a, b) => {
+                    let valA = a[currentSort.column];
+                    let valB = b[currentSort.column];
+
+                    if (typeof valA === 'string') valA = valA.toLowerCase();
+                    if (typeof valB === 'string') valB = valB.toLowerCase();
+
+                    if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
 
             // Render tabel dengan data yang sudah difilter menggunakan fungsi baru
             Obat.renderTableFromData(filtered);
@@ -318,7 +346,7 @@
                 }
 
                 // Refresh tabel
-                Obat.renderTable();
+                applyFilters();
 
                 // Reset form & flag
                 currentEditId = null;
