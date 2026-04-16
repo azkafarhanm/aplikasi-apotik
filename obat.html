@@ -116,10 +116,10 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Kode Obat</th>
-                                    <th onclick="handleSort('nama')" style="cursor: pointer">Nama Obat <i class="bi bi-sort-alpha-down"></i></th>
+                                    <th onclick="handleSort('nama')" style="cursor: pointer">Nama Obat <i id="sortIcon-nama" class="bi bi-chevron-expand"></i></th>
                                     <th>Kategori</th>
-                                    <th onclick="handleSort('harga')" style="cursor: pointer">Harga <i class="bi bi-sort-numeric-down"></i></th>
-                                    <th onclick="handleSort('stok')" style="cursor: pointer">Stok <i class="bi bi-sort-numeric-down"></i></th>
+                                    <th onclick="handleSort('harga')" style="cursor: pointer">Harga <i id="sortIcon-harga" class="bi bi-chevron-expand"></i></th>
+                                    <th onclick="handleSort('stok')" style="cursor: pointer">Stok <i id="sortIcon-stok" class="bi bi-chevron-expand"></i></th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -131,6 +131,16 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- Pagination Controls -->
+                    <div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls">
+                        <button class="btn btn-sm btn-outline-primary" id="prevPage" onclick="changePage(-1)">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+                        <span id="pageInfo">Page 1</span>
+                        <button class="btn btn-sm btn-outline-primary" id="nextPage" onclick="changePage(1)">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -237,6 +247,25 @@
                 currentSort.column = column;
                 currentSort.direction = 'asc';
             }
+
+            // Update UI for active column
+            document.querySelectorAll('th[onclick^="handleSort"] i').forEach(icon => {
+                icon.className = 'bi bi-chevron-expand';
+            });
+            const activeIcon = document.getElementById('sortIcon-' + column);
+            if (activeIcon) {
+                activeIcon.className = currentSort.direction === 'asc' ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+            }
+
+            applyFilters();
+        }
+
+        // --- PAGINATION STATE ---
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        function changePage(direction) {
+            currentPage += direction;
             applyFilters();
         }
 
@@ -291,19 +320,34 @@
                     return 0;
                 });
             }
+            
+            // 3. PAGINATION LOGIC
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
 
-            // Render tabel dengan data yang sudah difilter menggunakan fungsi baru
-            Obat.renderTableFromData(filtered);
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const paginatedData = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+            document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById("prevPage").disabled = currentPage === 1;
+            document.getElementById("nextPage").disabled = currentPage === totalPages;
+
+            // Render tabel dengan data yang sudah difilter dan dipaginate
+            Obat.renderTableFromData(paginatedData);
         }
 
         // Inisialisasi data obat saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function () {
+            // Override renderTable agar menggunakan pagination
+            Obat.renderTable = function() { applyFilters(); };
+            
             Obat.renderTable();
 
             // Event listener untuk input pencarian dan dropdown filter
-            document.getElementById("searchObat").addEventListener("input", applyFilters);
-            document.getElementById("filterKategori").addEventListener("change", applyFilters);
-            document.getElementById("filterStok").addEventListener("change", applyFilters);
+            document.getElementById("searchObat").addEventListener("input", () => { currentPage = 1; applyFilters(); });
+            document.getElementById("filterKategori").addEventListener("change", () => { currentPage = 1; applyFilters(); });
+            document.getElementById("filterStok").addEventListener("change", () => { currentPage = 1; applyFilters(); });
 
             // Reset modal ke mode tambah saat ditutup
             document.getElementById("modalTambahObat").addEventListener("hidden.bs.modal", function () {
