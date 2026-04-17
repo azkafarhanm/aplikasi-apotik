@@ -25,12 +25,7 @@ function initData() {
     const obat = getObat();
 
     if (obat.length === 0) {
-        const contohObat = [
-            { id: "OBT001", nama: "Paracetamol", kategori: "Tablet", stok: 50, harga: 5000 },
-            { id: "OBT002", nama: "Amoxicillin", kategori: "Kapsul", stok: 25, harga: 12000 },
-            { id: "OBT003", nama: "Vitamin C", kategori: "Suplemen", stok: 80, harga: 7000 },
-        ];
-        saveObat(contohObat);
+        saveObat([]);
     }
 
     const transaksi = getTransaksi();

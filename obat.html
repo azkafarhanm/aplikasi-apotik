@@ -209,6 +209,60 @@
     <script src="assets/js/storage.js"></script>
     <script>initData();</script>
     <script src="assets/js/auth.js"></script>
+    <script>
+        window.sampleObat = [
+            { nama: "Paracetamol 500 mg", kategori: "Tablet", harga: 8000, stok: 120 },
+            { nama: "Amoxicillin 500 mg", kategori: "Kapsul", harga: 18000, stok: 42 },
+            { nama: "Ibuprofen 400 mg", kategori: "Tablet", harga: 12000, stok: 35 },
+            { nama: "CTM 4 mg", kategori: "Tablet", harga: 5000, stok: 85 },
+            { nama: "Antasida DOEN", kategori: "Tablet", harga: 7000, stok: 60 },
+            { nama: "Omeprazole 20 mg", kategori: "Kapsul", harga: 22000, stok: 28 },
+            { nama: "Vitamin C 500 mg", kategori: "Suplemen", harga: 15000, stok: 75 },
+            { nama: "Sangobion Kapsul", kategori: "Suplemen", harga: 32000, stok: 24 },
+            { nama: "Bodrex Extra", kategori: "Tablet", harga: 6000, stok: 95 },
+            { nama: "Promag Tablet", kategori: "Tablet", harga: 9000, stok: 47 },
+            { nama: "Panadol Biru", kategori: "Tablet", harga: 11000, stok: 53 },
+            { nama: "Mefenamic Acid 500 mg", kategori: "Tablet", harga: 14000, stok: 18 },
+            { nama: "Ciprofloxacin 500 mg", kategori: "Tablet", harga: 25000, stok: 14 },
+            { nama: "Dexamethasone 0.5 mg", kategori: "Tablet", harga: 9000, stok: 39 },
+            { nama: "Amlodipine 5 mg", kategori: "Tablet", harga: 17000, stok: 8 },
+            { nama: "Simvastatin 10 mg", kategori: "Tablet", harga: 19000, stok: 12 },
+            { nama: "Metformin 500 mg", kategori: "Tablet", harga: 16000, stok: 56 },
+            { nama: "Allopurinol 100 mg", kategori: "Tablet", harga: 13000, stok: 21 },
+            { nama: "Asam Folat 400 mcg", kategori: "Suplemen", harga: 10000, stok: 67 },
+            { nama: "Neurobion Forte", kategori: "Suplemen", harga: 28000, stok: 31 },
+            { nama: "OBH Combi Batuk Berdahak", kategori: "Sirup", harga: 18000, stok: 26 },
+            { nama: "Woods Peppermint Expectorant", kategori: "Sirup", harga: 21000, stok: 17 },
+            { nama: "Sanmol Sirup", kategori: "Sirup", harga: 16000, stok: 44 },
+            { nama: "Termorex Sirup", kategori: "Sirup", harga: 17000, stok: 29 },
+            { nama: "Lactulax Sirup", kategori: "Sirup", harga: 42000, stok: 9 },
+            { nama: "Bisolvon Kids Sirup", kategori: "Sirup", harga: 24000, stok: 15 },
+            { nama: "Mylanta Cair", kategori: "Cair", harga: 23000, stok: 33 },
+            { nama: "Betadine Antiseptic Solution", kategori: "Cair", harga: 19000, stok: 40 },
+            { nama: "Rivanol 0.1%", kategori: "Cair", harga: 12000, stok: 22 },
+            { nama: "Minyak Kayu Putih Cap Lang", kategori: "Cair", harga: 14500, stok: 58 },
+            { nama: "Caladine Lotion", kategori: "Cair", harga: 18000, stok: 19 },
+            { nama: "Hansaplast Spray Antiseptik", kategori: "Cair", harga: 35000, stok: 7 },
+            { nama: "Bioplacenton Gel", kategori: "Salep", harga: 26000, stok: 13 },
+            { nama: "Betamethasone Cream", kategori: "Salep", harga: 15000, stok: 11 },
+            { nama: "Miconazole Cream", kategori: "Salep", harga: 22000, stok: 16 },
+            { nama: "Gentamicin Salep", kategori: "Salep", harga: 18000, stok: 6 },
+            { nama: "Voltaren Emulgel", kategori: "Salep", harga: 48000, stok: 20 },
+            { nama: "Counterpain Cream", kategori: "Salep", harga: 34000, stok: 27 },
+            { nama: "Curcuma Plus Emulsion", kategori: "Suplemen", harga: 21000, stok: 36 },
+            { nama: "Enervon-C", kategori: "Suplemen", harga: 27000, stok: 49 },
+            { nama: "Blackmores Multivitamins", kategori: "Suplemen", harga: 85000, stok: 5 },
+            { nama: "Redoxon Double Action", kategori: "Suplemen", harga: 59000, stok: 10 },
+            { nama: "Imboost Force", kategori: "Suplemen", harga: 65000, stok: 14 },
+            { nama: "Zinc Tablet 20 mg", kategori: "Suplemen", harga: 12000, stok: 63 },
+            { nama: "Insto Regular", kategori: "Tetes", harga: 16000, stok: 38 },
+            { nama: "Cendo Xitrol Eye Drops", kategori: "Tetes", harga: 39000, stok: 8 },
+            { nama: "Rohto Cool", kategori: "Tetes", harga: 17500, stok: 25 },
+            { nama: "Otilon Tetes Telinga", kategori: "Tetes", harga: 28000, stok: 4 },
+            { nama: "Nazal Tetes Hidung", kategori: "Tetes", harga: 14000, stok: 12 },
+            { nama: "Cendo Catarlent", kategori: "Tetes", harga: 47000, stok: 9 }
+        ];
+    </script>
     <script src="assets/js/obat.js"></script>
 
     <script>
@@ -223,7 +277,7 @@
             currentEditId = id;
 
             document.getElementById("namaObat").value = obat.nama;
-            document.getElementById("kategoriObat").value = obat.kategori;
+            document.getElementById("kategoriObat").value = (obat.kategori || "").toLowerCase();
             document.getElementById("hargaObat").value = obat.harga;
             document.getElementById("stokObat").value = obat.stok;
 
@@ -291,7 +345,7 @@
                 const matchSearch = !search || obat.nama.toLowerCase().includes(search);
 
                 // Filter Kategori
-                const matchKategori = !kategori || obat.kategori === kategori;
+                const matchKategori = !kategori || (obat.kategori || "").toLowerCase() === kategori;
 
                 // Filter Stok
                 let matchStok = true;
@@ -339,6 +393,28 @@
 
         // Inisialisasi data obat saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function () {
+            const existingObat = Obat.getAllObat();
+            const isLegacySeed =
+                existingObat.length === 3 &&
+                existingObat.some(obat => obat.nama === "Paracetamol") &&
+                existingObat.some(obat => obat.nama === "Amoxicillin") &&
+                existingObat.some(obat => obat.nama === "Vitamin C");
+
+            if ((existingObat.length === 0 || isLegacySeed) && Array.isArray(window.sampleObat) && window.sampleObat.length > 0) {
+                localStorage.setItem("apotikku_obat", JSON.stringify([]));
+
+                window.sampleObat.forEach(function (item) {
+                    Obat.addObat({
+                        ...item,
+                        kategori: item.kategori.toLowerCase()
+                    });
+                });
+
+                console.log("sampleObat inserted into localStorage:", window.sampleObat.length, "items");
+            } else {
+                console.log("sampleObat not inserted. Existing data:", existingObat.length);
+            }
+
             // Override renderTable agar menggunakan pagination
             Obat.renderTable = function() { applyFilters(); };
             

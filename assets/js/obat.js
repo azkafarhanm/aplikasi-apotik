@@ -225,9 +225,3 @@ const Obat = {
         }
     }
 };
-
-
-// Inisialisasi modul obat
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Obat module initialized');
-});
