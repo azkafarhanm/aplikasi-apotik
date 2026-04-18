@@ -37,76 +37,67 @@
     </nav>
     <div class="main-content">
         <div class="container">
-            <h2 class="page-title"><i class="bi bi-cart3 me-2"></i>Transaksi Penjualan</h2>
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="card mb-4">
-                        <div class="card-header"><i class="bi bi-cart-plus me-2"></i>Transaksi Baru</div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="page-title mb-0"><i class="bi bi-clock-history me-2"></i>Riwayat Transaksi</h2>
+                <a class="btn btn-primary" href="obat.html">
+                    <i class="bi bi-cart-plus me-2"></i>Beli Obat
+                </a>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary h-100">
                         <div class="card-body">
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label for="pilihObat" class="form-label">Pilih Obat</label>
-                                    <select class="form-select" id="pilihObat">
-                                        <option value="">-- Pilih Obat --</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="jumlahObat" class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control" id="jumlahObat" min="1" value="1">
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button class="btn btn-success w-100" id="btnTambahItem"><i
-                                            class="bi bi-plus-circle me-2"></i>Tambah</button>
-                                </div>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="tabelKeranjang">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Obat</th>
-                                            <th>Harga</th>
-                                            <th>Jumlah</th>
-                                            <th>Subtotal</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted">Keranjang kosong</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <h6 class="card-title">Total Transaksi</h6>
+                            <h3 class="mb-0" id="transaksiCount">0</h3>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-header"><i class="bi bi-wallet2 me-2"></i>Pembayaran</div>
+                <div class="col-md-4">
+                    <div class="card text-white bg-success h-100">
                         <div class="card-body">
-                            <div class="mb-3"><label class="form-label">Total Item</label>
-                                <h4 class="text-primary mb-0" id="totalItem">0 item</h4>
-                            </div>
-                            <hr>
-                            <div class="mb-3"><label class="form-label">Total Harga</label>
-                                <h3 class="text-success mb-0" id="totalHarga">Rp 0</h3>
-                            </div>
-                            <hr>
-                            <div class="mb-3"><label for="bayar" class="form-label">Bayar</label>
-                                <div class="input-group"><span class="input-group-text">Rp</span><input type="number"
-                                        class="form-control" id="bayar"></div>
-                            </div>
-                            <div class="mb-4"><label class="form-label">Kembalian</label>
-                                <h4 class="text-info mb-0" id="kembalian">Rp 0</h4>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary btn-lg" id="btnProses"><i
-                                        class="bi bi-check-circle me-2"></i>Proses</button>
-                                <button class="btn btn-outline-danger" id="btnReset"><i
-                                        class="bi bi-x-circle me-2"></i>Reset</button>
-                            </div>
+                            <h6 class="card-title">Total Pendapatan</h6>
+                            <h3 class="mb-0" id="transaksiRevenue">Rp 0</h3>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Item Terjual</h6>
+                            <h3 class="mb-0" id="transaksiItems">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-table me-2"></i>Daftar Transaksi</span>
+                    <button class="btn btn-outline-primary btn-sm" id="btnRefreshTransaksi">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tanggal</th>
+                                    <th>Kode Transaksi</th>
+                                    <th>Nama Obat</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaksiTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Belum ada histori transaksi</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
