@@ -23,6 +23,7 @@ Setiap fitur dan teknologi harus menyelesaikan masalah yang tercatat di [`PRD.md
 | 3b | Penjualan lewat **satu fungsi database dalam satu transaksi** | Stok tidak boleh minus; Penjualan harus utuh; harga tidak boleh diubah dari layar kasir | Beberapa perintah terpisah dari browser (bisa setengah tersimpan, bisa minus) | [ADR 0003](adr/0003-peran-admin-kasir-rls.md) |
 | 3c | **Tanpa pendaftaran akun umum** | Mencegah orang asing mencoba masuk | Pendaftaran terbuka + persetujuan Admin (mengundang spam) | [ADR 0003](adr/0003-peran-admin-kasir-rls.md) |
 | 4 | Visual **"etiket apotek"**, tanpa foto, tanpa mode gelap | Orang belum mengenali logo golongan obat (M-06); tampilan versi 1 generik | Bootstrap/template (tanpa identitas), gaya "template AI", foto produk (hak cipta, berat), mode gelap (biaya uji dua kali tanpa masalah nyata) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
+| 4a | Tata letak Katalog: **kartu etiket + laci Keluhan** (hasil prototipe) | Pengunjung ada yang tahu nama obat, ada yang hanya tahu keluhannya; harga harus ketemu ≤ 2 langkah | Laci keluhan saja (satu langkah lebih banyak), papan daftar harga (terasa seperti tabel) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
 
 ## Jawaban cepat untuk pertanyaan yang paling mungkin muncul
 

@@ -25,7 +25,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 
 - Bentuk: Katalog publik tanpa login + Area staf (Admin & Kasir) untuk satu apotek bernama ApotikKu.
 - Teknologi: Next.js + Supabase (supabase-js, migrasi SQL, RLS sejak awal) + Vercel, semuanya paket gratis. Middleware/proxy menjaga `/staf/*`. Bukan Drizzle/Prisma, karena keduanya bisa melewati RLS.
-- Visual: konsep "etiket apotek" (off-white, hijau apotek tua, tanda golongan obat sebagai elemen visual, harga dalam huruf monospace), tidak flat, tidak terlihat seperti template AI. Katalog dirancang untuk HP lebih dulu; layar kasir untuk laptop/tablet; tanpa mode gelap.
+- Visual: konsep "etiket apotek" (off-white, hijau apotek tua, tanda golongan obat sebagai elemen visual, harga dalam huruf monospace), tidak flat, tidak terlihat seperti template AI. Katalog dirancang untuk HP lebih dulu, berupa kartu etiket dengan laci Keluhan di atasnya; satuan ditulis lengkap ("per strip · 10 tablet"); layar kasir untuk laptop/tablet; tanpa mode gelap.
 - Menu: Kasir = Jual, Penjualan hari ini. Admin = semua itu + Ringkasan, Obat, Laporan.
 - Data awal: ±40 obat generik, harga acuan dari HET Kemenkes, kartu etiket tanpa foto.
 - Kode HTML lama ada di tag `v1-html`.
@@ -34,7 +34,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 
 1. ~~PRD + PDF sesi 3~~ (selesai 6 Okt 2026)
 2. ~~`docs/KENAPA.md` + ADR 0001–0004~~ (selesai 6 Okt 2026)
-3. Prototipe visual katalog "etiket apotek" untuk dinilai
+3. ~~Prototipe visual katalog "etiket apotek"~~ (selesai 6 Okt 2026: kartu etiket + laci Keluhan, lihat ADR 0004)
 4. `docs/SPEC.md` (skema database, route, aturan keamanan)
 5. Tiket di GitHub Issues per milestone, lalu mulai koding
 

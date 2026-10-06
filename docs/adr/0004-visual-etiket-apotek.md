@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Diterima (prototipe menyusul untuk dinilai) |
+| Status | Diterima; tata letak Katalog dipilih lewat prototipe (lihat bagian akhir) |
 | Tanggal | 6 Oktober 2026 |
 | Terkait | M-06; F-03; NF-03, NF-04 di [`PRD.md`](../PRD.md) |
 
@@ -56,7 +56,7 @@ Konsep visual **"etiket apotek"**: tampilan meminjam bahasa visual yang sudah ak
 - Komponen tampilan harus dirancang sendiri, tidak bisa sekadar memakai template, jadi butuh waktu lebih lama.
 - Warna golongan obat harus mengikuti makna resminya dan **tidak boleh dipakai untuk hal lain** (misalnya merah tidak dipakai untuk tombol hapus biasa supaya tidak tertukar dengan "Obat keras").
 - Kontras warna harus dicek supaya tetap terbaca (NF-04: huruf besar, kontras tinggi).
-- Konsep ini baru keputusan arah. **Prototipe visual** akan dibuat dan dinilai lebih dulu sebelum dipakai di seluruh aplikasi.
+- Konsep ini diuji dulu lewat **prototipe visual** sebelum dipakai di seluruh aplikasi (hasilnya di bagian akhir).
 
 ## Kalau dosen bertanya…
 
@@ -74,3 +74,22 @@ Huruf monospace membuat setiap angka sama lebar, sehingga harga dalam satu dafta
 
 **"Bagaimana dengan orang buta warna?"**
 Warna golongan obat selalu disertai teks ("Obat bebas", "Obat bebas terbatas", "Perlu resep dokter"). Warna membantu, tetapi bukan satu-satunya penanda.
+
+## Hasil prototipe tata letak Katalog (6 Oktober 2026)
+
+> **Prototipe** = tiruan cepat yang dibuat untuk menjawab satu pertanyaan, lalu dibuang. *Analogi:* contoh kue yang dicicipi sebelum memesan kue ulang tahun.
+
+Pertanyaan: *"Seperti apa Katalog etiket apotek paling enak dipakai di HP?"* Tiga tata letak yang strukturnya berbeda dibuat dan dicoba:
+
+| Variasi | Cara menemukan obat | Hasil |
+|---|---|---|
+| A. Tumpukan etiket | Pencarian + saringan, lalu kartu etiket berisi harga, golongan, dan stok | **Dipakai** sebagai dasar |
+| B. Lemari keluhan | Pilih "laci" Keluhan dulu, baru muncul daftar obat | **Lacinya dipakai**, digabung ke A |
+| C. Papan daftar harga | Daftar padat A–Z dengan penjelasan tanda golongan | Ditolak: terasa seperti tabel, kurang ramah untuk orang awam |
+
+**Keputusan:** kartu etiket dari variasi A, ditambah laci Keluhan dari variasi B di atas daftar. Pengunjung yang tahu nama obat langsung mencari. Pengunjung yang hanya tahu keluhannya cukup mengetuk laci. Keduanya sampai ke harga dalam ≤ 2 langkah (NF-03), karena harga, golongan, dan stok sudah terlihat di kartu tanpa perlu membuka detail.
+
+**Tambahan dari penilaian:** istilah satuan seperti "strip" belum tentu dipahami semua orang. Karena itu kartu menulis satuan lengkap dengan isinya (misalnya "per strip · 10 tablet"), dan halaman detail menjelaskan bahwa obat dijual per strip, tidak per butir (aturan bisnis 4).
+
+**Kalau dosen bertanya "kenapa tidak pakai daftar harga saja (variasi C), kan lebih padat?"**
+Daftar padat memudahkan membandingkan harga, tetapi Pengunjung kami kebanyakan orang awam yang membuka dari HP dan sering hanya tahu keluhannya, bukan nama obatnya. Laci Keluhan menjawab kebutuhan itu, dan kartu etiket menampilkan tanda golongan dengan teks yang lebih besar, sehingga edukasi golongan obat (M-06) tetap jalan.
