@@ -33,7 +33,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 ## Urutan kerja
 
 1. ~~PRD + PDF sesi 3~~ (selesai 6 Okt 2026)
-2. `docs/KENAPA.md` + ADR 0001–0004 (Next.js+Supabase, katalog publik + area staf, peran admin/kasir, visual etiket apotek)
+2. ~~`docs/KENAPA.md` + ADR 0001–0004~~ (selesai 6 Okt 2026)
 3. Prototipe visual katalog "etiket apotek" untuk dinilai
 4. `docs/SPEC.md` (skema database, route, aturan keamanan)
 5. Tiket di GitHub Issues per milestone, lalu mulai koding
