@@ -25,6 +25,21 @@ Setiap fitur dan teknologi harus menyelesaikan masalah yang tercatat di [`PRD.md
 | 4 | Visual **"etiket apotek"**, tanpa foto, tanpa mode gelap | Orang belum mengenali logo golongan obat (M-06); tampilan versi 1 generik | Bootstrap/template (tanpa identitas), gaya "template AI", foto produk (hak cipta, berat), mode gelap (biaya uji dua kali tanpa masalah nyata) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
 | 4a | Tata letak Katalog: **kartu etiket + laci Keluhan** (hasil prototipe) | Pengunjung ada yang tahu nama obat, ada yang hanya tahu keluhannya; harga harus ketemu ≤ 2 langkah | Laci keluhan saja (satu langkah lebih banyak), papan daftar harga (terasa seperti tabel) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
 
+## Keputusan teknis di SPEC
+
+Keputusan yang lebih kecil, dicatat lengkap beserta jawaban untuk dosen di [`SPEC.md`](SPEC.md).
+
+| Keputusan | Alasan singkat | Ditolak | Detail |
+|---|---|---|---|
+| Uang disimpan sebagai bilangan bulat rupiah | Rupiah tanpa sen; angka desimal komputer bisa meleset | Angka desimal | SPEC 4.3 |
+| Status stok dihitung satu fungsi database | Aturan tidak mungkin berbeda di Katalog, kasir, dan Ringkasan | Menghitung di tiap halaman | SPEC 4.3 |
+| Pengunjung hanya membaca tampilan `katalog` | Status stok terlihat, angka stok dan harga acuan tidak | Memberi Pengunjung akses ke tabel `obat` | SPEC 4.3 |
+| "Hari ini" selalu WIB | Penjualan 23.30 tidak boleh terhitung hari berikutnya | Waktu server (UTC) | SPEC 4.3 |
+| Kasir hanya melihat Penjualan miliknya hari ini | Daftar semua Penjualan = laporan pendapatan, wewenang Admin | Kasir melihat semua Penjualan | SPEC 4.5 |
+| Detail obat punya alamat sendiri | Tombol Kembali di HP bekerja wajar, tautan bisa dikirim | Jendela di atas daftar saja | SPEC 4.2 |
+| Satu obat satu Keluhan (versi 1) | Cukup untuk data awal, jauh lebih sederhana | Tabel banyak-ke-banyak | SPEC 4.3 |
+| Satu titik uji otomatis: database | Semua aturan berisiko tinggal di sana; tampilan diuji manual dengan target terukur | Tes tampilan otomatis sejak awal | SPEC 5 |
+
 ## Jawaban cepat untuk pertanyaan yang paling mungkin muncul
 
 | Pertanyaan | Jawaban singkat |

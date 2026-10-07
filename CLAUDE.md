@@ -17,6 +17,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 
 - `docs/PRD.md`: produk, aktor, fitur (F-xx), non-fungsional (NF-xx), aturan bisnis, cakupan
 - `CONTEXT.md`: glosarium istilah domain
+- `docs/SPEC.md`: cara membangun (skema database, route, fungsi, RLS, rencana uji)
 - `docs/adr/`: catatan keputusan penting
 - `docs/sesi/`: bahan tugas tiap sesi kuliah
 - `docs/penjelasan/`: penjelasan kode per fitur
@@ -35,7 +36,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 1. ~~PRD + PDF sesi 3~~ (selesai 6 Okt 2026)
 2. ~~`docs/KENAPA.md` + ADR 0001–0004~~ (selesai 6 Okt 2026)
 3. ~~Prototipe visual katalog "etiket apotek"~~ (selesai 6 Okt 2026: kartu etiket + laci Keluhan, lihat ADR 0004)
-4. `docs/SPEC.md` (skema database, route, aturan keamanan)
+4. ~~`docs/SPEC.md`~~ (selesai 7 Okt 2026: skema, route, RLS, fungsi database, rencana uji)
 5. Tiket di GitHub Issues per milestone, lalu mulai koding
 
 Tugas berikutnya dari dosen (batas Sabtu 10 Okt 2026): *Study Case Proses Pembangunan Perangkat Lunak* dan *Case Kelompok*. Bahannya disusun di `docs/sesi/`.
