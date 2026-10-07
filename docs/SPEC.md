@@ -352,6 +352,22 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 
 > **Migrasi** = file berurutan berisi perubahan bentuk database. *Analogi:* resep langkah demi langkah; siapa pun yang mengikutinya mendapat database yang sama (ADR 0001).
 
+### 4.12 Pengaturan Supabase
+
+Disepakati 7 Oktober 2026:
+
+| Hal | Keputusan | Alasan |
+|---|---|---|
+| Kapan dibuat | Saat tiket koding pertama dimulai | Project gratis dijeda bila ±7 hari tidak dipakai; tidak ada gunanya dibuat lebih awal |
+| Pemilik | Satu akun milik pemilik repo, login dengan akun GitHub yang 2FA-nya aktif | Tidak ada password bersama yang beredar di grup. Anggota kelompok menguji lewat akun Staf uji di aplikasi, bukan lewat dasbor |
+| Lokasi server | Singapura | Terdekat dengan Indonesia, membantu NF-05. Tidak bisa diubah setelah project dibuat |
+| Jumlah project | Dua: `apotikku` (asli) dan `apotikku-uji` (khusus tes otomatis) | Paket gratis mengizinkan 2 project. Project uji bisa dipakai dari laptop, sesi cloud, dan GitHub Actions tanpa Docker |
+| Bila tertidur | Dasbor → Resume project (bisa sampai 90 hari). Lewat 90 hari: unduh cadangan atau bangun ulang dari migrasi + data awal di repo | Bentuk database dan data awal selalu tersimpan di repo |
+
+**Kunci Supabase:** alamat project dan kunci publik (anon key) disimpan sebagai variabel lingkungan: di file lokal yang tidak ikut ke repo, di pengaturan Vercel, dan di *secrets* GitHub Actions untuk project uji. Kunci rahasia (service role key) tidak disimpan di mana pun dalam aplikasi atau repo. Akun Staf uji dibuat sekali lewat dasbor.
+
+> **Variabel lingkungan** = pengaturan yang dibaca aplikasi saat berjalan, disimpan di luar kode. *Analogi:* PIN brankas yang dihafal penjaga, bukan ditulis di pintu brankas.
+
 ## 5. Keputusan pengujian
 
 ### 5.1 Satu titik uji: database
