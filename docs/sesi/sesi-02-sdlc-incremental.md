@@ -105,7 +105,7 @@ Pada tahap ini ditentukan teknologi dan pembagian increment. Setiap keputusan pe
 | Peran Admin dan Kasir dengan aturan hak akses di database (*Row Level Security*) sejak awal | Kasir tidak bisa mengubah harga atau membatalkan Penjualan, walaupun mencoba melewati tampilan |
 | Tampilan bergaya "etiket apotek" | Logo golongan obat tampil di setiap kartu sebagai sarana edukasi |
 
-Seluruh kebutuhan kemudian dipecah menjadi **13 tiket kerja** di GitHub Issues dan dikelompokkan menjadi empat increment (lihat 4.5).
+Seluruh kebutuhan kemudian dipecah menjadi **13 tugas kerja** di papan tugas project dan dikelompokkan menjadi empat increment (lihat 4.5).
 
 ### 4.4 Tahap 3: Desain
 
@@ -116,20 +116,20 @@ Desain dibuat sekali untuk seluruh sistem, supaya semua increment berdiri di ata
 
 ### 4.5 Pembagian Increment
 
-| Increment | Isi (nomor tiket) | Hasil yang bisa dipakai | Pengguna yang terbantu |
+| Increment | Isi | Hasil yang bisa dipakai | Pengguna yang terbantu |
 |---|---|---|---|
-| **1. Produk inti: Katalog publik** | Katalog dari database (#2), cari nama dan laci Keluhan (#4), detail obat + WhatsApp (#5), data awal ±40 obat bersumber resmi (#7) | Pembeli bisa mengecek obat, harga, golongan, dan stok dari HP | Pengunjung |
-| **2. Penjualan di kasir** | Login dan logout Staf (#6), mencatat Penjualan (#8), Struk 58 mm dan Penjualan hari ini (#10) | Kasir melayani Penjualan berisi banyak obat; stok berkurang otomatis | Kasir |
-| **3. Pengelolaan oleh Admin** | Kelola obat + peringatan HET (#9), Ringkasan (#11), Laporan pendapatan (#12), Pembatalan Penjualan (#13) | Admin mengelola data, tahu stok yang hampir habis dan obat mendekati kedaluwarsa, serta mendapat laporan otomatis | Admin |
-| **4. Uji pengguna dan rilis** | Uji manual kemudahan pakai dan rilis Versi 1 (#14) | Bukti target kemudahan pakai tercapai; Versi 1 siap didemokan | Semua |
+| **1. Produk inti: Katalog publik** | Katalog dari database, cari nama dan laci Keluhan, detail obat + WhatsApp, data awal ±40 obat bersumber resmi | Pembeli bisa mengecek obat, harga, golongan, dan stok dari HP | Pengunjung |
+| **2. Penjualan di kasir** | Login dan logout Staf, mencatat Penjualan, Struk 58 mm dan Penjualan hari ini | Kasir melayani Penjualan berisi banyak obat; stok berkurang otomatis | Kasir |
+| **3. Pengelolaan oleh Admin** | Kelola obat + peringatan HET, Ringkasan, Laporan pendapatan, Pembatalan Penjualan | Admin mengelola data, tahu stok yang hampir habis dan obat mendekati kedaluwarsa, serta mendapat laporan otomatis | Admin |
+| **4. Uji pengguna dan rilis** | Uji manual kemudahan pakai dan rilis Versi 1 | Bukti target kemudahan pakai tercapai; Versi 1 siap didemokan | Semua |
 
-Urutan ini mengikuti ketergantungan antar-fitur. Contohnya, Penjualan membutuhkan login Staf, dan Laporan membutuhkan data Penjualan. Setiap tiket mencantumkan tiket mana yang harus selesai lebih dulu.
+Urutan ini mengikuti ketergantungan antar-fitur. Contohnya, Penjualan membutuhkan login Staf, dan Laporan membutuhkan data Penjualan. Setiap tugas mencantumkan tugas mana yang harus selesai lebih dulu.
 
 ### 4.6 Tahap 4: Implementasi dan Pengujian per Increment
 
-Setiap tiket dikerjakan di *branch* terpisah dan digabung melalui *Pull Request* setelah diperiksa. Setiap increment diuji dengan dua cara:
+Setiap tugas dikerjakan terpisah dan baru digabung ke versi utama setelah diperiksa. Setiap increment diuji dengan dua cara:
 
-- **Pengujian otomatis di database**, dijalankan otomatis oleh GitHub Actions setiap ada perubahan. Contoh yang diuji: Pengunjung tidak bisa mengubah data apa pun; Kasir tidak bisa melihat laporan; Penjualan tersimpan utuh atau tidak sama sekali; dua Kasir yang menjual obat terakhir bersamaan tidak membuat stok minus; dan total laporan sama dengan hitungan manual.
+- **Pengujian otomatis di database**, dijalankan otomatis setiap ada perubahan kode. Contoh yang diuji: Pengunjung tidak bisa mengubah data apa pun; Kasir tidak bisa melihat laporan; Penjualan tersimpan utuh atau tidak sama sekali; dua Kasir yang menjual obat terakhir bersamaan tidak membuat stok minus; dan total laporan sama dengan hitungan manual.
 - **Pengujian manual** untuk kebutuhan kemudahan pakai, diukur dengan stopwatch: harga ditemukan dalam ≤ 2 langkah dan Penjualan 3 obat selesai ≤ 30 detik.
 
 Tes otomatis dari increment sebelumnya tetap dijalankan di increment berikutnya. Dengan begitu, fitur baru yang merusak fitur lama langsung ketahuan.
@@ -140,7 +140,7 @@ Setiap increment yang lulus pengujian langsung dipasang di Vercel dan bisa dibuk
 
 ### 4.8 Posisi Pengerjaan Saat Ini
 
-Per 8 Oktober 2026, tahap analisis kebutuhan, perencanaan, dan desain sudah selesai dan terdokumentasi di repositori project. Tiket untuk keempat increment sudah dibuat. Tahap implementasi dimulai dari increment 1 (tiket #2).
+Per 8 Oktober 2026, tahap analisis kebutuhan, perencanaan, dan desain sudah selesai dan terdokumentasi. Tugas kerja untuk keempat increment sudah disusun. Tahap implementasi dimulai dari increment 1 (Katalog publik).
 
 ## 5. Kesimpulan
 
@@ -152,4 +152,3 @@ Model Incremental dipilih untuk ApotikKu karena kebutuhan intinya sudah bisa dir
 2. I. Sommerville, *Software Engineering*, edisi ke-10. Boston: Pearson, 2016.
 3. BINUS University Bekasi, "Incremental Model dalam Rekayasa Perangkat Lunak," 2025. [Daring]. Tersedia: https://binus.ac.id/bekasi/2025/07/incremental-model-dalam-rekayasa-perangkat-lunak/
 4. R. Sutjiadi dkk., "Perancangan Sistem Informasi Manajemen Tugas Akhir pada Institut Informatika Indonesia Menggunakan Metode Incremental," *TELSINAS*, vol. 5, no. 2, Nov. 2022, doi: 10.38043/telsinas.v5i2.4334.
-5. Repositori project ApotikKu (dokumen PRD, ADR, SPEC, dan tiket pengerjaan). [Daring]. Tersedia: https://github.com/azkafarhanm/aplikasi-apotik
