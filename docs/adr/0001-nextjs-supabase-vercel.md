@@ -37,7 +37,7 @@ Aturan tambahan yang ikut diputuskan:
 - **Perubahan struktur database ditulis sebagai file migrasi SQL** yang disimpan di repo.
   > **Migrasi** = file berisi langkah-langkah mengubah struktur database (menambah tabel, kolom, aturan). *Analogi:* resep masakan yang ditulis berurutan. Siapa pun yang mengikuti resep yang sama akan mendapat masakan yang sama, jadi database di laptop setiap anggota kelompok dan di server selalu sama bentuknya.
 - **Proxy/middleware Next.js menjaga semua halaman `/staf/*`**: orang yang belum login langsung diarahkan ke halaman login.
-  > **Middleware/proxy** = kode yang berjalan *sebelum* halaman dibuka. *Analogi:* satpam di pintu masuk ruang staf. (Di Next.js versi 16 namanya diganti dari `middleware` menjadi `proxy`; fungsinya sama.)
+  > **Middleware/proxy** = kode yang berjalan *sebelum* halaman dibuka. *Analogi:* satpam di pintu masuk ruang staf. (Di Next.js versi 16 namanya diganti dari `middleware` menjadi `proxy`; fungsinya sama, dan nama lama masih jalan tetapi sudah ditandai usang [3].)
   Satpam ini hanya lapisan pertama. Penjaga sebenarnya ada di database (RLS, lihat [ADR 0003](0003-peran-admin-kasir-rls.md)).
 
 ## Pilihan yang ditolak
@@ -62,9 +62,9 @@ Aturan tambahan yang ikut diputuskan:
 - Biaya Rp0 (NF-07).
 
 **Yang harus diterima**
-- Paket gratis Supabase **dijeda bila tidak dipakai ±1 minggu**. Sebelum demo, aplikasi dibuka dulu (PRD 11).
-- Paket gratis punya batas (ukuran database, jumlah project). Untuk satu apotek dengan ±40 obat, batas itu jauh dari tercapai.
-- Vercel gratis hanya untuk non-komersial. Untuk project kuliah ini tidak masalah.
+- Paket gratis Supabase **dijeda bila tidak dipakai ±1 minggu** [1]. Project yang dijeda bisa dibangunkan lagi dari dasbor sampai 90 hari; lewat dari itu, data hanya bisa diambil dari cadangan [2]. Sebelum demo, aplikasi dibuka dulu (PRD 11).
+- Paket gratis punya batas: maksimal 2 project aktif dan database 500 MB per project [1]. Untuk satu apotek dengan ±40 obat, batas ukuran itu jauh dari tercapai. Sebagai pengaman, bentuk database dan data awal selalu disimpan di repo (SPEC 4.11, 4.12).
+- Paket gratis Vercel (Hobby) hanya untuk pemakaian pribadi non-komersial [4]. Untuk project kuliah ini tidak masalah.
 - Kelompok harus belajar SQL dan RLS. Ini sekaligus materi yang relevan dengan mata kuliah.
 - Bergantung pada layanan pihak ketiga. Risiko ini dikurangi karena Supabase berbasis PostgreSQL biasa: data dan migrasi bisa dipindah ke server PostgreSQL lain.
 
@@ -84,3 +84,12 @@ Laporan pendapatan per periode butuh menggabungkan beberapa tabel dan menjumlahk
 
 **"Aplikasi kecil begini kok pakai framework?"**
 Karena kebutuhannya bukan kecil: ada login dengan dua peran, aturan stok yang tidak boleh minus walau dua kasir menjual bersamaan, dan data yang harus sama di banyak perangkat. HTML biasa tidak sanggup menjamin itu, dan versi 1 sudah membuktikannya.
+
+## Sumber
+
+Dicek 9 Oktober 2026. Batas paket gratis bisa berubah sewaktu-waktu; cek ulang sebelum mengambil keputusan baru.
+
+1. Supabase, "Pricing." https://supabase.com/pricing
+2. Supabase Docs, "Project Pausing." https://supabase.com/docs/guides/platform/free-project-pausing
+3. Next.js Docs, "File-system conventions: proxy.js." https://nextjs.org/docs/app/api-reference/file-conventions/proxy
+4. Vercel Docs, "Hobby Plan." https://vercel.com/docs/plans/hobby
