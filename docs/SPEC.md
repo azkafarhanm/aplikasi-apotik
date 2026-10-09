@@ -364,7 +364,8 @@ Disepakati 7 Oktober 2026:
 |---|---|---|
 | Kapan dibuat | Saat tiket koding pertama dimulai | Project gratis dijeda bila ±7 hari tidak dipakai; tidak ada gunanya dibuat lebih awal |
 | Pemilik | Satu akun milik pemilik repo, login dengan akun GitHub yang 2FA-nya aktif | Tidak ada password bersama yang beredar di grup. Anggota kelompok menguji lewat akun Staf uji di aplikasi, bukan lewat dasbor |
-| Lokasi server | Singapura | Terdekat dengan Indonesia, membantu NF-05. Tidak bisa diubah setelah project dibuat |
+| Lokasi server database | Singapura | Terdekat dengan Indonesia, membantu NF-05. Tidak bisa diubah setelah project dibuat |
+| Lokasi server aplikasi (Vercel) | Singapura (`sin1`), diatur di `vercel.json` (9 Oktober 2026, #18) | Sekota dengan database: setiap pertanyaan ke database tidak perlu menyeberang AS ↔ Singapura. Bawaan Vercel adalah Washington (`iad1`). Tanpa server cadangan: fiturnya berbayar dan database juga hanya di Singapura. Hasil ukur: lihat PR #18 |
 | Jumlah project | Dua: `apotikku` (asli) dan `apotikku-uji` (khusus tes otomatis) | Paket gratis mengizinkan 2 project. Project uji bisa dipakai dari laptop, sesi cloud, dan GitHub Actions tanpa Docker |
 | Bila tertidur | Dasbor → Resume project (bisa sampai 90 hari). Lewat 90 hari: unduh cadangan atau bangun ulang dari migrasi + data awal di repo | Bentuk database dan data awal selalu tersimpan di repo |
 
