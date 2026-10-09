@@ -39,6 +39,11 @@ Keputusan yang lebih kecil, dicatat lengkap beserta jawaban untuk dosen di [`SPE
 | Detail obat punya alamat sendiri | Tombol Kembali di HP bekerja wajar, tautan bisa dikirim | Jendela di atas daftar saja | SPEC 4.2 |
 | Satu obat satu Keluhan (versi 1) | Cukup untuk data awal, jauh lebih sederhana | Tabel banyak-ke-banyak | SPEC 4.3 |
 | Satu titik uji otomatis: database | Semua aturan berisiko tinggal di sana; tampilan diuji manual dengan target terukur | Tes tampilan otomatis sejak awal | SPEC 5 |
+| Kunci Supabase **tidak** disimpan di pengaturan sesi cloud; migrasi dipasang lewat connector Supabase | Tidak ada kunci/password database yang beredar di luar akun pemilik; sesi cloud tetap bisa memasang migrasi | Menyimpan kunci akses atau password database di pengaturan environment cloud (bocor = database terbuka) | SPEC 4.12 |
+| Fungsi bantu (`status_stok`, `hari_ini`) di skema `private` | Tampilan `katalog` butuh fungsi itu dengan hak Pengunjung, tetapi Pengunjung tidak boleh memanggilnya langsung lewat internet | Fungsi di `public` (terbuka sebagai API); menyalin rumus Status stok ke dalam tampilan (aturan tidak lagi di satu tempat) | SPEC 4.3 |
+| Data uji tetap + jadwal pg_cron penyegar tanggal, hanya di project uji | Tes hanya memegang kunci publik, jadi tidak bisa membentuk ulang database; baris "kedaluwarsa hari ini" harus selalu benar | Memberi CI password database (kunci induk di luar akun pemilik); tes tanggal yang dilewati | SPEC 5.3 |
+| Halaman Katalog: kerangka disiapkan saat build, daftar obat diambil setiap kali dibuka (Next.js *Partial Prerender*) | Judul dan catatan tampil seketika (NF-05), Status stok tetap terbaru | Seluruh halaman disimpan di cache (stok bisa basi); seluruh halaman dibuat ulang (lebih lambat tampil) | SPEC 4.7, [penjelasan](penjelasan/01-katalog.md) |
+| TypeScript + CSS biasa (CSS Modules), tanpa Tailwind/UI kit | TypeScript menangkap salah ketik nama kolom sebelum aplikasi jalan; desain etiket dibuat sendiri (ADR 0004) sehingga UI kit tidak membantu | JavaScript biasa (kesalahan baru ketahuan saat jalan); Tailwind/Bootstrap (alat tambahan yang harus dipelajari, cenderung ke tampilan template) | [penjelasan](penjelasan/01-katalog.md) |
 
 ## Jawaban cepat untuk pertanyaan yang paling mungkin muncul
 
@@ -79,3 +84,12 @@ Istilah domain apotek (Penjualan, Obat keras, Status stok, dll.) ada di [`CONTEX
 | Branch | Salinan kerja terpisah untuk mengerjakan satu perubahan | Draf di kertas lain sebelum disalin ke buku utama |
 | Pull Request (PR) | Permintaan agar perubahan di branch digabung ke versi utama, sambil diperiksa | Menyerahkan draf ke ketua kelompok untuk dicek sebelum dimasukkan ke laporan |
 | Tag | Penanda versi tertentu di repo (misalnya `v1-html`) | Pembatas buku di halaman penting |
+| Tampilan (view) | "Jendela" ke tabel yang hanya memperlihatkan kolom tertentu | Etalase toko: harga terlihat, buku stok di gudang tidak |
+| Skema | Folder di dalam database untuk mengelompokkan tabel dan fungsi | Ruang depan toko (untuk pembeli) dan ruang belakang (untuk petugas) |
+| Connector | Sambungan resmi asisten koding ke layanan lain dengan izin pemilik akun | Surat kuasa bertanda tangan untuk kurir, bukan meminjamkan kunci rumah |
+| Publishable key | Nama baru Supabase untuk kunci publik (anon key) | Kartu tamu |
+| Variabel lingkungan | Pengaturan yang dibaca aplikasi saat berjalan, disimpan di luar kode | PIN brankas yang dihafal penjaga, bukan ditulis di pintu |
+| Secrets GitHub | Tempat menyimpan nilai rahasia/pengaturan untuk GitHub Actions; tidak terlihat di repo | Amplop tertutup yang hanya dibuka petugas QC |
+| pg_cron | Penjadwal tugas di dalam PostgreSQL | Alarm yang mengingatkan petugas mengganti kertas tanggal |
+| Server Component | Bagian halaman yang disusun di server, lalu dikirim ke HP sebagai HTML jadi | Makanan yang dimasak di dapur, pembeli menerima piring siap santap |
+| Prerender / cache | Menyiapkan halaman lebih dulu dan menyimpannya untuk dipakai ulang | Fotokopi brosur: cepat dibagikan, tetapi isinya tidak berubah sampai dicetak ulang |
