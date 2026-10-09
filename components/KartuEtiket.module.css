@@ -1,0 +1,135 @@
+/* Kartu etiket: kertas label dengan garis tepi tipis, garis putus-putus
+   seperti potongan label, dan bayangan tipis seperti kertas ditempel. */
+.kartu {
+  background: var(--etiket);
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 0 var(--garis),
+    0 3px 8px rgb(70 50 10 / 0.08);
+  position: relative;
+}
+
+/* Garis putus-putus di dalam tepi, seperti etiket yang dicetak. */
+.kartu::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--garis);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.kepala {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem 0.45rem;
+  border-bottom: 1.5px solid var(--hijau-apotek);
+  margin: 0 0.45rem;
+}
+
+.keluhan {
+  font-family: var(--huruf-judul);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hijau-apotek);
+}
+
+.satuan {
+  font-size: 0.85rem;
+  color: var(--tinta-lembut);
+  text-align: right;
+}
+
+.badan {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.8rem 0.9rem 0.7rem 1.35rem;
+}
+
+.nama {
+  font-family: var(--huruf-judul);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.bentuk {
+  margin: 0.15rem 0 0;
+  font-size: 0.95rem;
+  color: var(--tinta-lembut);
+}
+
+.golongan {
+  margin: 0.45rem 0 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.kaki {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0.45rem;
+  padding: 0.6rem 0.9rem 0.75rem;
+  border-top: 1.5px dashed var(--garis);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Status stok tidak memakai hijau, biru, atau merah, karena warna itu milik
+   golongan obat (ADR 0004). Bentuk titiknya juga berbeda, supaya tidak
+   bergantung pada warna saja. */
+.titikStatus {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: currentColor;
+}
+
+.kartu[data-status="tersedia"] .status {
+  color: var(--hijau-apotek);
+}
+
+.kartu[data-status="hampir_habis"] .status {
+  color: var(--hampir-habis);
+}
+
+.kartu[data-status="hampir_habis"] .titikStatus {
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+
+.kartu[data-status="habis"] .status {
+  color: var(--habis);
+}
+
+.kartu[data-status="habis"] .titikStatus {
+  background: transparent;
+}
+
+.kartu[data-status="habis"] {
+  background: var(--etiket-habis);
+}
+
+.harga {
+  font-family: var(--huruf-angka);
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}

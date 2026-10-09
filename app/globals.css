@@ -1,0 +1,41 @@
+/* Warna dan huruf "etiket apotek" (ADR 0004). Tanpa mode gelap. */
+:root {
+  --kertas: #f4efe2;
+  --etiket: #fffcf3;
+  --etiket-habis: #f1eee6;
+  --tinta: #1c211e;
+  --tinta-lembut: #4a514c;
+  --garis: #c8bea4;
+  --hijau-apotek: #1f4a36;
+  --hampir-habis: #8a5200;
+  --habis: #63645e;
+
+  /* Warna golongan obat: hanya untuk logo golongan, tidak untuk hal lain. */
+  --golongan-bebas: #1f9a43;
+  --golongan-bebas-terbatas: #1d5fbf;
+  --golongan-keras: #d4232b;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--kertas);
+  color: var(--tinta);
+  font-family: var(--huruf-isi), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 3px solid var(--hijau-apotek);
+  outline-offset: 2px;
+}
