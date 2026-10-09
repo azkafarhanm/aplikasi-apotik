@@ -98,6 +98,8 @@ Bila database tidak bisa dihubungi, halaman tidak rusak. Pengunjung melihat "Kat
 
 ## 6. Tampilan kartu etiket
 
+<img src="gambar/katalog-hp-360.png" alt="Katalog di layar HP 360 px: papan nama hijau, catatan informasi umum, lalu kartu etiket Antasida DOEN, Asam Mefenamat, Dekstrometorfan (Habis), dan Gentamisin" width="300">
+
 Mengikuti ADR 0004:
 
 - Logo golongan digambar sebagai SVG (gambar dari garis dan lingkaran, tajam di layar mana pun) sesuai penandaan resmi: lingkaran bergaris tepi hitam; merah untuk Obat keras dengan huruf K yang menyentuh garis tepi.
