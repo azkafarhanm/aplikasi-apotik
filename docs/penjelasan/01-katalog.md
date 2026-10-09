@@ -17,6 +17,8 @@ HP Pengunjung ──1──▶ Vercel (Next.js) ──2──▶ Supabase: tampi
 
 *Analogi:* restoran. Pelayan (Next.js) langsung menaruh piring dan sendok (kerangka halaman), lalu mengambil masakan dari dapur (database). Dapur hanya mengeluarkan masakan lewat jendela saji (`katalog`), bukan membuka gudang bahan.
 
+**Server Vercel dan database sama-sama di Singapura.** Server diatur di `vercel.json` (`"regions": ["sin1"]`). Tanpa pengaturan ini, Vercel menjalankan server di Washington, AS, sehingga langkah 2 dan 3 harus menyeberang AS ↔ Singapura setiap kali halaman dibuka. *Analogi:* kasir di Jakarta yang setiap mengecek stok harus menelepon gudang di Amerika; gudangnya kami pindah ke sebelah toko.
+
 Langkah 2–4 terjadi **setiap kali** halaman dibuka, jadi Status stok selalu sesuai keadaan terakhir di database.
 
 ## 2. Peta file
