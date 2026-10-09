@@ -20,7 +20,7 @@ Sementara itu, ada masalah yang justru bisa dibantu tampilan:
 
 Konsep visual **"etiket apotek"**: tampilan meminjam bahasa visual yang sudah akrab bagi orang Indonesia, yaitu etiket (label) yang ditempel apoteker di kemasan obat, kemasan obat generik, dan papan apotek.
 
-> **Etiket** = label kecil dari apotek berisi nama obat dan aturan pakai. Etiket putih untuk obat diminum, biru untuk obat luar.
+> **Etiket** = label kecil dari apotek berisi nama obat dan aturan pakai. Etiket putih untuk obat dalam (diminum), biru untuk obat luar, sesuai kebiasaan standar pelayanan kefarmasian di apotek [2], [3].
 > *Analogi untuk konsep ini:* seperti kafe yang dekorasinya meniru warung kopi lama. Pengunjung langsung paham "ini tempat apa" tanpa harus membaca papan nama.
 
 | Elemen | Wujud | Alasan |
@@ -28,7 +28,7 @@ Konsep visual **"etiket apotek"**: tampilan meminjam bahasa visual yang sudah ak
 | Warna dasar | Off-white (putih kekuningan seperti kertas etiket), bukan putih murni | Lebih nyaman di mata dan terasa "kertas", tidak dingin seperti layar |
 | Warna utama | Hijau apotek tua | Warna yang lazim dipakai papan apotek di Indonesia; terasa tepercaya, bukan warna startup |
 | Kartu obat | Berbentuk etiket: garis tepi, nama obat tegas, tanpa foto | Data awal tidak punya foto berlisensi; kartu tanpa foto juga lebih ringan dimuat di HP (NF-05) dan seragam |
-| **Tanda golongan obat** | Lingkaran hijau, biru, dan merah-K dipakai sebagai elemen visual utama di setiap kartu, **selalu disertai teks** ("Obat bebas", "Perlu resep dokter") | Setiap kali Pengunjung mencari obat, ia ikut belajar membaca logo golongan (M-06). Teks wajib ada karena ±1 dari 12 laki-laki buta warna, jadi warna tidak boleh menjadi satu-satunya penanda |
+| **Tanda golongan obat** | Lingkaran hijau, biru, dan merah-K dipakai sebagai elemen visual utama di setiap kartu, **selalu disertai teks** ("Obat bebas", "Perlu resep dokter") | Setiap kali Pengunjung mencari obat, ia ikut belajar membaca logo golongan (M-06). Teks wajib ada karena sekitar 1 dari 12 laki-laki dan 1 dari 200 perempuan buta warna [1], jadi warna tidak boleh menjadi satu-satunya penanda |
 | Harga | Huruf monospace (setiap angka sama lebar) | Angka lurus sejajar sehingga mudah dibandingkan, dan mengingatkan pada cetakan struk/label harga |
 | Tekstur | Tidak flat: garis putus-putus seperti potongan label, bayangan tipis seperti kertas ditempel | Memberi karakter tanpa mengganggu keterbacaan |
 | Tata letak | Katalog untuk HP lebih dulu; layar kasir untuk laptop/tablet | Sesuai perangkat masing-masing aktor (NF-04) |
@@ -93,3 +93,11 @@ Pertanyaan: *"Seperti apa Katalog etiket apotek paling enak dipakai di HP?"* Tig
 
 **Kalau dosen bertanya "kenapa tidak pakai daftar harga saja (variasi C), kan lebih padat?"**
 Daftar padat memudahkan membandingkan harga, tetapi Pengunjung kami kebanyakan orang awam yang membuka dari HP dan sering hanya tahu keluhannya, bukan nama obatnya. Laci Keluhan menjawab kebutuhan itu, dan kartu etiket menampilkan tanda golongan dengan teks yang lebih besar, sehingga edukasi golongan obat (M-06) tetap jalan.
+
+## Sumber
+
+Dicek 9 Oktober 2026.
+
+1. Colour Blind Awareness, dikutip dalam "1 in 12 men and 1 in 200 women are colour blind," Centre for Male Psychology. https://www.centreformalepsychology.com/male-psychology-magazine-listings/1-in-12-men-and-1-in-200-women-are-colour-blind-but-colour-blindness-can-impact-anybody-at-any-time. Angka ini perkiraan umum yang dipakai organisasi kesadaran buta warna, bukan hasil satu penelitian tertentu.
+2. M. R. Rokhman, "Etiket Obat," Universitas Gadjah Mada, 2014. https://m-rifqi-rokhman.staff.ugm.ac.id/2014/03/09/etiket-obat/
+3. Universitas Airlangga, "Pentingkan Standar Pelabelan Obat (Etiket) pada Pelayanan Obat dengan Resep di Apotek?" https://unair.ac.id/pentingkan-standar-pelabelan-obat-etiket-pada-pelayanan-obat-dengan-resep-di-apotek/ (merujuk Permenkes No. 73 Tahun 2016 tentang Standar Pelayanan Kefarmasian di Apotek)

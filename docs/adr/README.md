@@ -12,5 +12,5 @@ Setiap file di folder ini mencatat **satu** keputusan penting: konteks, keputusa
 ## Aturan menulis ADR baru
 
 1. Nomor urut berikutnya, nama file `NNNN-judul-singkat.md`.
-2. ADR yang sudah diterima **tidak diedit isinya**. Kalau keputusan berubah, tulis ADR baru dan ubah status yang lama menjadi "Digantikan oleh ADR NNNN".
+2. ADR yang sudah diterima **tidak diedit isinya**. Kalau keputusan berubah, tulis ADR baru dan ubah status yang lama menjadi "Digantikan oleh ADR NNNN". Menambah sumber atau meluruskan fakta pendukung tanpa mengubah keputusan boleh dilakukan langsung.
 3. Setiap istilah teknis diberi arti awam dan analogi.

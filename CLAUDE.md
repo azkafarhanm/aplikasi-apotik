@@ -38,6 +38,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 3. ~~Prototipe visual katalog "etiket apotek"~~ (selesai 6 Okt 2026: kartu etiket + laci Keluhan, lihat ADR 0004)
 4. ~~`docs/SPEC.md`~~ (selesai 7 Okt 2026: skema, route, RLS, fungsi database, rencana uji)
 5. ~~Tiket di GitHub Issues~~ (selesai 8 Okt 2026: induk #1, tiket #2–#14, label `siap-dikerjakan`)
-6. Tugas dosen Sabtu 10 Okt (lihat di bawah), lalu koding mulai dari #2; akun Supabase dibuat saat itu (SPEC 4.12)
+6. ~~Tugas individu Sesi 2: Study Case SDLC~~ (selesai 8 Okt 2026: model Incremental, `docs/sesi/sesi-02-sdlc-incremental.md`; PDF bernama dibuat di luar repo)
+7. Koding mulai dari #2; akun Supabase dibuat saat itu (SPEC 4.12)
 
-Tugas berikutnya dari dosen (batas Sabtu 10 Okt 2026): *Study Case Proses Pembangunan Perangkat Lunak* dan *Case Kelompok*. Bahannya disusun di `docs/sesi/`.
+Bahan tugas dari dosen disusun di `docs/sesi/` tanpa nama/NIM; PDF yang memuat identitas dibuat di luar repo memakai template dosen.
