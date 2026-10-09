@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| Versi | 1.0, 7 Oktober 2026 |
+| Versi | 1.1, 9 Oktober 2026 (tiket #2: skema `private`, kunci lewat connector, data uji) |
 | Status | Siap dipecah menjadi tiket (langkah 5) |
 | Dasar | PRD 1.0, ADR 0001–0004, prototipe Katalog (kartu etiket + laci Keluhan) |
 
@@ -251,6 +251,10 @@ Obat dianggap **Segera kedaluwarsa** bila tanggal kedaluwarsanya hari ini sampai
 
 Isinya hanya obat yang tidak diarsipkan, dengan kolom: `slug`, `nama`, `bentuk`, `keluhan`, `golongan`, `satuan_jual`, `isi_per_satuan`, `kegunaan`, `harga_jual`, dan `status_stok`. **Tidak ada** `stok`, `harga_acuan`, atau tanggal kedaluwarsa.
 
+**Fungsi bantu tinggal di skema `private`** (ditambahkan 9 Oktober 2026, tiket #2): `status_stok`, `hari_ini`, dan fungsi pembentuk slug. PostgreSQL mengecek izin *fungsi* di dalam tampilan memakai hak si pembaca, bukan hak pemilik tampilan, jadi Pengunjung perlu izin menjalankan `status_stok`. Karena Supabase hanya membuka skema `public` ke internet, fungsi di `private` tetap tidak bisa dipanggil langsung dari luar (sesuai SPEC 5.2), tetapi bisa dipakai tampilan `katalog`. Fungsi yang memang dipanggil aplikasi (`catat_penjualan`, dll.) tetap di `public`.
+
+> **Skema** = folder di dalam database untuk mengelompokkan tabel dan fungsi. *Analogi:* ruang depan toko (dibuka untuk pembeli) dan ruang belakang (hanya untuk petugas).
+
 Pengunjung tidak diberi izin membaca tabel `obat` sama sekali. Tampilan ini berjalan dengan hak pemiliknya, sehingga bisa menghitung Status stok dari kolom `stok` tanpa membocorkan angka stoknya. Alat pemeriksa Supabase akan memberi peringatan untuk tampilan seperti ini. Peringatan itu disengaja dan dicatat di migrasi, karena tampilan ini justru dirancang sebagai satu-satunya pintu yang aman untuk Pengunjung.
 
 ### 4.4 Fungsi database
@@ -364,7 +368,15 @@ Disepakati 7 Oktober 2026:
 | Jumlah project | Dua: `apotikku` (asli) dan `apotikku-uji` (khusus tes otomatis) | Paket gratis mengizinkan 2 project. Project uji bisa dipakai dari laptop, sesi cloud, dan GitHub Actions tanpa Docker |
 | Bila tertidur | Dasbor → Resume project (bisa sampai 90 hari). Lewat 90 hari: unduh cadangan atau bangun ulang dari migrasi + data awal di repo | Bentuk database dan data awal selalu tersimpan di repo |
 
-**Kunci Supabase:** alamat project dan kunci publik (anon key) disimpan sebagai variabel lingkungan: di file lokal yang tidak ikut ke repo, di pengaturan Vercel, dan di *secrets* GitHub Actions untuk project uji. Kunci rahasia (service role key) tidak disimpan di mana pun dalam aplikasi atau repo. Akun Staf uji dibuat sekali lewat dasbor.
+**Kunci Supabase** (diperbarui 9 Oktober 2026, tiket #2): alamat project dan kunci publik (*publishable key*, nama baru untuk anon key) disimpan sebagai variabel lingkungan di tiga tempat saja: file `.env.local` di laptop (tidak ikut ke repo, contohnya di `.env.example`), pengaturan Vercel, dan *secrets* GitHub Actions untuk project uji. **Tidak ada kunci atau password database di pengaturan environment sesi cloud.** Migrasi dan data dipasang lewat connector Supabase yang tersambung ke akun pemilik repo, jadi sesi cloud tidak perlu memegang kunci apa pun. Kunci rahasia (service role / secret key) tidak disimpan di mana pun dalam aplikasi atau repo. Akun Staf uji dibuat sekali lewat dasbor.
+
+> **Connector** = sambungan resmi antara asisten koding dan layanan lain (di sini Supabase) yang izinnya diberikan pemilik akun, bukan lewat kunci yang ditempel. *Analogi:* memberi kurir surat kuasa bertanda tangan untuk mengambil paket, bukan meminjamkan kunci rumah.
+
+| File di repo | Isi | Dipasang di |
+|---|---|---|
+| `supabase/migrations/*.sql` | Bentuk database (tabel, fungsi, tampilan, RLS), berurutan | Kedua project |
+| `supabase/data/contoh.sql` | Data contoh Katalog (diganti data awal lengkap di tiket #7) | `apotikku` |
+| `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal | `apotikku-uji` saja |
 
 > **Variabel lingkungan** = pengaturan yang dibaca aplikasi saat berjalan, disimpan di luar kode. *Analogi:* PIN brankas yang dihafal penjaga, bukan ditulis di pintu brankas.
 
@@ -417,8 +429,12 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 
 ### 5.3 Alat dan tempat menjalankan
 
-- **Database uji** terpisah dari database asli. Pilihan utama: Supabase yang dijalankan di laptop lewat Supabase CLI (perlu Docker). Cadangan bila laptop tidak kuat: satu project Supabase gratis kedua khusus uji. Keduanya Rp0.
-- **Alat tes**: Vitest (penjalan tes untuk JavaScript/TypeScript) + `supabase-js`. Sebelum tes berjalan, database uji dibentuk ulang dari migrasi dan diisi data uji yang tetap, supaya setiap kali hasilnya sama.
+- **Database uji** terpisah dari database asli: project Supabase gratis kedua `apotikku-uji` (SPEC 4.12), sehingga tes bisa dijalankan dari laptop, sesi cloud, dan GitHub Actions tanpa Docker.
+- **Alat tes**: Vitest (penjalan tes untuk JavaScript/TypeScript) + `supabase-js`. Tes hanya memegang kunci publik, jadi tes **tidak** membentuk ulang database. Database uji dibentuk dari migrasi yang sama dan diisi data uji yang tetap (`supabase/uji/data-uji.sql`) setiap kali ada migrasi baru, lewat connector Supabase.
+- **Tanggal yang bergeser**: tes "kedaluwarsa kemarin" dan "kedaluwarsa hari ini" butuh tanggal yang selalu relatif terhadap hari ini (WIB). Project uji punya jadwal kecil (pg_cron) yang menyegarkan dua baris itu setiap menit. Jadwal ini hanya ada di project uji, tidak di project asli.
+- **Tes yang mengubah data** (Penjualan, kelola obat) mulai tiket #6 dan #8 berjalan sebagai Staf uji dan membersihkan atau memakai data miliknya sendiri, supaya tes bisa diulang.
+
+> **pg_cron** = penjadwal tugas di dalam PostgreSQL. *Analogi:* alarm yang setiap menit mengingatkan petugas mengganti kertas tanggal di papan.
 - **Dijalankan otomatis** setiap ada Pull Request lewat GitHub Actions (gratis untuk repo publik), supaya perubahan yang merusak aturan ketahuan sebelum digabung.
 
 > **GitHub Actions** = layanan GitHub yang menjalankan perintah otomatis setiap ada perubahan. *Analogi:* petugas QC di pabrik yang memeriksa setiap barang sebelum masuk gudang.
@@ -470,3 +486,9 @@ Karena semua aturan yang kalau salah merugikan (hak akses, stok, harga, laporan)
 
 **"Kenapa satu obat hanya satu Keluhan?"**
 Data awal kami tidak membutuhkan lebih, dan satu kolom jauh lebih sederhana. Bila nanti dibutuhkan, bisa diubah lewat migrasi baru tanpa merombak aplikasi.
+
+**"Kenapa `status_stok` disimpan di skema `private`, bukan `public`?"**
+Karena tampilan `katalog` dibaca Pengunjung, dan PostgreSQL mengecek izin fungsi di dalam tampilan memakai hak Pengunjung. Jadi Pengunjung harus boleh menjalankan `status_stok`. Kalau fungsinya di `public`, Supabase otomatis membukanya sebagai alamat API, dan siapa pun bisa memanggilnya langsung. Di `private`, fungsi itu hanya bisa dipakai dari dalam database. Kesalahan ini justru ditemukan oleh tes otomatis pertama kami.
+
+**"Kalau tes cuma memegang kunci publik, bagaimana data ujinya selalu benar?"**
+Data uji dipasang sekali lewat connector Supabase dan tidak bisa diubah Pengunjung (itu juga yang diuji). Dua baris yang tanggalnya harus selalu "kemarin" dan "hari ini" disegarkan oleh jadwal pg_cron setiap menit, hanya di project uji.

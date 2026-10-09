@@ -1,0 +1,27 @@
+# Menjalankan tes database (Vitest + supabase-js) untuk setiap Pull Request,
+# memakai project Supabase apotikku-uji. Alamat dan kunci publiknya disimpan
+# sebagai secrets GitHub: SUPABASE_UJI_URL dan SUPABASE_UJI_PUBLISHABLE_KEY.
+name: Tes database
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+        env:
+          SUPABASE_UJI_URL: ${{ secrets.SUPABASE_UJI_URL }}
+          SUPABASE_UJI_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_UJI_PUBLISHABLE_KEY }}
