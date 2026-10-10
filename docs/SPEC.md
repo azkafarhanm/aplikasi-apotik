@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| Versi | 1.1, 9 Oktober 2026 (tiket #2: skema `private`, kunci lewat connector, data uji) |
+| Versi | 1.2, 10 Oktober 2026 (tiket #6: proxy hanya cek login, `peran_saya` di `private`, Keluar dengan muat ulang penuh) |
 | Status | Siap dipecah menjadi tiket (langkah 5) |
 | Dasar | PRD 1.0, ADR 0001–0004, prototipe Katalog (kartu etiket + laci Keluhan) |
 
@@ -130,7 +130,8 @@ Semua aturan penting (siapa boleh apa, stok tidak boleh minus, harga diambil dar
 |---|---|---|
 | **Halaman Katalog** | Menampilkan daftar dan detail obat dari tampilan database `katalog`; menyaring di HP Pengunjung | Pengunjung |
 | **Halaman Area staf** | Layar Jual, Penjualan hari ini, Struk, Ringkasan, Obat, Laporan | Kasir, Admin |
-| **Proxy (satpam halaman)** | Memperbarui sesi login dan mengarahkan yang belum login dari `/staf/*` ke `/masuk`; mengarahkan Kasir yang membuka halaman khusus Admin ke layar Jual | Semua |
+| **Proxy (satpam halaman)** | Memperbarui sesi login, mengarahkan yang belum login dari `/staf/*` ke `/masuk`, dan yang sudah login dari `/masuk` ke `/staf`. Hanya berjalan di `/staf/*` dan `/masuk` | Staf |
+| **Pengecek Staf (`lib/staf.ts`)** | Dipanggil setiap halaman `/staf/*`: membaca profil Staf yang login, menampilkan menu sesuai peran, dan mengarahkan Kasir yang membuka halaman khusus Admin ke layar Jual | Kasir, Admin |
 | **Penghubung Supabase** | Dua jenis: untuk browser dan untuk server. Keduanya memakai kunci publik (anon key) dan sesi Staf yang login, sehingga RLS selalu berlaku. Sesi disimpan di cookie lewat pustaka resmi `@supabase/ssr` | Semua |
 | **Database** | Tabel, tampilan `katalog`, fungsi database, dan aturan RLS. **Semua aturan bisnis yang wajib benar tinggal di sini** | Semua |
 
@@ -157,7 +158,7 @@ Kunci rahasia Supabase (service role key) **tidak pernah** dipakai di aplikasi (
 | `/staf/obat/[id]` | Ubah, arsipkan, atau kembalikan obat | Admin | F-10, F-13 |
 | `/staf/laporan` | Laporan per periode, siap cetak | Admin | F-11 |
 
-Keluar (logout) adalah tombol di semua halaman `/staf/*`, bukan halaman tersendiri.
+Keluar (logout) adalah tombol di semua halaman `/staf/*`, bukan halaman tersendiri. Tombol itu mengirim formulir ke `POST /keluar` (Route Handler), yang mengakhiri sesi lalu membuka `/masuk?keluar=1` dengan muat ulang penuh (alasannya di 4.6). Katalog punya tautan kecil "Masuk Staf" di bagian bawah; tautan ini bukan pengamanan, karena Area staf dijaga login dan RLS.
 
 - `slug` = versi nama obat yang aman untuk alamat web, misalnya `parasetamol-500-mg`. Dibuat otomatis dari nama saat obat ditambahkan dan tidak berubah walau nama diubah, supaya tautan yang sudah dibagikan tetap jalan.
 - **Detail obat punya alamat sendiri** (bukan sekadar jendela di atas daftar seperti di prototipe), supaya tombol Kembali di HP bekerja wajar dan tautannya bisa dikirim lewat WhatsApp (user story 14 dan 15). Tampilannya tetap etiket seperti di prototipe.
@@ -265,7 +266,7 @@ Semua fungsi di bawah **mengecek sendiri** siapa pemanggilnya (Staf aktif? Admin
 
 | Fungsi | Dipanggil oleh | Yang dilakukan | Ditolak bila… |
 |---|---|---|---|
-| `peran_saya()` | Aturan RLS | Mengembalikan `admin`/`kasir` untuk Staf aktif yang sedang login, atau kosong | (tidak pernah menolak; dipakai sebagai alat bantu) |
+| `private.peran_saya()` | Aturan RLS | Mengembalikan `admin`/`kasir` untuk Staf aktif yang sedang login, atau kosong | (tidak pernah menolak; dipakai sebagai alat bantu). Tinggal di skema `private` sehingga tidak bisa dipanggil lewat API; berjalan dengan hak pemiliknya (*security definer*) karena aturan RLS `profil_staf` sendiri memakainya |
 | `catat_penjualan(keranjang, metode_bayar, uang_diterima, cek_resep)` | Layar Jual | Mengunci baris obat yang dibeli, mengecek semuanya, mengambil harga dari database, menghitung total dan kembalian, menyimpan Penjualan + Item penjualan, mengurangi stok. Mengembalikan nomor Penjualan | Bukan Staf aktif; keranjang kosong; jumlah ≤ 0; obat diarsipkan, Habis, atau Sudah kedaluwarsa; stok kurang; ada Obat keras tetapi `cek_resep` tidak dicentang; tunai tetapi uang kurang; QRIS/transfer tetapi uang diterima diisi |
 | `batalkan_penjualan(nomor, alasan)` | Halaman Penjualan (Admin) | Mengubah status menjadi Dibatalkan, mencatat siapa, kapan, dan alasannya, lalu mengembalikan stok setiap Item penjualan | Bukan Admin; Penjualan tidak ada; sudah Dibatalkan; alasan kosong |
 | `ringkasan()` | Halaman Ringkasan (Admin) | Pendapatan dan jumlah Penjualan hari ini, daftar Hampir habis, Segera kedaluwarsa, Sudah kedaluwarsa | Bukan Admin |
@@ -289,7 +290,7 @@ Detail penting `catat_penjualan`:
 | Tabel `obat` | Baca | ❌ | ✅ (yang tidak diarsipkan) | ✅ (semua) |
 | | Tambah / ubah | ❌ | ❌ (stok berkurang 🔧 lewat Penjualan) | ✅ |
 | | Hapus | ❌ | ❌ | ❌ (pakai Arsipkan) |
-| Tabel `profil_staf` | Baca | ❌ | ✅ (miliknya) | ✅ (semua) |
+| Tabel `profil_staf` | Baca | ❌ | ✅ (miliknya, juga bila nonaktif) | ✅ (semua) |
 | | Tambah / ubah / hapus | ❌ | ❌ | ❌ (lewat dasbor Supabase sampai milestone 2) |
 | Tabel `penjualan` | Baca | ❌ | ✅ (miliknya, hari ini) | ✅ (semua) |
 | | Tambah | ❌ | 🔧 `catat_penjualan` | 🔧 `catat_penjualan` |
@@ -309,7 +310,18 @@ Semua aturan RLS dipasang **di migrasi pertama**, sebelum ada fitur (ADR 0003).
 - Sesi disimpan di cookie oleh `@supabase/ssr` dan diperbarui oleh proxy setiap kali halaman dibuka.
 - Keluar memanggil fungsi keluar Supabase, yang menghapus cookie sesi (memperbaiki kelemahan v1 no. 3).
 - Pesan gagal login selalu sama: "Email atau password salah."
-- Akun Staf yang `aktif`-nya dimatikan masih bisa login, tetapi semua fungsi dan data menolaknya. Halaman menampilkan "Akun ini sudah tidak aktif. Hubungi Admin."
+- Akun Staf yang `aktif`-nya dimatikan masih bisa login, tetapi semua fungsi dan data menolaknya. Halaman menampilkan "Akun ini sudah tidak aktif. Hubungi Admin." Staf nonaktif tetap boleh membaca profilnya sendiri supaya halaman tahu harus menampilkan pesan ini. Akun login yang profilnya belum dipasang diperlakukan sama.
+
+Ditambahkan 10 Oktober 2026 (tiket #6):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Pembagian tugas proxy | Proxy hanya mengecek "sudah login atau belum" (memeriksa tanda tangan token, tanpa bertanya ke database). Peran dicek halaman lewat `lib/staf.ts` | Panduan Next.js 16 melarang proxy dipakai untuk mengambil data atau sebagai satu-satunya penentu hak akses. Halaman memang harus membaca profil (nama, menu, pesan nonaktif), jadi satu kali baca dipakai sekaligus untuk peran | Proxy membaca peran dari database di setiap halaman (satu pertanyaan tambahan ke database, padahal halaman membaca data yang sama) |
+| Proxy hanya di `/staf/*` dan `/masuk` | Katalog tidak lewat proxy | Pengunjung tidak butuh sesi; Katalog tetap secepat sebelumnya (NF-05) | Proxy di semua alamat (cara bawaan contoh Supabase) |
+| Formulir masuk | Server Action | Diproses di server, cookie ditulis server, tetap jalan walau JavaScript belum termuat | Login lewat JavaScript di browser |
+| Pesan gagal | Semua kesalahan data masuk (kode 4xx) → "Email atau password salah."; gangguan server (5xx) → "Sedang tidak bisa masuk. Coba lagi sebentar lagi." | Orang asing tidak bisa menebak email Staf, tetapi Staf tidak mengira passwordnya salah saat server bermasalah | Satu pesan untuk semua keadaan |
+| Keluar | Formulir biasa ke `POST /keluar`, lalu muat ulang penuh ke `/masuk?keluar=1`. Sesi yang diakhiri hanya di perangkat itu (scope `local`) | Next.js 16 menyimpan halaman yang baru dikunjungi secara tersembunyi di memori browser. Ditemukan saat uji di browser: setelah Keluar lewat Server Action, isi halaman Staf masih tersimpan tersembunyi di halaman `/masuk`. Muat ulang penuh menghapusnya | Server Action (isi halaman lama tertinggal di memori); keluar dari semua perangkat (Admin di tablet ikut terlempar) |
+| Tombol Kembali setelah Keluar | Halaman `/staf/*` dikirim dengan `Cache-Control: private, no-store` | Browser tidak menyimpan salinan halaman Staf, jadi Kembali selalu bertanya ke server dan diarahkan ke `/masuk` | Mengandalkan cache bawaan browser |
 
 ### 4.7 Katalog (dari prototipe)
 
@@ -351,7 +363,7 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 ### 4.11 Data awal
 
 - **±40 obat generik** yang tersebar di 6 Keluhan, dengan harga acuan dari Keputusan Menteri Kesehatan tentang HET obat generik (PRD sumber [9]) dan golongan dicek ke sumber resmi BPOM. Setiap obat di data awal mencatat sumber harga acuannya. Harga jual awal = harga acuan (aturan bisnis 5). Stok dan tanggal kedaluwarsa dibuat beragam supaya semua Status stok dan keadaan kedaluwarsa muncul saat demo.
-- **Dua akun uji** (satu Admin, satu Kasir) dengan email umum seperti `admin@apotikku.test`. Password tidak disimpan di repo.
+- **Akun uji**: di `apotikku`, `admin@apotikku.test` (Admin) dan `kasir@apotikku.test` (Kasir); di `apotikku-uji` ditambah `nonaktif@apotikku.test` (Kasir nonaktif) untuk tes Staf nonaktif. Akun dibuat pemilik project lewat dasbor, profilnya dipasang dengan `supabase/data/profil-staf.sql` (asli) dan `supabase/uji/data-uji.sql` (uji). Password tidak disimpan di repo dan tidak dikirim lewat chat: password akun uji disimpan di secrets GitHub dan `.env.local` (`SUPABASE_UJI_ADMIN_PASSWORD`, `SUPABASE_UJI_KASIR_PASSWORD`, `SUPABASE_UJI_NONAKTIF_PASSWORD`).
 - Data awal ditulis sebagai file SQL terpisah dari migrasi, supaya bisa dipasang ulang kapan saja.
 
 > **Migrasi** = file berurutan berisi perubahan bentuk database. *Analogi:* resep langkah demi langkah; siapa pun yang mengikutinya mendapat database yang sama (ADR 0001).
@@ -377,7 +389,8 @@ Disepakati 7 Oktober 2026:
 |---|---|---|
 | `supabase/migrations/*.sql` | Bentuk database (tabel, fungsi, tampilan, RLS), berurutan | Kedua project |
 | `supabase/data/contoh.sql` | Data contoh Katalog (diganti data awal lengkap di tiket #7) | `apotikku` |
-| `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal | `apotikku-uji` saja |
+| `supabase/data/profil-staf.sql` | Profil akun Staf (peran, nama tampilan); akunnya dibuat di dasbor dulu | `apotikku` |
+| `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal + profil tiga akun Staf uji | `apotikku-uji` saja |
 
 > **Variabel lingkungan** = pengaturan yang dibaca aplikasi saat berjalan, disimpan di luar kode. *Analogi:* PIN brankas yang dihafal penjaga, bukan ditulis di pintu brankas.
 
@@ -396,11 +409,13 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 **Hak akses (NF-01)**
 - Pengunjung bisa membaca `katalog`, dan kolomnya tidak memuat stok, harga acuan, atau tanggal kedaluwarsa.
 - Pengunjung tidak bisa membaca `obat`, `penjualan`, `item_penjualan`, `profil_staf`, dan tidak bisa menambah atau mengubah apa pun.
-- Pengunjung tidak bisa memanggil fungsi apa pun selain membaca `katalog`.
+- Pengunjung tidak bisa memanggil fungsi apa pun selain membaca `katalog`, termasuk fungsi bawaan Supabase `rls_auto_enable()` (ditolak dengan kode izin, bukan sekadar gagal di tengah jalan).
+- Pendaftaran akun umum tertutup (`disable_signup` di pengaturan Auth).
+- Kasir hanya membaca profilnya sendiri; Admin membaca semua; tidak ada yang bisa menambah, mengubah, atau menghapus `profil_staf` dari aplikasi.
 - Kasir tidak bisa mengubah `obat` secara langsung (termasuk harga dan stok).
 - Kasir tidak bisa melihat Penjualan Kasir lain atau Penjualan kemarin.
 - Kasir tidak bisa memanggil `batalkan_penjualan`, `ringkasan`, `laporan_pendapatan`.
-- Staf yang dinonaktifkan ditolak semua fungsi.
+- Staf yang dinonaktifkan ditolak semua fungsi dan tidak bisa membaca `obat`.
 - Obat yang diarsipkan tidak muncul di `katalog` dan tidak terbaca Kasir.
 
 **Penjualan (NF-06, F-06, F-12)**
@@ -490,6 +505,12 @@ Data awal kami tidak membutuhkan lebih, dan satu kolom jauh lebih sederhana. Bil
 
 **"Kenapa `status_stok` disimpan di skema `private`, bukan `public`?"**
 Karena tampilan `katalog` dibaca Pengunjung, dan PostgreSQL mengecek izin fungsi di dalam tampilan memakai hak Pengunjung. Jadi Pengunjung harus boleh menjalankan `status_stok`. Kalau fungsinya di `public`, Supabase otomatis membukanya sebagai alamat API, dan siapa pun bisa memanggilnya langsung. Di `private`, fungsi itu hanya bisa dipakai dari dalam database. Kesalahan ini justru ditemukan oleh tes otomatis pertama kami.
+
+**"Kenapa peran tidak dicek di proxy saja, seperti rencana awal?"**
+Panduan resmi Next.js 16 menyebut proxy bukan untuk mengambil data dan tidak boleh jadi satu-satunya penentu hak akses. Proxy kami hanya mengecek "sudah login atau belum" tanpa bertanya ke database, jadi cepat. Halaman memang harus membaca profil Staf untuk menampilkan nama dan menu, jadi pengecekan peran ikut di sana. Penjaga datanya tetap RLS.
+
+**"Kenapa Keluar memuat ulang seluruh halaman? Bukankah aplikasi modern tidak perlu memuat ulang?"**
+Kami menemukannya saat menguji di browser. Next.js menyimpan halaman yang baru dikunjungi dalam keadaan tersembunyi supaya tombol Kembali cepat. Setelah Keluar tanpa muat ulang, nama Kasir masih ada tersembunyi di halaman masuk. Kelak isinya bisa berupa daftar Penjualan. Di komputer kasir yang dipakai bergantian, itu kebocoran. Muat ulang penuh menghapus semua sisa itu, dan panduan Next.js sendiri menyarankan cara ini untuk logout.
 
 **"Kalau tes cuma memegang kunci publik, bagaimana data ujinya selalu benar?"**
 Data uji dipasang sekali lewat connector Supabase dan tidak bisa diubah Pengunjung (itu juga yang diuji). Dua baris yang tanggalnya harus selalu "kemarin" dan "hari ini" disegarkan oleh jadwal pg_cron setiap menit, hanya di project uji.
