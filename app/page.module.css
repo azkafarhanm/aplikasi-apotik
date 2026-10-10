@@ -77,3 +77,13 @@
   padding: 1.5rem 0;
   font-size: 1.05rem;
 }
+
+.kaki {
+  border-top: 1.5px solid var(--garis);
+  padding: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.kaki a {
+  color: var(--tinta-lembut);
+}

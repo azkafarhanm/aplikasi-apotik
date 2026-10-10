@@ -1,6 +1,8 @@
 # Menjalankan tes database (Vitest + supabase-js) untuk setiap Pull Request,
 # memakai project Supabase apotikku-uji. Alamat dan kunci publiknya disimpan
 # sebagai secrets GitHub: SUPABASE_UJI_URL dan SUPABASE_UJI_PUBLISHABLE_KEY.
+# Password akun Staf uji (tiket #6) juga secrets: SUPABASE_UJI_ADMIN_PASSWORD,
+# SUPABASE_UJI_KASIR_PASSWORD, SUPABASE_UJI_NONAKTIF_PASSWORD.
 name: Tes database
 
 on:
@@ -25,3 +27,6 @@ jobs:
         env:
           SUPABASE_UJI_URL: ${{ secrets.SUPABASE_UJI_URL }}
           SUPABASE_UJI_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_UJI_PUBLISHABLE_KEY }}
+          SUPABASE_UJI_ADMIN_PASSWORD: ${{ secrets.SUPABASE_UJI_ADMIN_PASSWORD }}
+          SUPABASE_UJI_KASIR_PASSWORD: ${{ secrets.SUPABASE_UJI_KASIR_PASSWORD }}
+          SUPABASE_UJI_NONAKTIF_PASSWORD: ${{ secrets.SUPABASE_UJI_NONAKTIF_PASSWORD }}
