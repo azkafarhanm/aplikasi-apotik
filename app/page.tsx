@@ -5,6 +5,7 @@
 // stok selalu sesuai Penjualan terakhir. <Suspense> membuat bagian tetap
 // langsung tampil sementara daftar obat menyusul.
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { KartuEtiket } from "@/components/KartuEtiket";
 import { ambilKatalog } from "@/lib/katalog";
@@ -32,6 +33,14 @@ export default function HalamanKatalog() {
           <DaftarObat />
         </Suspense>
       </main>
+
+      {/* Tautan untuk Staf (keputusan #6). Bukan pengamanan apa pun: Area staf
+          dijaga login dan RLS, bukan oleh alamat yang dirahasiakan. */}
+      <footer className={styles.kaki}>
+        <div className={styles.lebar}>
+          <Link href="/masuk">Masuk Staf</Link>
+        </div>
+      </footer>
     </>
   );
 }

@@ -26,8 +26,9 @@ export async function buatSupabaseServer() {
             cookieStore.set(name, value, options);
           }
         } catch {
-          // Halaman (Server Component) tidak boleh menulis cookie. Sesi login
-          // akan diperbarui oleh proxy, yang dibuat bersama tiket login Staf.
+          // Halaman (Server Component) tidak boleh menulis cookie; sesi login
+          // sudah diperbarui oleh proxy.ts sebelum halaman dibuka. Server
+          // Action (masuk/keluar) boleh menulis cookie, jadi di sana berhasil.
         }
       },
     },

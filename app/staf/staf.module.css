@@ -1,0 +1,160 @@
+/* Area staf: dirancang untuk laptop/tablet (ADR 0004), palet etiket yang sama
+   dengan Katalog. Pita hijau seperti papan nama apotek, menu seperti tab map. */
+.lebar {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.pita {
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  border-bottom: 4px double var(--etiket);
+  box-shadow: 0 4px 0 var(--hijau-apotek);
+}
+
+.pita .lebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+}
+
+.merek {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+.merekKecil {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.kanan {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.siapa {
+  margin: 0;
+  font-weight: 600;
+}
+
+.peran {
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--etiket);
+  border-radius: 2px;
+  font-family: var(--huruf-judul);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.keluar {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border: 1.5px solid var(--etiket);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--etiket);
+  cursor: pointer;
+}
+
+.keluar:hover {
+  background: var(--etiket);
+  color: var(--hijau-apotek);
+}
+
+/* Menu: tab kertas yang menempel ke garis di bawahnya. */
+.menu {
+  margin-top: 1.25rem;
+  border-bottom: 1.5px solid var(--tinta);
+}
+
+.menu ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 auto;
+}
+
+.tab {
+  display: block;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--garis);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  background: var(--etiket-habis);
+  color: var(--tinta-lembut);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: var(--tinta);
+}
+
+.tab[aria-current="page"] {
+  position: relative;
+  top: 1.5px;
+  border-color: var(--tinta);
+  background: var(--etiket);
+  color: var(--hijau-apotek);
+}
+
+.isi {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.judul {
+  margin: 0 0 1rem;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 1.8rem;
+  line-height: 1.15;
+}
+
+.kerangka {
+  padding: 1.5rem;
+  border: 1.5px dashed var(--garis);
+  border-radius: 3px;
+  background: var(--etiket);
+  color: var(--tinta-lembut);
+}
+
+.kerangka p {
+  margin: 0;
+}
+
+.tiket {
+  margin-top: 0.5rem !important;
+  font-family: var(--huruf-angka);
+  font-size: 0.9rem;
+}
+
+.nonaktif {
+  max-width: 32rem;
+  margin: 2rem auto;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--tinta);
+  border-left: 8px solid var(--habis);
+  border-radius: 3px;
+  background: var(--etiket);
+  font-size: 1.1rem;
+  font-weight: 600;
+}

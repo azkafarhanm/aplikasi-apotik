@@ -1,0 +1,105 @@
+/* Halaman masuk: satu etiket di tengah kertas (ADR 0004). */
+.halaman {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  padding: 1.5rem 1rem;
+}
+
+.etiket {
+  width: min(24rem, calc(100vw - 2rem));
+  background: var(--etiket);
+  border: 1.5px solid var(--tinta);
+  border-top: 10px solid var(--hijau-apotek);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 0 var(--garis),
+    0 3px 8px rgb(70 50 10 / 0.08);
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.merek {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hijau-apotek);
+}
+
+.judul {
+  margin: 0.15rem 0 1rem;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.15;
+  padding-bottom: 0.6rem;
+  border-bottom: 1.5px solid var(--hijau-apotek);
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.isian {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.6rem 0.7rem;
+  border: 1.5px solid var(--tinta-lembut);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--tinta);
+}
+
+.tombol {
+  font: inherit;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 3px;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  cursor: pointer;
+}
+
+.tombol:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+/* Pesan gagal: tidak memakai merah (merah khusus tanda Obat keras, ADR 0004). */
+.gagal {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-left: 4px solid var(--tinta);
+  background: var(--etiket-habis);
+  font-weight: 600;
+}
+
+.info {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.75rem;
+  border-left: 4px solid var(--hijau-apotek);
+  background: var(--kertas);
+}
+
+.kembali {
+  margin: 1rem 0 0;
+  text-align: center;
+}
+
+.kembali a {
+  color: var(--hijau-apotek);
+}

@@ -40,3 +40,25 @@ select cron.schedule(
      where slug = 'uji-kedaluwarsa-hari-ini';
   $$
 );
+
+-- ---------------------------------------------------------------------------
+-- Profil Staf uji (tiket #6). Akun loginnya dibuat dulu lewat dasbor
+-- (Authentication → Users → Add user, centang "Auto Confirm User"):
+--   admin@apotikku.test, kasir@apotikku.test, nonaktif@apotikku.test
+-- Password-nya disimpan di secrets GitHub dan .env.local, TIDAK di repo:
+--   SUPABASE_UJI_ADMIN_PASSWORD, SUPABASE_UJI_KASIR_PASSWORD,
+--   SUPABASE_UJI_NONAKTIF_PASSWORD
+-- Bagian ini bisa dijalankan ulang: profil yang sudah ada diperbarui.
+-- ---------------------------------------------------------------------------
+insert into public.profil_staf (id, nama_tampilan, peran, aktif)
+select u.id, p.nama_tampilan, p.peran, p.aktif
+  from (values
+    ('admin@apotikku.test',    'Admin Uji',    'admin', true),
+    ('kasir@apotikku.test',    'Kasir Uji',    'kasir', true),
+    ('nonaktif@apotikku.test', 'Nonaktif Uji', 'kasir', false)
+  ) as p (email, nama_tampilan, peran, aktif)
+  join auth.users u on u.email = p.email
+on conflict (id) do update
+  set nama_tampilan = excluded.nama_tampilan,
+      peran         = excluded.peran,
+      aktif         = excluded.aktif;
