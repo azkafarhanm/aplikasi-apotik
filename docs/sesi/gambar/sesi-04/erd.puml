@@ -1,0 +1,82 @@
+@startuml erd
+' ERD ApotikKu versi 1 (notasi crow's foot). Sumber: docs/SPEC.md 4.3 dan migrasi di supabase/migrations/.
+skinparam defaultFontName Liberation Sans
+skinparam defaultFontSize 11
+skinparam shadowing false
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFCF3
+  BorderColor #1F4A36
+  HeaderBackgroundColor #EAF2E3
+}
+hide circle
+hide methods
+
+entity "akun_login\n(auth.users, dikelola Supabase Auth)" as akun {
+  * id : uuid <<PK>>
+  --
+  email : text
+  password : hash (bcrypt)
+}
+
+entity "profil_staf" as staf {
+  * id : uuid <<PK, FK>>
+  --
+  * nama_tampilan : text
+  * peran : admin | kasir
+  * aktif : boolean
+  * dibuat_pada : timestamptz
+}
+
+entity "obat" as obat {
+  * id : bigint <<PK>>
+  --
+  * slug : text <<unik>>
+  * nama : text
+  * bentuk : text
+  * keluhan : text
+  * golongan : bebas | bebas_terbatas | keras
+  * satuan_jual : strip | botol | tube | sachet
+  * isi_per_satuan : text
+  * kegunaan : text
+  * harga_jual : integer (Rp, > 0)
+  harga_acuan : integer (Rp, HET)
+  * stok : integer (>= 0)
+  * tanggal_kedaluwarsa : date
+  * diarsipkan : boolean
+  * dibuat_pada, diubah_pada : timestamptz
+}
+
+entity "penjualan" as jual {
+  * id : bigint <<PK>>
+  --
+  * nomor : text <<unik>>
+  * kasir_id : uuid <<FK>>
+  * waktu : timestamptz
+  * total : integer (Rp)
+  * metode_bayar : tunai | qris_transfer
+  uang_diterima : integer (Rp)
+  kembalian : integer (Rp)
+  * cek_resep : boolean
+  * status : selesai | dibatalkan
+  dibatalkan_oleh : uuid <<FK>>
+  dibatalkan_pada : timestamptz
+  alasan_batal : text
+}
+
+entity "item_penjualan" as item {
+  * id : bigint <<PK>>
+  --
+  * penjualan_id : bigint <<FK>>
+  * obat_id : bigint <<FK>>
+  * jumlah : integer (> 0)
+  * harga_satuan : integer (Rp, saat terjual)
+  * subtotal : integer (Rp)
+}
+
+akun ||--o| staf : memiliki
+staf ||--o{ jual : mencatat
+staf |o--o{ jual : membatalkan
+jual ||--|{ item : berisi
+obat ||--o{ item : terjual dalam
+@enduml

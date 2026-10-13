@@ -1,0 +1,72 @@
+// DFD level 1 ApotikKu, notasi Gane & Sarson. Sumber: docs/SPEC.md 4.3–4.5.
+// Entitas di atas, proses di tengah, penyimpanan data di bawah.
+digraph dfd1 {
+  graph [rankdir=TB, nodesep=0.55, ranksep=1.1, fontname="Liberation Sans", splines=true, pad=0.2];
+  node  [fontname="Liberation Sans", fontsize=11, color="#1F4A36", style=filled, fillcolor="#FFFCF3"];
+  edge  [fontname="Liberation Sans", fontsize=9, color="#333333", arrowsize=0.7];
+
+  // Entitas luar
+  P [label="Pengunjung", shape=box, fillcolor="#EAF2E3"];
+  K [label="Kasir", shape=box, fillcolor="#EAF2E3"];
+  A [label="Admin", shape=box, fillcolor="#EAF2E3"];
+  { rank=same; P; K; A; }
+
+  // Proses
+  node [shape=box, style="rounded,filled"];
+  P1 [label="1.0\nMenampilkan\nKatalog"];
+  P2 [label="2.0\nAutentikasi\nStaf"];
+  P3 [label="3.0\nMencatat\nPenjualan"];
+  P6 [label="6.0\nMenyajikan Penjualan,\nRingkasan, Laporan"];
+  P4 [label="4.0\nMembatalkan\nPenjualan"];
+  P5 [label="5.0\nMengelola\nObat"];
+  { rank=same; P1; P2; P3; P6; P4; P5; }
+
+  // Penyimpanan data
+  node [shape=plain];
+  D1 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D1</b></td><td sides="TB">Obat</td></tr></table>>];
+  D2 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D2</b></td><td sides="TB">Profil Staf</td></tr></table>>];
+  D3 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D3</b></td><td sides="TB">Penjualan</td></tr></table>>];
+  D4 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D4</b></td><td sides="TB">Item Penjualan</td></tr></table>>];
+  { rank=same; D1; D2; D3; D4; }
+
+  // Urutan kiri-ke-kanan
+  P -> K -> A [style=invis];
+  P1 -> P2 -> P3 -> P6 -> P4 -> P5 [style=invis];
+  D1 -> D2 -> D3 -> D4 [style=invis];
+
+  // 1.0
+  P  -> P1 [label="kata kunci,\nKeluhan"];
+  P1 -> P  [label="daftar &\ndetail obat"];
+  D1 -> P1 [label="obat tidak diarsipkan\n(tanpa stok persis)"];
+
+  // 2.0
+  K  -> P2 [label="email,\npassword"];
+  A  -> P2 [label="email,\npassword"];
+  D2 -> P2 [label="peran,\naktif"];
+  P2 -> K  [label="sesi login,\nmenu sesuai peran"];
+
+  // 3.0
+  K  -> P3 [label="keranjang, cara bayar,\nuang, Cek resep"];
+  P3 -> K  [label="Struk atau\npesan penolakan"];
+  D1 -> P3 [label="harga jual,\nstok"];
+  P3 -> D1 [label="stok\nberkurang"];
+  P3 -> D3 [label="Penjualan\nbaru"];
+  P3 -> D4 [label="item + harga\nsaat terjual"];
+
+  // 6.0
+  D3 -> P6 [label="Penjualan"];
+  D4 -> P6 [label="item"];
+  P6 -> K  [label="Penjualan hari ini\n(miliknya)"];
+  P6 -> A  [label="Ringkasan,\nLaporan"];
+
+  // 4.0
+  A  -> P4 [label="nomor,\nalasan"];
+  D4 -> P4 [label="jumlah\nper obat"];
+  P4 -> D3 [label="status\nDibatalkan"];
+  P4 -> D1 [label="stok\ndikembalikan"];
+
+  // 5.0
+  A  -> P5 [label="data obat,\narsip"];
+  P5 -> A  [label="peringatan\nharga > HET"];
+  P5 -> D1 [label="obat baru /\ndiubah"];
+}
