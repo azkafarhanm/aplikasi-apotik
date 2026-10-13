@@ -1,9 +1,9 @@
 // DFD level 1 ApotikKu, notasi Gane & Sarson. Sumber: docs/SPEC.md 4.3–4.5.
-// Entitas di atas, proses di tengah, penyimpanan data di bawah.
+// Entitas di kiri, proses di tengah, penyimpanan data di kanan (memanjang ke bawah agar muat tegak di A4).
 digraph dfd1 {
-  graph [rankdir=TB, nodesep=0.55, ranksep=1.1, fontname="Liberation Sans", splines=true, pad=0.2];
-  node  [fontname="Liberation Sans", fontsize=11, color="#1F4A36", style=filled, fillcolor="#FFFCF3"];
-  edge  [fontname="Liberation Sans", fontsize=9, color="#333333", arrowsize=0.7];
+  graph [rankdir=LR, nodesep=0.8, ranksep=0.9, fontname="Liberation Sans", splines=true, pad=0.2];
+  node  [fontname="Liberation Sans", fontsize=15, color="#1F4A36", style=filled, fillcolor="#FFFCF3"];
+  edge  [fontname="Liberation Sans", fontsize=13, color="#333333", arrowsize=0.7];
 
   // Entitas luar
   P [label="Pengunjung", shape=box, fillcolor="#EAF2E3"];
@@ -27,12 +27,12 @@ digraph dfd1 {
   D2 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D2</b></td><td sides="TB">Profil Staf</td></tr></table>>];
   D3 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D3</b></td><td sides="TB">Penjualan</td></tr></table>>];
   D4 [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="6" color="#1F4A36" bgcolor="#FFFFFF"><tr><td><b>D4</b></td><td sides="TB">Item Penjualan</td></tr></table>>];
-  { rank=same; D1; D2; D3; D4; }
+  { rank=same; D2; D1; D3; D4; }
 
-  // Urutan kiri-ke-kanan
+  // Urutan atas-ke-bawah di setiap kolom
   P -> K -> A [style=invis];
   P1 -> P2 -> P3 -> P6 -> P4 -> P5 [style=invis];
-  D1 -> D2 -> D3 -> D4 [style=invis];
+  D2 -> D1 -> D3 -> D4 [style=invis];
 
   // 1.0
   P  -> P1 [label="kata kunci,\nKeluhan"];
