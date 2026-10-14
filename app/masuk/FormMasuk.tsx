@@ -18,6 +18,11 @@ export function FormMasuk() {
           type="email"
           name="email"
           autoComplete="username"
+          // Alamat email bukan kalimat: tanpa tebakan kata, huruf besar
+          // otomatis, atau garis merah ejaan dari keyboard HP (#26).
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           defaultValue={hasil?.email}
           required
           autoFocus
