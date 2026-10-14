@@ -26,7 +26,7 @@ Langkah 2–4 terjadi **setiap kali** halaman dibuka, jadi Status stok selalu se
 | File | Isinya | Analogi |
 |---|---|---|
 | `supabase/migrations/20261009034254_katalog.sql` | Resep bentuk database: tabel `obat`, fungsi `status_stok`, tampilan `katalog`, dan aturan hak akses | Gambar kerja gudang |
-| `supabase/data/contoh.sql` | 11 obat contoh untuk project asli (1 diarsipkan) | Barang pajangan sementara |
+| `supabase/data/contoh.sql` | 11 obat contoh untuk project asli (1 diarsipkan). Di tiket #7 diganti `data-awal.sql` ([penjelasan](03-data-awal.md)) | Barang pajangan sementara |
 | `supabase/uji/data-uji.sql` | Baris khusus tes untuk project `apotikku-uji` | Barang uji di laboratorium |
 | `lib/supabase/server.ts` | Membuat sambungan ke Supabase memakai kunci publik | Telepon ke gudang |
 | `lib/katalog.ts` | Mengambil daftar obat dan mengubah kode database menjadi tulisan yang dibaca orang (`bebas_terbatas` → "Obat bebas terbatas", `4000` → "Rp4.000") | Penerjemah label |

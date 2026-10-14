@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| Versi | 1.2, 10 Oktober 2026 (tiket #6: proxy hanya cek login, `peran_saya` di `private`, Keluar dengan muat ulang penuh) |
+| Versi | 1.3, 14 Oktober 2026 (tiket #7: data awal 38 obat, aturan harga acuan per Satuan jual dan golongan dari nomor izin edar) |
 | Status | Siap dipecah menjadi tiket (langkah 5) |
 | Dasar | PRD 1.0, ADR 0001–0004, prototipe Katalog (kartu etiket + laci Keluhan) |
 
@@ -366,6 +366,19 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 - **Akun uji**: di `apotikku`, `admin@apotikku.test` (Admin) dan `kasir@apotikku.test` (Kasir); di `apotikku-uji` ditambah `nonaktif@apotikku.test` (Kasir nonaktif) untuk tes Staf nonaktif. Akun dibuat pemilik project lewat dasbor, profilnya dipasang dengan `supabase/data/profil-staf.sql` (asli) dan `supabase/uji/data-uji.sql` (uji). Password tidak disimpan di repo dan tidak dikirim lewat chat: password akun uji disimpan di secrets GitHub dan `.env.local` (`SUPABASE_UJI_ADMIN_PASSWORD`, `SUPABASE_UJI_KASIR_PASSWORD`, `SUPABASE_UJI_NONAKTIF_PASSWORD`).
 - Data awal ditulis sebagai file SQL terpisah dari migrasi, supaya bisa dipasang ulang kapan saja.
 
+Ditambahkan 14 Oktober 2026 (tiket #7, `supabase/data/data-awal.sql`, riset di [`riset/data-awal-obat.md`](riset/data-awal-obat.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Sumber harga acuan | KMK 092/MENKES/SK/II/2012, dicatat sebagai "harga tahun 2012" | Daftar HET obat generik umum terakhir yang ditemukan di situs resmi Kemenkes | Harga pasar dari toko online (bukan sumber resmi, berubah setiap hari) |
+| Harga acuan per Satuan jual | HET kemasan ÷ jumlah Satuan jual di kemasan, **dibulatkan ke bawah** ke rupiah | HET berlaku per kemasan pabrik; pembulatan ke atas melewati HET | Ke atas (melanggar HET); ke ratusan (angka acuan tidak sesuai sumber; pembulatan harga jual wewenang Admin) |
+| Kemasan | Per strip bila kemasan berupa kotak berisi strip; utuh bila botol, tube, atau bungkus ≤ 100 butir. Obat yang hanya ada dalam botol 250–1000 butir tidak dimasukkan | Satuan jual yang ada (strip, botol, tube, sachet) cukup tanpa mengubah skema | Mengemas ulang per 10 butir (butuh Satuan jual baru "klip" tanpa masalah nyata di PRD) |
+| Golongan | Huruf ke-2 nomor izin edar generik yang berlaku di cekbpom (B/T/K); bila berbeda-beda, yang terbanyak, dan jumlahnya dicatat. Yang hampir seimbang (CTM) tidak dimasukkan | Data resmi BPOM yang tercetak di kemasan dan bisa dicek siapa pun | Menebak dari kebiasaan (Ambroksol ternyata keras); golongan paling ketat (setirizin ikut "perlu resep" padahal 40 dari 48 nomornya bebas terbatas) |
+| Vitamin | Hanya vitamin yang terdaftar sebagai obat (Asam Folat, Tablet Tambah Darah, Vitamin A) | Vitamin C dan B kompleks tablet kini terdaftar sebagai suplemen kesehatan, tanpa golongan obat; lingkaran hijau pada suplemen salah mengedukasi (M-06) | Menganggap suplemen sebagai obat bebas |
+| Tanggal kedaluwarsa | Relatif terhadap hari pemasangan (`private.hari_ini() + n`) | Setiap pemasangan ulang sebelum demo memunculkan lagi semua keadaan kedaluwarsa | Tanggal tetap (keadaan Segera kedaluwarsa hilang setelah beberapa bulan) |
+| Sumber per obat | Komentar SQL per baris + tabel riset, tanpa kolom baru | Sumber hanya untuk penelusuran, tidak dipakai aplikasi | Kolom `sumber_harga_acuan` (migrasi dan isian formulir Admin tanpa kebutuhan di PRD) |
+| Pasang ulang | Hapus semua obat lalu isi ulang; menolak berjalan bila sudah ada Penjualan | Obat yang pernah terjual tidak boleh dihapus (aturan bisnis 7) | Pasang ulang tanpa penjaga |
+
 > **Migrasi** = file berurutan berisi perubahan bentuk database. *Analogi:* resep langkah demi langkah; siapa pun yang mengikutinya mendapat database yang sama (ADR 0001).
 
 ### 4.12 Pengaturan Supabase
@@ -388,7 +401,7 @@ Disepakati 7 Oktober 2026:
 | File di repo | Isi | Dipasang di |
 |---|---|---|
 | `supabase/migrations/*.sql` | Bentuk database (tabel, fungsi, tampilan, RLS), berurutan | Kedua project |
-| `supabase/data/contoh.sql` | Data contoh Katalog (diganti data awal lengkap di tiket #7) | `apotikku` |
+| `supabase/data/data-awal.sql` | Data awal 38 obat bersumber resmi (tiket #7; menggantikan `contoh.sql`). Bisa dipasang ulang sebelum demo | `apotikku` |
 | `supabase/data/profil-staf.sql` | Profil akun Staf (peran, nama tampilan); akunnya dibuat di dasbor dulu | `apotikku` |
 | `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal + profil tiga akun Staf uji | `apotikku-uji` saja |
 
@@ -479,7 +492,7 @@ Sama dengan PRD bagian 9:
 ## 7. Catatan lanjutan
 
 **Yang masih harus dipastikan sebelum atau saat koding**
-- Data HET dan golongan setiap obat di data awal harus dicek ke sumber resmi dan dicantumkan sumbernya (validasi lewat studi pustaka).
+- Data HET dan golongan setiap obat di data awal harus dicek ke sumber resmi dan dicantumkan sumbernya (validasi lewat studi pustaka). Selesai di tiket #7: [`riset/data-awal-obat.md`](riset/data-awal-obat.md).
 - Nomor WhatsApp dan alamat apotek untuk Struk: pakai data contoh yang jelas bertanda contoh, karena ApotikKu bukan apotek sungguhan.
 - Paket gratis Supabase dijeda bila ±1 minggu tidak dipakai; buka aplikasi sebelum demo (PRD bagian 11).
 

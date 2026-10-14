@@ -22,6 +22,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 - `docs/adr/`: catatan keputusan penting
 - `docs/sesi/`: bahan tugas tiap sesi kuliah
 - `docs/penjelasan/`: penjelasan kode per fitur
+- `docs/riset/`: hasil studi pustaka beserta sumbernya
 
 ## Keputusan yang sudah disepakati
 
@@ -29,7 +30,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 - Teknologi: Next.js + Supabase (supabase-js, migrasi SQL, RLS sejak awal) + Vercel, semuanya paket gratis. Middleware/proxy menjaga `/staf/*`. Bukan Drizzle/Prisma, karena keduanya bisa melewati RLS.
 - Visual: konsep "etiket apotek" (off-white, hijau apotek tua, tanda golongan obat sebagai elemen visual, harga dalam huruf monospace), tidak flat, tidak terlihat seperti template AI. Katalog dirancang untuk HP lebih dulu, berupa kartu etiket dengan laci Keluhan di atasnya; satuan ditulis lengkap ("per strip · 10 tablet"); layar kasir untuk laptop/tablet; tanpa mode gelap.
 - Menu: Kasir = Jual, Penjualan hari ini. Admin = semua itu + Ringkasan, Obat, Laporan.
-- Data awal: ±40 obat generik, harga acuan dari HET Kemenkes, kartu etiket tanpa foto.
+- Data awal: 38 obat generik (`supabase/data/data-awal.sql`), harga acuan dari HET Kemenkes (KMK 092/2012), golongan dari nomor izin edar BPOM, kartu etiket tanpa foto.
 - Kode HTML lama ada di tag `v1-html`.
 
 ## Urutan kerja
@@ -45,8 +46,8 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
    1. ~~#2 Katalog tampil dari database~~ (selesai)
    2. ~~#3 Lengkapi sumber klaim di ADR~~ (selesai)
    3. ~~#18 Server aplikasi di Singapura~~ (selesai)
-   4. #6 Login dan logout Staf
-   5. #7 Data awal ±40 obat
+   4. ~~#6 Login dan logout Staf~~ (selesai)
+   5. ~~#7 Data awal ±40 obat~~ (selesai: 38 obat, lihat `docs/riset/data-awal-obat.md`)
    6. #8 Mencatat Penjualan
    7. #10 Struk dan Penjualan hari ini
    8. #13 Pembatalan
