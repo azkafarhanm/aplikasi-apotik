@@ -1,0 +1,27 @@
+@startuml dfd-0
+' DFD level 0 (diagram konteks) ApotikKu, notasi Gane & Sarson. Sumber: docs/PRD.md, docs/SPEC.md.
+skinparam defaultFontName Liberation Sans
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam rectangle {
+  BackgroundColor #FFFCF3
+  BorderColor #1F4A36
+  RoundCorner<<proses>> 25
+  BackgroundColor<<entitas>> #EAF2E3
+}
+skinparam stereotypeCBackgroundColor transparent
+hide stereotype
+left to right direction
+
+rectangle "Pengunjung" <<entitas>> as P
+rectangle "Kasir" <<entitas>> as K
+rectangle "Admin" <<entitas>> as A
+rectangle "0\n\nSistem Informasi\nApotek ApotikKu" <<proses>> as S
+
+P --> S : kata kunci nama obat,\nKeluhan, pilihan “Tanpa resep”
+S --> P : daftar & detail obat (harga jual,\ngolongan, Status stok),\ntautan WhatsApp
+K --> S : email & password,\nkeranjang, cara bayar,\nuang diterima, Cek resep
+S --> K : Struk, Penjualan hari ini,\nstok persis, pesan penolakan
+A --> S : email & password, data obat,\nnomor & alasan Pembatalan,\nperiode laporan
+S --> A : Ringkasan, Laporan pendapatan,\nperingatan harga > HET
+@enduml

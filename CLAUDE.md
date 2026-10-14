@@ -40,6 +40,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 4. ~~`docs/SPEC.md`~~ (selesai 7 Okt 2026: skema, route, RLS, fungsi database, rencana uji)
 5. ~~Tiket di GitHub Issues~~ (selesai 8 Okt 2026: induk #1, tiket #2–#14, label `siap-dikerjakan`)
 6. ~~Tugas individu Sesi 2: Study Case SDLC~~ (selesai 8 Okt 2026: model Incremental, `docs/sesi/sesi-02-sdlc-incremental.md`; PDF bernama dibuat di luar repo)
+   - Tugas Sesi 4: Analisis Perangkat Lunak, requirement gathering + SKPL template dosen + use case/flowchart (13 Okt 2026: `docs/sesi/sesi-04-skpl.md`, diagram di `docs/sesi/gambar/sesi-04/`; dikerjakan kelompok, PDF bernama gaya kop Sesi 3 dibuat di luar repo)
 7. Koding, mengikuti urutan di issue #1 (disepakati 9 Okt 2026; rantai terpanjang #6 → #8 → #10 → #13 didahulukan):
    1. ~~#2 Katalog tampil dari database~~ (selesai)
    2. ~~#3 Lengkapi sumber klaim di ADR~~ (selesai)

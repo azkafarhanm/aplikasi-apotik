@@ -1,0 +1,55 @@
+@startuml use-case
+' Use case diagram ApotikKu versi 1 (Sesi 4, SKPL). Sumber: docs/PRD.md bagian 4 dan 6.
+left to right direction
+skinparam defaultFontName Liberation Sans
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FFFCF3
+  BorderColor #1F4A36
+}
+skinparam rectangle {
+  BorderColor #1F4A36
+}
+
+actor "Pengunjung" as P
+actor "Kasir" as K
+actor "Admin" as A
+A -|> K : mewarisi hak Kasir
+
+rectangle "ApotikKu" {
+  rectangle "Katalog (tanpa login)" {
+    usecase "Mencari obat\nberdasarkan nama\n(F-01)" as UC1
+    usecase "Menyaring menurut Keluhan\ndan “Tanpa resep” (F-02)" as UC2
+    usecase "Melihat detail obat\n(F-03)" as UC3
+    usecase "Bertanya lewat\nWhatsApp (F-04)" as UC4
+  }
+  rectangle "Area staf (wajib login)" {
+    usecase "Login dan logout\n(F-05)" as UC5
+    usecase "Mencatat Penjualan\n(F-06)" as UC6
+    usecase "Cek resep\n(Obat keras)" as UC6a
+    usecase "Mencetak Struk\n(F-07)" as UC7
+    usecase "Melihat Penjualan\nhari ini (F-08)" as UC8
+    usecase "Melihat Ringkasan\n(F-09)" as UC9
+    usecase "Mengelola obat\n(F-10, F-13)" as UC10
+    usecase "Membuat Laporan\n(F-11)" as UC11
+    usecase "Membatalkan Penjualan\n(F-14)" as UC14
+  }
+}
+
+P --> UC1
+P --> UC2
+P --> UC3
+P --> UC4
+K --> UC5
+K --> UC6
+K --> UC7
+K --> UC8
+A --> UC9
+A --> UC10
+A --> UC11
+A --> UC14
+UC6 ..> UC6a : <<include>>\nbila ada Obat keras
+UC7 .[norank].> UC6 : <<extend>>
+@enduml

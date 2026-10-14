@@ -1,0 +1,50 @@
+@startuml flowchart-penjualan
+' Flowchart Mencatat Penjualan (F-06, F-07, F-12). Sumber: docs/SPEC.md 4.4 (catat_penjualan) dan 4.8.
+skinparam defaultFontName Liberation Sans
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam ActivityBackgroundColor #FFFCF3
+skinparam ActivityBorderColor #1F4A36
+skinparam ActivityDiamondBackgroundColor #EAF2E3
+skinparam ActivityDiamondBorderColor #1F4A36
+skinparam PartitionBorderColor #1F4A36
+
+|Kasir (layar Jual)|
+start
+repeat
+  :Cari obat berdasarkan nama;
+  :Tambahkan ke keranjang dan atur jumlahnya\n(obat Habis / Sudah kedaluwarsa tidak bisa dipilih);
+repeat while (Masih ada obat lain?) is (ya)
+-> tidak;
+if (Keranjang berisi Obat keras?) then (ya)
+  :Centang "Saya sudah memeriksa\nresep dokter" (Cek resep);
+else (tidak)
+endif
+if (Cara bayar?) then (tunai)
+  :Isi uang diterima,\nlayar menampilkan kembalian;
+else (QRIS/transfer)
+endif
+:Tekan Simpan;
+
+|Database (fungsi catat_penjualan)|
+:Pastikan pemanggil adalah Staf aktif;
+:Kunci baris obat yang dibeli\n(urut id, mencegah dua Kasir\nmenjual stok yang sama);
+:Ambil harga jual dari database\n(harga dari layar diabaikan);
+if (Semua aturan terpenuhi?\n- stok cukup, tidak diarsipkan,\n  tidak kedaluwarsa\n- Cek resep bila ada Obat keras\n- uang tunai >= total) then (ya)
+  :Simpan Penjualan + Item penjualan;
+  :Kurangi stok setiap obat;
+  :Kembalikan nomor Penjualan;
+else (tidak)
+  :Batalkan semuanya\n(tidak ada stok yang berkurang);
+  :Kirim pesan yang jelas, misalnya\n"Stok Ambroksol tinggal 3 strip";
+endif
+
+|Kasir (layar Jual)|
+if (Penjualan tersimpan?) then (ya)
+  :Kosongkan keranjang;
+  :Tampilkan Struk 58 mm,\nsiap dicetak;
+else (tidak)
+  :Tampilkan pesan,\nkeranjang TIDAK dikosongkan;
+endif
+stop
+@enduml
