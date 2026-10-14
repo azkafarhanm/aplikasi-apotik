@@ -158,7 +158,7 @@ Kunci rahasia Supabase (service role key) **tidak pernah** dipakai di aplikasi (
 | `/staf/obat/[id]` | Ubah, arsipkan, atau kembalikan obat | Admin | F-10, F-13 |
 | `/staf/laporan` | Laporan per periode, siap cetak | Admin | F-11 |
 
-Keluar (logout) adalah tombol di semua halaman `/staf/*`, bukan halaman tersendiri. Tombol itu mengirim formulir ke `POST /keluar` (Route Handler), yang mengakhiri sesi lalu membuka `/masuk?keluar=1` dengan muat ulang penuh (alasannya di 4.6). Katalog punya tautan kecil "Masuk Staf" di bagian bawah; tautan ini bukan pengamanan, karena Area staf dijaga login dan RLS.
+Keluar (logout) adalah tombol di semua halaman `/staf/*`, bukan halaman tersendiri. Tombol itu mengirim formulir ke `POST /keluar` (Route Handler), yang mengakhiri sesi lalu membuka `/masuk?keluar=1` dengan muat ulang penuh (alasannya di 4.6). Katalog punya tautan kecil "Masuk Staf" di pojok kanan atas papan nama (dipindah dari bagian bawah di #24, supaya Staf tidak perlu menggulir melewati semua kartu obat); tautan ini bukan pengamanan, karena Area staf dijaga login dan RLS.
 
 - `slug` = versi nama obat yang aman untuk alamat web, misalnya `parasetamol-500-mg`. Dibuat otomatis dari nama saat obat ditambahkan dan tidak berubah walau nama diubah, supaya tautan yang sudah dibagikan tetap jalan.
 - **Detail obat punya alamat sendiri** (bukan sekadar jendela di atas daftar seperti di prototipe), supaya tombol Kembali di HP bekerja wajar dan tautannya bisa dikirim lewat WhatsApp (user story 14 dan 15). Tampilannya tetap etiket seperti di prototipe.

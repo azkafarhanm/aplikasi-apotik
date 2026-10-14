@@ -16,7 +16,16 @@ export default function HalamanKatalog() {
     <>
       <header className={styles.papanNama}>
         <div className={styles.lebar}>
-          <p className={styles.merek}>ApotikKu</p>
+          <div className={styles.barisMerek}>
+            <p className={styles.merek}>ApotikKu</p>
+            {/* Tautan untuk Staf, di atas supaya tidak perlu menggulir melewati
+                semua kartu obat (#24). Sengaja kecil dan pudar agar tidak
+                mengalihkan Pengunjung. Bukan pengamanan apa pun: Area staf
+                dijaga login dan RLS, bukan oleh alamat yang dirahasiakan. */}
+            <Link href="/masuk" className={styles.masukStaf}>
+              Masuk Staf
+            </Link>
+          </div>
           <h1 className={styles.judul}>Katalog obat</h1>
           <p className={styles.subjudul}>
             Harga, golongan, dan ketersediaan obat hari ini.
@@ -33,14 +42,6 @@ export default function HalamanKatalog() {
           <DaftarObat />
         </Suspense>
       </main>
-
-      {/* Tautan untuk Staf (keputusan #6). Bukan pengamanan apa pun: Area staf
-          dijaga login dan RLS, bukan oleh alamat yang dirahasiakan. */}
-      <footer className={styles.kaki}>
-        <div className={styles.lebar}>
-          <Link href="/masuk">Masuk Staf</Link>
-        </div>
-      </footer>
     </>
   );
 }

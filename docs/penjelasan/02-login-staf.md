@@ -165,4 +165,8 @@ Login ditangani Supabase Auth, yang tidak tahu soal kolom `aktif` milik kami. Ya
 Tidak, dan memang tidak diandalkan. Menyembunyikan menu hanya soal kenyamanan. Kalau Kasir mengetik alamat `/staf/laporan`, ia diarahkan ke Jual. Kalau ia mengakali browser untuk meminta data langsung, database yang menolak (RLS), dan itu diuji otomatis.
 
 **"Kenapa ada tautan Masuk Staf di Katalog? Bukankah lebih aman disembunyikan?"**
-Menyembunyikan alamat bukan pengamanan; alamat mudah ditebak. Yang mengamankan adalah login dan RLS. Tautan kecil itu memudahkan Staf membuka Area staf dari HP atau tablet mana pun.
+Menyembunyikan alamat bukan pengamanan; alamat mudah ditebak. Yang mengamankan adalah login dan RLS. Tautan kecil itu memudahkan Staf membuka Area staf dari HP atau tablet mana pun. Tautannya ada di pojok kanan atas papan nama, kecil dan pudar. Awalnya di bagian paling bawah, tetapi setelah ada ±40 obat, Staf harus menggulir melewati semua kartu setiap kali mau masuk, jadi dipindah ke atas (#24).
+
+![Katalog di HP 360 px: "Masuk Staf" di pojok kanan atas papan nama](gambar/katalog-masuk-staf-360.png)
+
+**Tips untuk Staf:** simpan alamat **apotikku.vercel.app/staf** sebagai shortcut di layar HP atau bookmark di laptop (Chrome: titik tiga → *Tambahkan ke layar utama*; Safari: tombol bagikan → *Tambah ke Layar Utama*). Sesi login bertahan, jadi Staf yang sudah pernah masuk langsung dibawa ke halaman kerjanya tanpa membuka Katalog.
