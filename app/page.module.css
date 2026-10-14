@@ -78,12 +78,28 @@
   font-size: 1.05rem;
 }
 
-.kaki {
-  border-top: 1.5px solid var(--garis);
-  padding: 1rem 0 1.5rem;
-  font-size: 0.9rem;
+/* Baris "ApotikKu" + tautan Masuk Staf di pojok kanan (#24). */
+.barisMerek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.kaki a {
-  color: var(--tinta-lembut);
+.masukStaf {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.25rem;
+  margin-right: -0.25rem;
+  font-size: 0.8rem;
+  color: var(--etiket);
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.masukStaf:hover {
+  opacity: 1;
 }
