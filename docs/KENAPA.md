@@ -50,6 +50,11 @@ Keputusan yang lebih kecil, dicatat lengkap beserta jawaban untuk dosen di [`SPE
 | Keluar lewat formulir biasa + muat ulang penuh | Ditemukan saat uji di browser: Next.js menyimpan halaman Staf secara tersembunyi, sehingga setelah Keluar tanpa muat ulang, isinya masih ada di memori browser komputer kasir | Server Action (isi halaman lama tertinggal) | SPEC 4.6, [penjelasan](penjelasan/02-login-staf.md) |
 | Fungsi bawaan `rls_auto_enable()` dicabut izinnya dari `anon`/`authenticated` | Fungsi berhak penuh dari pengaturan "automatic RLS" ikut terbuka sebagai alamat API; pemicu otomatisnya tetap bekerja tanpa izin itu (sudah dicoba) | Membiarkan (peringatan pemeriksa keamanan); mematikan "automatic RLS" (kehilangan jaring pengaman untuk tabel baru) | Migrasi `20261010084330_login_staf.sql`, #6 |
 | Password akun Staf uji di secrets GitHub dan `.env.local`, tidak di repo atau chat | Tes Kasir/Admin harus benar-benar login, tetapi repo ini publik | Menulis password di repo (siapa pun bisa masuk sebagai Admin uji); menempelkannya di chat (tercatat di riwayat percakapan) | SPEC 4.11 |
+| Harga acuan = HET kemasan (KMK 092/2012) ÷ isi kemasan, **dibulatkan ke bawah** | HET berlaku per kemasan pabrik; pembulatan ke atas melewati HET walau hanya sen | Ke atas (melanggar HET); ke ratusan (angka acuan tidak sesuai sumber) | SPEC 4.11, [riset](riset/data-awal-obat.md), #7 |
+| Golongan dari huruf ke-2 **nomor izin edar** generik yang berlaku di cekbpom; bila berbeda-beda, yang terbanyak | Data resmi BPOM yang tercetak di kemasan dan bisa dicek siapa pun; tebakan ternyata salah (Ambroksol obat keras) | Menebak dari kebiasaan; selalu golongan paling ketat (setirizin jadi "perlu resep" padahal mayoritas bebas terbatas) | SPEC 4.11, [riset](riset/data-awal-obat.md), #7 |
+| Vitamin C dan B kompleks **tidak** dimasukkan | Keduanya kini terdaftar sebagai suplemen kesehatan, tanpa golongan obat; lingkaran hijau pada suplemen salah mengedukasi (M-06) | Menganggapnya obat bebas | [riset](riset/data-awal-obat.md), #7 |
+| Data awal 38 obat, bukan dipaksakan 40 | Obat yang golongannya tidak pasti (CTM) atau izin edarnya dibatalkan (dekstrometorfan tunggal) dibuang | Menambah obat tebakan supaya genap 40 | [riset](riset/data-awal-obat.md), #7 |
+| Tanggal kedaluwarsa data awal relatif terhadap hari pemasangan | Setiap pemasangan ulang sebelum demo memunculkan lagi semua keadaan kedaluwarsa | Tanggal tetap (contoh Segera kedaluwarsa hilang setelah beberapa bulan) | SPEC 4.11, [penjelasan](penjelasan/03-data-awal.md) |
 
 ## Jawaban cepat untuk pertanyaan yang paling mungkin muncul
 
@@ -105,3 +110,6 @@ Istilah domain apotek (Penjualan, Obat keras, Status stok, dll.) ada di [`CONTEX
 | Security definer | Fungsi database yang berjalan dengan hak pemiliknya, bukan hak pemanggil | Petugas gudang yang boleh masuk gudang atas nama pembeli, tetapi hanya mengambilkan barang milik pembeli itu |
 | Activity (Next.js) | Cara Next.js menyimpan halaman yang baru dikunjungi secara tersembunyi supaya tombol Kembali cepat | Buku yang ditutup tetapi masih tergeletak di meja; orang berikutnya bisa membukanya |
 | Cache-Control: no-store | Pesan ke browser agar tidak menyimpan salinan halaman | Tulisan "jangan difotokopi" di lembar rahasia |
+| Nomor izin edar (NIE) | Nomor resmi dari BPOM yang wajib ada di kemasan obat; huruf ke-2 menunjukkan golongan (B/T/K) | Plat nomor kendaraan: hurufnya menunjukkan asal daerah |
+| SHA-256 | "Sidik jari" sebuah file; berubah bila isinya berubah sedikit saja | Nomor seri uang kertas |
+| Rollback | Membatalkan semua langkah dalam satu transaksi database | Menulis dengan pensil lalu menghapusnya |
