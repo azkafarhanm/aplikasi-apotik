@@ -1,9 +1,21 @@
-/* Halaman masuk: satu etiket di tengah kertas (ADR 0004). */
+/* Halaman masuk: satu etiket di kertas (ADR 0004).
+   Etiket diletakkan dengan jarak TETAP dari atas, bukan di tengah layar.
+   Di HP, tinggi layar menyusut saat keyboard muncul; kalau etiket dibuat
+   di tengah (atau jaraknya dihitung dari tinggi layar), ia ikut melompat,
+   saran email Chrome ikut berpindah, dan keyboard berkedip (#26).
+   Jarak hanya bergantung pada LEBAR layar, yang tidak berubah saat
+   keyboard muncul. */
 .halaman {
-  min-height: 100dvh;
-  display: grid;
-  place-content: center;
-  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1rem 2rem;
+}
+
+@media (min-width: 48rem) {
+  .halaman {
+    padding-top: 6rem;
+  }
 }
 
 .etiket {
