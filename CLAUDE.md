@@ -48,7 +48,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
    3. ~~#18 Server aplikasi di Singapura~~ (selesai)
    4. ~~#6 Login dan logout Staf~~ (selesai)
    5. ~~#7 Data awal ±40 obat~~ (selesai: 38 obat, lihat `docs/riset/data-awal-obat.md`)
-   6. #8 Mencatat Penjualan
+   6. ~~#8 Mencatat Penjualan~~ (selesai)
    7. #10 Struk dan Penjualan hari ini
    8. #13 Pembatalan
    9. #9 Kelola obat

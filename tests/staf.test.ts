@@ -1,69 +1,27 @@
 // Tes database untuk login Staf (tiket #6, SPEC 4.5 dan 5.2).
 // Tes berperan sebagai Pengunjung, Kasir, Admin, dan Staf nonaktif, lalu
 // memanggil database lewat jalur yang sama dengan aplikasi (supabase-js +
-// kunci publik). Akun uji dibuat lewat dasbor project apotikku-uji; profilnya
-// dipasang oleh supabase/uji/data-uji.sql. Password tidak pernah ada di repo:
-// dibaca dari .env.local (laptop) atau secrets GitHub (CI).
+// kunci publik). Cara login akun uji ada di tests/bantu.ts.
 import { beforeAll, describe, expect, it } from "vitest";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-
-const url = process.env.SUPABASE_UJI_URL;
-const kunciPublik = process.env.SUPABASE_UJI_PUBLISHABLE_KEY;
-
-const akunUji = {
-  admin: {
-    email: "admin@apotikku.test",
-    password: process.env.SUPABASE_UJI_ADMIN_PASSWORD,
-  },
-  kasir: {
-    email: "kasir@apotikku.test",
-    password: process.env.SUPABASE_UJI_KASIR_PASSWORD,
-  },
-  nonaktif: {
-    email: "nonaktif@apotikku.test",
-    password: process.env.SUPABASE_UJI_NONAKTIF_PASSWORD,
-  },
-};
-
-if (!url || !kunciPublik) {
-  throw new Error(
-    "Isi SUPABASE_UJI_URL dan SUPABASE_UJI_PUBLISHABLE_KEY (alamat dan kunci publik project apotikku-uji).",
-  );
-}
-for (const [peran, akun] of Object.entries(akunUji)) {
-  if (!akun.password) {
-    throw new Error(
-      `Password akun uji ${peran} belum diisi. Isi SUPABASE_UJI_${peran.toUpperCase()}_PASSWORD di .env.local atau secrets GitHub.`,
-    );
-  }
-}
-
-function buatPenghubung() {
-  return createClient(url!, kunciPublik!, { auth: { persistSession: false } });
-}
-
-async function masuk(akun: { email: string; password?: string }) {
-  const supabase = buatPenghubung();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: akun.email,
-    password: akun.password!,
-  });
-  if (error) {
-    throw new Error(`Gagal masuk sebagai ${akun.email}: ${error.message}`);
-  }
-  return { supabase, id: data.user.id };
-}
+import {
+  akunUji,
+  alamatUji,
+  buatPenghubung,
+  kunciPublikUji,
+  masukSebagai,
+  type StafUji,
+} from "./bantu";
 
 const pengunjung = buatPenghubung();
-let admin: { supabase: SupabaseClient; id: string };
-let kasir: { supabase: SupabaseClient; id: string };
-let nonaktif: { supabase: SupabaseClient; id: string };
+let admin: StafUji;
+let kasir: StafUji;
+let nonaktif: StafUji;
 
 beforeAll(async () => {
   [admin, kasir, nonaktif] = await Promise.all([
-    masuk(akunUji.admin),
-    masuk(akunUji.kasir),
-    masuk(akunUji.nonaktif),
+    masukSebagai("admin"),
+    masukSebagai("kasir"),
+    masukSebagai("nonaktif"),
   ]);
 });
 
@@ -90,8 +48,8 @@ describe("Login", () => {
     // mendaftar: percobaan mendaftar bisa ditolak karena alasan lain (misalnya
     // domain .test dianggap email tidak valid) sehingga tes lulus walau
     // pendaftaran sebenarnya masih terbuka.
-    const jawaban = await fetch(`${url}/auth/v1/settings`, {
-      headers: { apikey: kunciPublik! },
+    const jawaban = await fetch(`${alamatUji}/auth/v1/settings`, {
+      headers: { apikey: kunciPublikUji },
     });
     expect(jawaban.ok).toBe(true);
     const pengaturan = await jawaban.json();

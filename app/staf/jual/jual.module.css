@@ -1,0 +1,369 @@
+/* Layar Jual: laptop/tablet (ADR 0004). Kiri daftar obat, kanan keranjang,
+   seperti meja kasir: rak di belakang, nota di depan. Harga monospace. */
+.layar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Tablet tegak dan layar sempit: keranjang di bawah daftar obat. */
+@media (max-width: 52rem) {
+  .layar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.judulBagian {
+  margin: 0 0 0.6rem;
+  font-family: var(--huruf-judul);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.petunjuk {
+  margin: 0.4rem 0 0;
+  color: var(--tinta-lembut);
+  font-size: 0.9rem;
+}
+
+/* --- Kiri: cari obat --------------------------------------------------- */
+
+.kotakCari {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+.daftar {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  max-height: 34rem;
+  overflow-y: auto;
+  border: 1.5px solid var(--garis);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.daftar li + li {
+  border-top: 1px dashed var(--garis);
+}
+
+.obat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.obat:hover:not(:disabled) {
+  background: var(--kertas);
+}
+
+.obat:disabled {
+  background: var(--etiket-habis);
+  color: var(--habis);
+  cursor: not-allowed;
+}
+
+.obat:disabled .obatTanda {
+  opacity: 0.45;
+}
+
+.obatTanda {
+  display: flex;
+}
+
+.obatNama {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
+.obatKecil {
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--tinta-lembut);
+}
+
+.obatStok {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--huruf-angka);
+  font-size: 0.9rem;
+}
+
+.obat[data-status="hampir_habis"] .obatStok {
+  color: var(--hampir-habis);
+}
+
+.harga {
+  font-family: var(--huruf-angka);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* --- Kanan: keranjang dan bayar --------------------------------------- */
+
+.kasir {
+  padding: 1rem 1.1rem 1.25rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+  box-shadow: 4px 4px 0 var(--garis);
+}
+
+.kosong {
+  margin: 0;
+  color: var(--tinta-lembut);
+}
+
+.keranjang {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.baris {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed var(--garis);
+}
+
+.barisNama {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
+.jumlah {
+  display: flex;
+  align-items: center;
+}
+
+.jumlah button {
+  width: 2rem;
+  height: 2rem;
+  border: 1.5px solid var(--tinta);
+  background: var(--kertas);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.jumlah button:disabled {
+  color: var(--garis);
+  border-color: var(--garis);
+  cursor: not-allowed;
+}
+
+.jumlah input {
+  width: 3.2rem;
+  height: 2rem;
+  border: 1.5px solid var(--tinta);
+  border-left: none;
+  border-right: none;
+  font-family: var(--huruf-angka);
+  font-size: 1rem;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.jumlah input::-webkit-inner-spin-button,
+.jumlah input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.hapus {
+  border: none;
+  background: none;
+  color: var(--tinta-lembut);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0.9rem 0;
+  font-weight: 600;
+}
+
+.hargaBesar {
+  font-family: var(--huruf-angka);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Cek resep: satu-satunya tempat merah di layar ini adalah tanda K (ADR 0004). */
+.cekResep {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 0.9rem;
+  padding: 0.65rem 0.75rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--kertas);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cekResep input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.15rem;
+}
+
+.cekResep svg {
+  vertical-align: -3px;
+}
+
+.bayar {
+  margin: 0 0 0.9rem;
+  padding: 0.6rem 0.75rem 0.75rem;
+  border: 1.5px solid var(--garis);
+  border-radius: 3px;
+}
+
+.bayar legend {
+  padding: 0 0.3rem;
+  font-weight: 600;
+}
+
+.pilihanBayar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: 1.25rem;
+  cursor: pointer;
+}
+
+.tunai {
+  margin-top: 0.6rem;
+}
+
+.uang {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.uang input {
+  padding: 0.5rem 0.65rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  font-family: var(--huruf-angka);
+  font-size: 1.15rem;
+}
+
+.cepat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.cepat button {
+  padding: 0.35rem 0.7rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--kertas);
+  font-family: var(--huruf-angka);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cepat button:disabled {
+  color: var(--garis);
+  border-color: var(--garis);
+  cursor: not-allowed;
+}
+
+.kembalian {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+}
+
+.gagal {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid var(--tinta);
+  border-left: 8px solid var(--habis);
+  border-radius: 3px;
+  background: var(--etiket-habis);
+  font-weight: 600;
+}
+
+.simpan {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 3px;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.simpan:disabled {
+  background: var(--garis);
+  color: var(--tinta-lembut);
+  cursor: not-allowed;
+}
+
+/* Hasil: seperti potongan nota yang baru keluar dari mesin. */
+.hasil {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1.5px solid var(--hijau-apotek);
+  border-left: 8px solid var(--hijau-apotek);
+  border-radius: 3px;
+  background: var(--kertas);
+}
+
+.hasil p {
+  margin: 0;
+}
+
+.hasilJudul {
+  font-weight: 700;
+  margin-bottom: 0.2rem !important;
+}
+
+.nomor {
+  font-family: var(--huruf-angka);
+  font-size: 1.15rem;
+}
+
+.perubahan {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-left: 6px solid var(--hampir-habis);
+  background: #fbf0d9;
+  font-weight: 600;
+}

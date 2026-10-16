@@ -86,6 +86,18 @@ _Hindari_: harga, price
 Satu kali pembeli dilayani di kasir, berisi satu atau lebih Item penjualan.
 _Hindari_: transaksi, pembelian, beli, order
 
+**Keranjang**:
+Daftar obat dan jumlah yang sedang disusun Kasir di layar Jual sebelum Penjualan disimpan; belum tercatat dan belum mengurangi stok.
+_Hindari_: troli, cart, pesanan, order
+
+**Nomor Penjualan**:
+Kode unik sebuah Penjualan yang tercetak di Struk, berbentuk PJ-000123.
+_Hindari_: nomor transaksi, nomor nota, invoice
+
+**Cara bayar**:
+Tunai (dengan uang diterima dan kembalian) atau QRIS/transfer (hanya dicatat; uangnya masuk ke rekening apotek, bukan ke laci).
+_Hindari_: metode pembayaran, payment
+
 **Item penjualan**:
 Satu baris dalam Penjualan: satu obat, jumlahnya, dan Harga jual saat itu terjual.
 _Hindari_: detail transaksi, line item
