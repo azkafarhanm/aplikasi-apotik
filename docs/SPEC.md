@@ -278,6 +278,34 @@ Detail penting `catat_penjualan`:
 - **Pesan penolakan ditulis dalam bahasa sehari-hari dan menyebut obatnya**, misalnya "Stok Ambroksol 30 mg tinggal 3 strip", supaya bisa langsung ditampilkan ke Kasir.
 - Kasir **tidak punya izin mengubah tabel `obat` secara langsung**. Pengurangan stok hanya terjadi di dalam fungsi ini.
 
+Ditambahkan 16 Oktober 2026 (tiket #8, migrasi `…_penjualan.sql`, [ADR 0005](adr/0005-kunci-baris-obat-saat-penjualan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Cara menolak | Berhenti di pelanggaran pertama dengan `RAISE EXCEPTION` (kode `P0001`). Layar menampilkan pesan berkode itu apa adanya; kesalahan lain → "Penjualan belum tersimpan karena gangguan. Coba lagi." | Pengecualian otomatis membatalkan seluruh transaksi (utuh atau tidak sama sekali); satu pesan yang jelas cukup karena layar sudah mencegah hampir semua kesalahan | Mengumpulkan semua kesalahan sekaligus (kode jauh lebih rumit); mengembalikan `{ok: false}` tanpa pengecualian (langkah yang sudah terjadi tidak otomatis batal) |
+| Urutan cek | Staf aktif → keranjang kosong → cara bayar → obat dikenal → jumlah ≥ 1 → **kunci baris obat urut id** → per obat (urut id): diarsipkan, Sudah kedaluwarsa, Habis, stok kurang → Cek resep → uang | Pengecekan yang tidak butuh data obat dilakukan sebelum mengunci, supaya kunci dipegang sesingkat mungkin | — |
+| Nilai kembalian | JSON berisi `nomor`, `total`, `metode_bayar`, `uang_diterima`, `kembalian`, dan `item` (obat, nama, jumlah, harga database, subtotal) | Layar bisa membandingkan harga resmi dengan perkiraannya dan memberi tahu Kasir bila berubah, tanpa bertanya lagi ke database | Hanya nomor (layar harus membaca ulang, dan Kasir tidak bisa membaca Penjualan Admin) |
+| Obat dikirim dua kali | Jumlahnya dijumlahkan, lalu stok dicek terhadap total | Hasilnya tetap benar dan aman; menolak tidak menambah keamanan | Pesan penolakan khusus |
+| Cek resep tanpa Obat keras | Disimpan apa adanya | Yang tercatat adalah yang benar-benar dikonfirmasi Kasir | Diubah diam-diam menjadi "tidak" |
+| Nomor Penjualan | Kolom terhitung `'PJ-' + id 6 digit` (PJ-000123; lebih dari 999.999 menjadi 7 digit) | Pasti unik dan tidak bisa diketik sendiri | Nomor per hari (perlu penghitung tambahan tanpa masalah nyata) |
+
+Pesan penolakan (diuji kata per kata di `tests/penjualan.test.ts`):
+
+| Keadaan | Pesan |
+|---|---|
+| Bukan Staf aktif | Akun ini tidak bisa mencatat Penjualan. |
+| Keranjang kosong | Keranjang masih kosong. |
+| Obat tidak ada | Ada obat di keranjang yang tidak dikenal. Muat ulang halaman Jual. |
+| Jumlah ≤ 0 | Jumlah Parasetamol 500 mg minimal 1. |
+| Diarsipkan | Parasetamol 500 mg sudah diarsipkan dan tidak bisa dijual. |
+| Sudah kedaluwarsa | Parasetamol 500 mg sudah kedaluwarsa dan tidak boleh dijual. |
+| Habis | Stok Parasetamol 500 mg habis. |
+| Stok kurang | Stok Ambroksol 30 mg tinggal 3 strip. |
+| Obat keras tanpa Cek resep | Ada Obat keras (Amoksisilin 500 mg). Centang Cek resep setelah memeriksa resep dokter. |
+| Tunai tanpa uang | Isi uang diterima untuk pembayaran tunai. |
+| Tunai, uang kurang | Uang diterima kurang. Total Rp12.500. |
+| QRIS/transfer dengan uang diterima | QRIS/transfer tidak memakai uang diterima. |
+
 ### 4.5 Aturan hak akses (RLS)
 
 > **RLS** = aturan di dalam database tentang siapa boleh membaca atau mengubah baris yang mana. *Analogi:* loker dengan kunci masing-masing (lihat ADR 0003).
@@ -347,6 +375,20 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 - Total di layar hanya perkiraan. Angka resmi datang dari `catat_penjualan`. Bila harga di database ternyata sudah berubah, Struk memakai harga database dan layar menampilkan pemberitahuan.
 - Setelah berhasil: keranjang dikosongkan dan Struk dibuka, siap dicetak. Bila gagal: keranjang tetap, dan pesan dari database ditampilkan.
 
+Ditambahkan 16 Oktober 2026 (tiket #8, `app/staf/jual/`):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Sumber daftar obat | Tampilan `obat_kasir` (`security_invoker`: RLS tabel `obat` tetap berlaku) berisi stok persis, `status_stok`, dan `sudah_kedaluwarsa` dari fungsi yang sama dengan Katalog | Aturan Status stok tetap di satu tempat (4.3) | Menghitung Status stok di TypeScript (aturan di dua tempat) |
+| Enter di pencarian | Menambahkan hasil pertama yang **bisa dijual**; obat Habis dilewati. Bila tidak ada, tampil "Tidak ada obat yang bisa dijual untuk …" | Enter tidak "macet" karena obat Habis yang kebetulan di atas (target ≤ 30 detik, NF-03); obat Habis tetap terlihat supaya Kasir bisa memberi tahu pembeli | Tidak menambahkan apa pun bila hasil teratas Habis |
+| Jumlah di keranjang | Dibatasi stok yang terlihat; database tetap mengecek ulang | Kasir langsung tahu sebelum menekan Simpan; penjaga sebenarnya tetap database (ADR 0003) | Membiarkan angka melebihi stok sampai ditolak database |
+| Cara bayar bawaan | Tunai. Memilih QRIS/transfer menyembunyikan dan mengosongkan uang diterima | Sebagian besar pembeli apotek kecil membayar tunai; angka sisa pasti ditolak database | Tanpa pilihan bawaan |
+| Tombol cepat uang | Uang pas, Rp50.000, Rp100.000 (yang di bawah total tidak aktif). Enter di kolom uang = Simpan | Pecahan uang kertas terbesar; seluruh Penjualan bisa diselesaikan dengan keyboard | — |
+| Harga berubah | Penjualan tetap tersimpan dengan harga database; panel hasil menampilkan "Harga … sudah berubah: Rp… → Rp…. Total memakai harga terbaru." Bila uang tunai jadi kurang, database menolak dengan total baru | SPEC di atas sudah memilih "harga database + pemberitahuan"; Kasir tidak perlu menyimpan dua kali | Menolak lalu meminta Kasir menyimpan ulang |
+| Setelah berhasil (sebelum #10) | Keranjang kosong, panel hasil (Nomor Penjualan, total, cara bayar, kembalian), daftar stok dimuat ulang (`refresh()` dari Server Action), fokus kembali ke pencarian | Struk dan tombol cetaknya dibangun di #10 | — |
+| Jalur simpan | Server Action `simpanPenjualan` → `supabase.rpc("catat_penjualan")`. Hanya `obat_id` dan `jumlah` yang diteruskan | Sama dengan pola formulir masuk (#6); daftar stok dimuat ulang dalam perjalanan pulang yang sama | Memanggil database langsung dari browser (perlu penghubung Supabase kedua khusus browser, padahal yang lain lewat server) |
+| Kode bersama browser–server | `lib/katalog.ts` dan `lib/penjualan.ts` hanya berisi bentuk data dan cara menulisnya; pengambilan data pindah ke halamannya (`app/page.tsx`, `app/staf/jual/page.tsx`) | Layar Jual (berjalan di browser) memakai `tulisRupiah` dkk.; Next.js menolak kode server ikut terbawa ke browser | Menyalin fungsi penulisan ke file lain (aturan tulisan di dua tempat) |
+
 ### 4.9 Struk dan Laporan cetak
 
 - Struk memakai lebar kertas 58 mm lewat pengaturan cetak browser (aturan CSS khusus cetak). Isinya: nama apotek, alamat, nomor Penjualan, waktu (WIB), nama tampilan Kasir, daftar Item penjualan (nama, jumlah × harga, subtotal), total, cara bayar, uang diterima dan kembalian (bila tunai), serta tulisan "Terima kasih. Simpan struk ini sebagai bukti pembelian."
@@ -403,7 +445,7 @@ Disepakati 7 Oktober 2026:
 | `supabase/migrations/*.sql` | Bentuk database (tabel, fungsi, tampilan, RLS), berurutan | Kedua project |
 | `supabase/data/data-awal.sql` | Data awal 38 obat bersumber resmi (tiket #7; menggantikan `contoh.sql`). Bisa dipasang ulang sebelum demo | `apotikku` |
 | `supabase/data/profil-staf.sql` | Profil akun Staf (peran, nama tampilan); akunnya dibuat di dasbor dulu | `apotikku` |
-| `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal + profil tiga akun Staf uji | `apotikku-uji` saja |
+| `supabase/uji/data-uji.sql` | Baris uji yang tetap + jadwal penyegar tanggal + profil tiga akun Staf uji + fungsi `uji_atur_obat` + satu Penjualan lama (tiket #8) | `apotikku-uji` saja |
 
 > **Variabel lingkungan** = pengaturan yang dibaca aplikasi saat berjalan, disimpan di luar kode. *Analogi:* PIN brankas yang dihafal penjaga, bukan ditulis di pintu brankas.
 
@@ -462,6 +504,8 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - **Alat tes**: Vitest (penjalan tes untuk JavaScript/TypeScript) + `supabase-js`. Tes hanya memegang kunci publik, jadi tes **tidak** membentuk ulang database. Database uji dibentuk dari migrasi yang sama dan diisi data uji yang tetap (`supabase/uji/data-uji.sql`) setiap kali ada migrasi baru, lewat connector Supabase.
 - **Tanggal yang bergeser**: tes "kedaluwarsa kemarin" dan "kedaluwarsa hari ini" butuh tanggal yang selalu relatif terhadap hari ini (WIB). Project uji punya jadwal kecil (pg_cron) yang menyegarkan dua baris itu setiap menit. Jadwal ini hanya ada di project uji, tidak di project asli.
 - **Tes yang mengubah data** (Penjualan, kelola obat) mulai tiket #6 dan #8 berjalan sebagai Staf uji dan membersihkan atau memakai data miliknya sendiri, supaya tes bisa diulang.
+- **Tes Penjualan bisa diulang** (16 Oktober 2026, tiket #8): sebelum setiap tes, stok dan harga obat `uji-jual-*` dikembalikan ke angka awal lewat fungsi `public.uji_atur_obat`. Fungsi ini **hanya ada di project uji** (dipasang `data-uji.sql`, bukan migrasi), hanya bisa dipanggil Admin uji, dan hanya untuk slug `uji-jual-*`. Penjualan uji tidak dihapus (aturan bisnis 7); mereka menumpuk di project uji dan tidak mengganggu, karena setiap tes mencari Penjualannya sendiri lewat Nomor Penjualan. `data-uji.sql` tidak lagi menghapus obat, karena obat yang pernah terjual dirujuk Item penjualan. Ditolak: jadwal pg_cron penyetel stok (bisa bertabrakan dengan tes yang sedang berjalan); membuat obat baru per tes (Admin belum boleh menambah obat sampai #9, dan tabel menumpuk).
+- **Tes dua Kasir bersamaan**: dua sesi berbeda (Kasir uji dan Admin uji) memanggil `catat_penjualan` serentak untuk obat ber-stok 1, diulang 3 ronde. Ditolak: akun Kasir uji kedua (perlu dasbor dan secret baru, padahal yang diuji adalah penguncian stoknya, bukan perannya).
 
 > **pg_cron** = penjadwal tugas di dalam PostgreSQL. *Analogi:* alarm yang setiap menit mengingatkan petugas mengganti kertas tanggal di papan.
 - **Dijalankan otomatis** setiap ada Pull Request lewat GitHub Actions (gratis untuk repo publik), supaya perubahan yang merusak aturan ketahuan sebelum digabung.
@@ -480,6 +524,8 @@ Tampilan **tidak** diuji otomatis di versi 1. Aturan pentingnya sudah dijaga di 
 ### 5.5 Contoh sebelumnya
 
 Belum ada. ApotikKu versi 1 tidak punya tes otomatis. Tes Penjualan menjadi contoh pertama yang diikuti tes lain.
+
+Mulai tiket #8, contohnya adalah [`tests/penjualan.test.ts`](../tests/penjualan.test.ts): login lewat alat bersama [`tests/bantu.ts`](../tests/bantu.ts), atur data milik tes sendiri di `beforeEach`, panggil database persis seperti layar, lalu periksa perilaku yang terlihat (stok, total, pesan kata per kata), bukan isi fungsinya.
 
 ## 6. Di luar cakupan
 
