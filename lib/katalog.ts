@@ -1,7 +1,8 @@
 // Bentuk data tampilan `katalog` dan cara menuliskannya untuk Pengunjung.
 // Nilai di database berupa kode (misalnya `bebas_terbatas`); tulisan yang
-// dibaca orang ada di sini, di satu tempat.
-import { buatSupabaseServer } from "@/lib/supabase/server";
+// dibaca orang ada di sini, di satu tempat. File ini juga dipakai kode browser
+// (layar Jual), jadi tidak boleh membawa kode khusus server; pengambilan data
+// ada di halamannya masing-masing.
 
 export type Golongan = "bebas" | "bebas_terbatas" | "keras";
 export type StatusStok = "tersedia" | "hampir_habis" | "habis";
@@ -60,21 +61,4 @@ export function tulisRupiah(rupiah: number): string {
 /** "strip", "10 tablet" → "per strip · 10 tablet" */
 export function tulisSatuan(satuanJual: string, isiPerSatuan: string): string {
   return `per ${satuanJual} · ${isiPerSatuan}`;
-}
-
-/**
- * Mengambil semua obat di Katalog, urut nama A–Z.
- * Dipanggil setiap kali halaman dibuka (tanpa cache), supaya Status stok selalu terbaru.
- */
-export async function ambilKatalog(): Promise<ObatKatalog[]> {
-  const supabase = await buatSupabaseServer();
-  const { data, error } = await supabase
-    .from("katalog")
-    .select("*")
-    .order("nama", { ascending: true });
-
-  if (error) {
-    throw new Error(`Gagal membaca katalog: ${error.message}`);
-  }
-  return data as ObatKatalog[];
 }

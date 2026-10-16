@@ -8,7 +8,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { KartuEtiket } from "@/components/KartuEtiket";
-import { ambilKatalog } from "@/lib/katalog";
+import type { ObatKatalog } from "@/lib/katalog";
+import { buatSupabaseServer } from "@/lib/supabase/server";
 import styles from "./page.module.css";
 
 export default function HalamanKatalog() {
@@ -78,4 +79,21 @@ async function DaftarObat() {
       </ul>
     </>
   );
+}
+
+/**
+ * Mengambil semua obat di Katalog, urut nama A–Z.
+ * Dipanggil setiap kali halaman dibuka (tanpa cache), supaya Status stok selalu terbaru.
+ */
+async function ambilKatalog(): Promise<ObatKatalog[]> {
+  const supabase = await buatSupabaseServer();
+  const { data, error } = await supabase
+    .from("katalog")
+    .select("*")
+    .order("nama", { ascending: true });
+
+  if (error) {
+    throw new Error(`Gagal membaca katalog: ${error.message}`);
+  }
+  return data as ObatKatalog[];
 }
