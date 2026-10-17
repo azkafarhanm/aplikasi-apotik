@@ -143,3 +143,74 @@ insert into public.item_penjualan (penjualan_id, obat_id, jumlah, harga_satuan, 
 select baru.id, o.id, 1, 2500, 2500
   from baru, public.obat o
  where o.slug = 'uji-jual-bebas';
+
+-- ---------------------------------------------------------------------------
+-- Penjualan berjam tetap (tiket #10)
+-- ---------------------------------------------------------------------------
+-- Tes "hari ini menurut WIB" (user story 72) butuh Penjualan Kasir uji pada
+-- jam tertentu, relatif terhadap hari ini:
+--   hari-ini-0030 : pukul 00.30 WIB hari ini (= 17.30 UTC KEMARIN). Kalau
+--                   "hari ini" salah dihitung memakai UTC, baris ini hilang.
+--                   Berisi obat 'Uji Diarsipkan', untuk tes Struk yang tetap
+--                   menampilkan nama obat yang sudah diarsipkan.
+--   hari-ini-2330 : pukul 23.30 WIB hari ini, tetap terhitung hari ini.
+--   kemarin-2330  : pukul 23.30 WIB kemarin, TIDAK terhitung hari ini.
+--   admin-1200    : milik Admin uji, pukul 12.00 WIB hari ini. Kasir tidak
+--                   boleh melihatnya; Admin melihatnya beserta namanya.
+-- Tes hari ini tidak mencatat Penjualan baru, supaya tidak mengganggu angka
+-- stok tes Penjualan yang berjalan bersamaan.
+-- Waktunya disegarkan setiap menit oleh jadwal di bawah (seperti tanggal
+-- kedaluwarsa). Tabel penanda ini hanya ada di project uji.
+create table if not exists private.uji_penjualan_berjam (
+  kunci        text primary key,
+  penjualan_id bigint not null unique references public.penjualan (id),
+  geser_hari   integer not null,
+  jam          time not null
+);
+
+with rencana (kunci, email, geser_hari, jam, slug_obat, harga) as (
+  values
+    ('hari-ini-0030', 'kasir@apotikku.test',  0, time '00:30', 'uji-diarsipkan', 1000),
+    ('hari-ini-2330', 'kasir@apotikku.test',  0, time '23:30', 'uji-jual-bebas', 2500),
+    ('kemarin-2330',  'kasir@apotikku.test', -1, time '23:30', 'uji-jual-bebas', 2500),
+    ('admin-1200',    'admin@apotikku.test',  0, time '12:00', 'uji-jual-kedua', 7000)
+),
+belum as (
+  select r.*, row_number() over (order by r.kunci) as urut
+    from rencana r
+   where r.kunci not in (select kunci from private.uji_penjualan_berjam)
+),
+baru as (
+  insert into public.penjualan (kasir_id, waktu, total, metode_bayar)
+  select u.id,
+         ((private.hari_ini() + b.geser_hari) + b.jam) at time zone 'Asia/Jakarta',
+         b.harga, 'qris_transfer'
+    from belum b
+    join auth.users u on u.email = b.email
+   order by b.urut
+  returning id
+),
+berpasangan as (
+  select b.*, n.id as penjualan_id
+    from (select id, row_number() over (order by id) as urut from baru) n
+    join belum b on b.urut = n.urut
+),
+penanda as (
+  insert into private.uji_penjualan_berjam (kunci, penjualan_id, geser_hari, jam)
+  select kunci, penjualan_id, geser_hari, jam from berpasangan
+)
+insert into public.item_penjualan (penjualan_id, obat_id, jumlah, harga_satuan, subtotal)
+select p.penjualan_id, o.id, 1, p.harga, p.harga
+  from berpasangan p
+  join public.obat o on o.slug = p.slug_obat;
+
+select cron.schedule(
+  'uji-segarkan-waktu-penjualan',
+  '* * * * *',
+  $$
+    update public.penjualan p
+       set waktu = ((private.hari_ini() + b.geser_hari) + b.jam) at time zone 'Asia/Jakarta'
+      from private.uji_penjualan_berjam b
+     where p.id = b.penjualan_id;
+  $$
+);
