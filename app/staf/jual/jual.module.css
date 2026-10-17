@@ -367,3 +367,14 @@
   background: #fbf0d9;
   font-weight: 600;
 }
+
+.bukaStruk {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 3px;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  font-weight: 700;
+  text-decoration: none;
+}

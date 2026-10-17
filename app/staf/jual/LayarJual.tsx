@@ -5,6 +5,8 @@
 // Semua angka di sini PERKIRAAN untuk membantu Kasir. Yang menentukan adalah
 // fungsi database catat_penjualan: harga, stok, Cek resep, dan uang dicek ulang
 // di sana, dan pesan penolakannya ditampilkan apa adanya.
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { TandaGolongan } from "@/components/TandaGolongan";
 import { tulisanGolongan, tulisanStatusStok, tulisRupiah, tulisSatuan } from "@/lib/katalog";
@@ -39,6 +41,7 @@ export function LayarJual({ daftarObat }: { daftarObat: ObatJual[] }) {
   const [hasil, setHasil] = useState<Hasil | null>(null);
   const [sedangMenyimpan, mulaiMenyimpan] = useTransition();
   const kotakCari = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // Daftar obat dimuat ulang server setelah setiap Penjualan. Baris keranjang
   // memakai data terbaru (stok, harga) bila obatnya masih ada.
@@ -153,13 +156,20 @@ export function LayarJual({ daftarObat }: { daftarObat: ObatJual[] }) {
         .filter((i) => hargaDiLayar.get(i.obat_id) !== i.harga_satuan)
         .map((i) => ({ nama: i.nama, lama: hargaDiLayar.get(i.obat_id) ?? 0, baru: i.harga_satuan }));
 
-      setHasil({ penjualan: jawaban.penjualan, perubahanHarga });
       setKeranjang([]);
       setUangDiterima("");
       setCekResep(false);
       setCaraBayar("tunai");
       setCari("");
-      kotakCari.current?.focus();
+
+      // Harga sama dengan yang dilihat Kasir: langsung buka Struk, siap dicetak
+      // (SPEC 4.8). Harga berubah: tetap di sini dulu supaya Kasir membaca
+      // pemberitahuannya, lalu membuka Struk lewat tombol.
+      if (perubahanHarga.length === 0) {
+        router.push(`/staf/penjualan/${jawaban.penjualan.nomor}/struk?baru=1`);
+        return;
+      }
+      setHasil({ penjualan: jawaban.penjualan, perubahanHarga });
     });
   }
 
@@ -392,6 +402,12 @@ export function LayarJual({ daftarObat }: { daftarObat: ObatJual[] }) {
 
 function PanelHasil({ hasil }: { hasil: Hasil }) {
   const { penjualan, perubahanHarga } = hasil;
+  const tombolStruk = useRef<HTMLAnchorElement>(null);
+  // Enter berikutnya langsung membuka Struk (NF-03). React hanya menjalankan
+  // autoFocus untuk tombol dan kolom isian, bukan tautan, jadi fokus diatur di sini.
+  useEffect(() => {
+    tombolStruk.current?.focus();
+  }, [penjualan.nomor]);
   return (
     <div className={styles.hasil} role="status">
       <p className={styles.hasilJudul}>
@@ -416,6 +432,9 @@ function PanelHasil({ hasil }: { hasil: Hasil }) {
           <p>Total memakai harga terbaru. Beri tahu pembeli.</p>
         </div>
       )}
+      <Link ref={tombolStruk} href={`/staf/penjualan/${penjualan.nomor}/struk?baru=1`} className={styles.bukaStruk}>
+        Buka Struk
+      </Link>
     </div>
   );
 }

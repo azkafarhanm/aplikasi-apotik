@@ -1,0 +1,104 @@
+/* Penjualan hari ini: buku catatan kasir, satu baris per pembeli.
+   Angka monospace dan rata kanan supaya mudah dibandingkan (ADR 0004). */
+.keterangan {
+  margin: -0.5rem 0 1rem;
+  color: var(--tinta-lembut);
+}
+
+.kosong {
+  padding: 1.25rem;
+  border: 1.5px dashed var(--garis);
+  border-radius: 3px;
+  background: var(--etiket);
+  color: var(--tinta-lembut);
+}
+
+.jumlah {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.jumlah strong {
+  font-family: var(--huruf-angka);
+}
+
+.catatan {
+  color: var(--tinta-lembut);
+  font-size: 0.95rem;
+}
+
+.bungkusTabel {
+  overflow-x: auto;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.tabel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabel th,
+.tabel td {
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabel th {
+  border-bottom: 1.5px solid var(--tinta);
+  font-family: var(--huruf-judul);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tabel tbody tr + tr td {
+  border-top: 1px dashed var(--garis);
+}
+
+.angka {
+  text-align: right !important;
+}
+
+.nomor {
+  font-family: var(--huruf-angka);
+}
+
+.status {
+  font-size: 0.9rem;
+}
+
+/* Dibatalkan: tetap terlihat (aturan bisnis 7), tetapi abu-abu dan dicoret. */
+.dibatalkan td {
+  color: var(--habis);
+  background: var(--etiket-habis);
+}
+
+.dibatalkan .angka {
+  text-decoration: line-through;
+}
+
+.dibatalkan .status {
+  padding: 0.05rem 0.4rem;
+  border: 1.5px solid var(--habis);
+  border-radius: 2px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.struk {
+  font-weight: 700;
+  color: var(--hijau-apotek);
+}
+
+.tersembunyi {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
