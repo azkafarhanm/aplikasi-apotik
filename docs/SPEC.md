@@ -326,6 +326,8 @@ Pesan penolakan (diuji kata per kata di `tests/penjualan.test.ts`):
 | | Hapus | ❌ | ❌ | ❌ |
 | Tabel `item_penjualan` | Baca | ❌ | ✅ (milik Penjualannya) | ✅ (semua) |
 | | Tambah / ubah / hapus | ❌ | 🔧 / ❌ / ❌ | 🔧 / ❌ / ❌ |
+| Tampilan `penjualan_hari_ini` (#10) | Baca | ❌ | ✅ (miliknya, hari ini) | ✅ (semua, hari ini) |
+| Tampilan `rincian_struk` (#10) | Baca | ❌ | ✅ (milik Penjualannya) | ✅ (semua) |
 | Ringkasan, Laporan | Panggil | ❌ | ❌ | 🔧 |
 
 **Kasir hanya melihat Penjualan miliknya hari ini.** Itu cukup untuk mengecek pekerjaan dan mencetak ulang Struk (F-07, F-08). Daftar Penjualan semua Kasir sama saja dengan laporan pendapatan harian, dan laporan pendapatan adalah wewenang Admin (PRD bagian 4).
@@ -386,6 +388,7 @@ Ditambahkan 16 Oktober 2026 (tiket #8, `app/staf/jual/`):
 | Tombol cepat uang | Uang pas, Rp50.000, Rp100.000 (yang di bawah total tidak aktif). Enter di kolom uang = Simpan | Pecahan uang kertas terbesar; seluruh Penjualan bisa diselesaikan dengan keyboard | — |
 | Harga berubah | Penjualan tetap tersimpan dengan harga database; panel hasil menampilkan "Harga … sudah berubah: Rp… → Rp…. Total memakai harga terbaru." Bila uang tunai jadi kurang, database menolak dengan total baru | SPEC di atas sudah memilih "harga database + pemberitahuan"; Kasir tidak perlu menyimpan dua kali | Menolak lalu meminta Kasir menyimpan ulang |
 | Setelah berhasil (sebelum #10) | Keranjang kosong, panel hasil (Nomor Penjualan, total, cara bayar, kembalian), daftar stok dimuat ulang (`refresh()` dari Server Action), fokus kembali ke pencarian | Struk dan tombol cetaknya dibangun di #10 | — |
+| Setelah berhasil (mulai #10) | Harga sama: keranjang kosong lalu langsung pindah ke Struk (`/staf/penjualan/PJ-…/struk?baru=1`). Harga berubah: tetap di panel hasil dengan kotak kuning dan tombol **Buka Struk** (sudah terfokus) | Struk langsung siap dicetak (issue #10). Pemberitahuan harga berubah hanya ada di memori layar Jual; kalau langsung pindah halaman, Kasir tidak sempat membacanya dan tidak memberi tahu pembeli | Selalu tetap di panel hasil (satu langkah tambahan di setiap Penjualan); selalu langsung pindah (pemberitahuan harga hilang) |
 | Jalur simpan | Server Action `simpanPenjualan` → `supabase.rpc("catat_penjualan")`. Hanya `obat_id` dan `jumlah` yang diteruskan | Sama dengan pola formulir masuk (#6); daftar stok dimuat ulang dalam perjalanan pulang yang sama | Memanggil database langsung dari browser (perlu penghubung Supabase kedua khusus browser, padahal yang lain lewat server) |
 | Kode bersama browser–server | `lib/katalog.ts` dan `lib/penjualan.ts` hanya berisi bentuk data dan cara menulisnya; pengambilan data pindah ke halamannya (`app/page.tsx`, `app/staf/jual/page.tsx`) | Layar Jual (berjalan di browser) memakai `tulisRupiah` dkk.; Next.js menolak kode server ikut terbawa ke browser | Menyalin fungsi penulisan ke file lain (aturan tulisan di dua tempat) |
 
@@ -394,6 +397,21 @@ Ditambahkan 16 Oktober 2026 (tiket #8, `app/staf/jual/`):
 - Struk memakai lebar kertas 58 mm lewat pengaturan cetak browser (aturan CSS khusus cetak). Isinya: nama apotek, alamat, nomor Penjualan, waktu (WIB), nama tampilan Kasir, daftar Item penjualan (nama, jumlah × harga, subtotal), total, cara bayar, uang diterima dan kembalian (bila tunai), serta tulisan "Terima kasih. Simpan struk ini sebagai bukti pembelian."
 - Struk Penjualan yang Dibatalkan diberi tanda besar "DIBATALKAN".
 - Laporan dicetak di kertas A4 dengan tombol Cetak browser.
+
+Ditambahkan 17 Oktober 2026 (tiket #10, migrasi `…_struk_penjualan_hari_ini.sql`, [penjelasan](penjelasan/05-struk-penjualan-hari-ini.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Membuka Struk | Halaman `/staf/penjualan/[nomor]/struk`. Tombol **Cetak Struk** sudah terfokus bila dibuka dari layar Jual (`?baru=1`), jadi Enter = cetak; sesudah mencetak, fokus pindah ke **Penjualan berikutnya** (Enter = kembali ke Jual). Kotak "PJ-… tersimpan. Kembalian Rp…" tampil di atas Struk | Seluruh alur bisa dengan keyboard (NF-03: 3 obat ≤ 30 detik); kembalian tetap terlihat besar setelah pindah halaman | Dialog cetak muncul otomatis (mengejutkan, padahal pembeli belum tentu minta struk); Struk hanya di dalam layar Jual (tidak bisa dicetak ulang, dua versi Struk) |
+| Siapa boleh membuka Struk | Tidak dicek halaman; RLS yang menentukan. Penjualan yang tidak boleh dibaca tampil sama dengan nomor yang tidak ada: "Penjualan tidak ditemukan." | Satu penjaga di satu tempat (ADR 0003); orang lain tidak bisa menebak nomor mana yang benar-benar ada | Mengecek pemilik di kode halaman (aturan di dua tempat) |
+| Ukuran cetak | Kertas 58 mm, tulisan 48 mm (jarak 5 mm kiri-kanan), huruf monospace 8 pt. Semua ukuran Struk memakai em, jadi Struk di layar (15 px) adalah versi besar yang persis sama dengan hasil cetak | Printer kasir 58 mm hanya mencetak ±48 mm; monospace membuat harga sejajar (ADR 0004) | Lebar penuh 58 mm (tulisan pinggir terpotong) |
+| Tinggi kertas | Diukur sesaat sebelum mencetak (event `beforeprint`, juga saat Ctrl+P) lalu ditulis ke `@page struk { size: 58mm <tinggi>mm }`, ditambah 6 mm untuk menyobek | Diuji di Chromium: `58mm auto` ditolak (jatuh ke kertas Letter) dan `58mm` saja menjadi kertas persegi 58 × 58 mm | Tinggi tetap, misalnya 297 mm (printer kasir mengeluarkan kertas kosong panjang) |
+| Halaman cetak bernama | Struk memakai `page: struk`, jadi ukuran 58 mm hanya berlaku untuknya. Pita dan menu Area staf disembunyikan saat mencetak | Next.js tidak membuang CSS halaman sebelumnya saat pindah halaman; tanpa nama, Laporan A4 (#12) bisa ikut tercetak 58 mm | `@page` tanpa nama |
+| Alamat apotek | Konstanta di `lib/apotek.ts` ("Jl. Contoh Sehat No. 1, Kota Contoh"), Struk mencetak "(alamat contoh)" | ApotikKu bukan apotek sungguhan (SPEC 7); alamat bukan rahasia dan sama di semua tempat | Variabel lingkungan (cocok untuk nomor WhatsApp #5, tetapi untuk alamat hanya menambah langkah di Vercel) |
+| Daftar Penjualan hari ini | Tampilan `penjualan_hari_ini` (`security_invoker`) menyaring "hari ini" dengan `private.hari_ini()` dan menyertakan nama Kasir. Kolom: Nomor, Jam, [Kasir untuk Admin], Cara bayar, Total, Status, tautan Struk; terbaru di atas | RLS Admin membaca semua Penjualan, jadi tetap perlu disaring; arti "hari ini menurut WIB" tetap di satu tempat dan bisa dites | Menghitung batas jam 00.00–24.00 WIB di TypeScript (aturan di dua tempat) |
+| Baris jumlah | "N Penjualan · Rp…" di atas daftar; Penjualan Dibatalkan tetap tampil (abu-abu, dicoret) tetapi tidak dihitung | Kasir mengecek pekerjaannya (user story 43) tanpa menjumlah sendiri; angka itu sudah terlihat per baris, jadi tidak membuka data baru | Tanpa jumlah; dipisah tunai vs QRIS (tidak ada di PRD) |
+| Tanggal lain | Tidak ada pilihan tanggal. Admin tetap bisa membuka Struk lama lewat alamatnya | F-08 = hari ini; tanggal lain adalah tugas Laporan (#12) | Pemilih tanggal untuk Admin (fitur Laporan masuk ke tiket yang salah) |
+| Nama obat di Struk | Tampilan `rincian_struk` membaca nama dan Satuan jual lewat `private.obat_untuk_struk` (security definer) | Kasir tidak boleh membaca obat yang diarsipkan; tanpa ini, obat yang diarsipkan Admin (#9) siang hari hilang namanya dari Struk yang dicetak ulang sore harinya. Yang terbuka hanya nama dan satuan, untuk Item penjualan yang memang boleh dibaca | Menyalin nama ke `item_penjualan` (mengubah tabel dan `catat_penjualan` dari #8); membiarkan nama kosong |
 
 ### 4.10 Halaman Obat (Admin)
 
@@ -483,6 +501,13 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - **Dua Kasir bersamaan**: obat dengan stok 1 dijual oleh dua panggilan serentak; tepat satu berhasil, satu ditolak, dan stok akhir 0.
 - Mengubah harga jual setelah Penjualan tidak mengubah `harga_satuan` dan total Penjualan lama.
 
+**Struk dan Penjualan hari ini (F-07, F-08; tiket #10, `tests/penjualan-hari-ini.test.ts`)**
+- Penjualan pukul 00.30 dan 23.30 WIB hari ini terhitung hari ini; 23.30 WIB kemarin tidak.
+- Kasir hanya melihat Penjualan miliknya hari ini di `penjualan_hari_ini`; Admin melihat semua Staf beserta nama Kasirnya.
+- Kasir mencetak ulang Struk miliknya, termasuk nama obat yang sudah diarsipkan; Kasir tidak bisa membaca Penjualan maupun Item penjualan milik Staf lain atau kemarin.
+- Admin membuka Struk siapa pun, termasuk Penjualan kemarin.
+- Pengunjung ditolak membaca kedua tampilan; Staf nonaktif mendapat daftar kosong.
+
 **Pembatalan (F-14)**
 - Admin membatalkan: status Dibatalkan, stok kembali, siapa/kapan/alasan tercatat.
 - Ditolak: membatalkan dua kali, alasan kosong.
@@ -505,6 +530,7 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - **Tanggal yang bergeser**: tes "kedaluwarsa kemarin" dan "kedaluwarsa hari ini" butuh tanggal yang selalu relatif terhadap hari ini (WIB). Project uji punya jadwal kecil (pg_cron) yang menyegarkan dua baris itu setiap menit. Jadwal ini hanya ada di project uji, tidak di project asli.
 - **Tes yang mengubah data** (Penjualan, kelola obat) mulai tiket #6 dan #8 berjalan sebagai Staf uji dan membersihkan atau memakai data miliknya sendiri, supaya tes bisa diulang.
 - **Tes Penjualan bisa diulang** (16 Oktober 2026, tiket #8): sebelum setiap tes, stok dan harga obat `uji-jual-*` dikembalikan ke angka awal lewat fungsi `public.uji_atur_obat`. Fungsi ini **hanya ada di project uji** (dipasang `data-uji.sql`, bukan migrasi), hanya bisa dipanggil Admin uji, dan hanya untuk slug `uji-jual-*`. Penjualan uji tidak dihapus (aturan bisnis 7); mereka menumpuk di project uji dan tidak mengganggu, karena setiap tes mencari Penjualannya sendiri lewat Nomor Penjualan. `data-uji.sql` tidak lagi menghapus obat, karena obat yang pernah terjual dirujuk Item penjualan. Ditolak: jadwal pg_cron penyetel stok (bisa bertabrakan dengan tes yang sedang berjalan); membuat obat baru per tes (Admin belum boleh menambah obat sampai #9, dan tabel menumpuk).
+- **Penjualan berjam tetap** (17 Oktober 2026, tiket #10): `data-uji.sql` menyimpan empat Penjualan uji (Kasir uji pukul 00.30 dan 23.30 WIB hari ini, 23.30 WIB kemarin; Admin uji pukul 12.00 WIB hari ini). Waktunya disegarkan setiap menit oleh jadwal pg_cron, seperti tanggal kedaluwarsa. Pukul 00.30 WIB = 17.30 UTC kemarin, jadi kalau "hari ini" salah dihitung dengan UTC, tes langsung gagal. Tes #10 **tidak mencatat Penjualan baru**, supaya tidak mengganggu angka stok tes Penjualan yang berjalan bersamaan. Ditolak: mencatat Penjualan di dalam tes (waktunya selalu "sekarang", jadi batas jam tidak bisa diuji).
 - **Tes dua Kasir bersamaan**: dua sesi berbeda (Kasir uji dan Admin uji) memanggil `catat_penjualan` serentak untuk obat ber-stok 1, diulang 3 ronde. Ditolak: akun Kasir uji kedua (perlu dasbor dan secret baru, padahal yang diuji adalah penguncian stoknya, bukan perannya).
 
 > **pg_cron** = penjadwal tugas di dalam PostgreSQL. *Analogi:* alarm yang setiap menit mengingatkan petugas mengganti kertas tanggal di papan.
@@ -539,7 +565,7 @@ Sama dengan PRD bagian 9:
 
 **Yang masih harus dipastikan sebelum atau saat koding**
 - Data HET dan golongan setiap obat di data awal harus dicek ke sumber resmi dan dicantumkan sumbernya (validasi lewat studi pustaka). Selesai di tiket #7: [`riset/data-awal-obat.md`](riset/data-awal-obat.md).
-- Nomor WhatsApp dan alamat apotek untuk Struk: pakai data contoh yang jelas bertanda contoh, karena ApotikKu bukan apotek sungguhan.
+- Nomor WhatsApp dan alamat apotek untuk Struk: pakai data contoh yang jelas bertanda contoh, karena ApotikKu bukan apotek sungguhan. Alamat selesai di tiket #10 (`lib/apotek.ts`); nomor WhatsApp di tiket #5.
 - Paket gratis Supabase dijeda bila ±1 minggu tidak dipakai; buka aplikasi sebelum demo (PRD bagian 11).
 
 **Kalau dosen bertanya…**

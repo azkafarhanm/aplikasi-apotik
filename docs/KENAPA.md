@@ -65,6 +65,11 @@ Keputusan yang lebih kecil, dicatat lengkap beserta jawaban untuk dosen di [`SPE
 | Fungsi `uji_atur_obat` hanya di project uji untuk menyetel ulang stok/harga obat `uji-jual-*` | Tes Penjualan mengurangi stok, jadi harus bisa dikembalikan agar tes bisa diulang; Kasir tidak boleh mengubah obat | Jadwal pg_cron penyetel stok (bertabrakan dengan tes); membuat obat baru per tes (Admin belum boleh, tabel menumpuk) | SPEC 5.3, #8 |
 | Tes dua Kasir bersamaan: Kasir uji + Admin uji serentak, 3 ronde | Yang diuji penguncian stok, bukan peran; 3 ronde supaya lulus bukan kebetulan | Akun Kasir uji kedua (dasbor + secret baru) | SPEC 5.3, #8 |
 | `lib/*.ts` hanya bentuk data dan cara menulisnya; pengambilan data di halaman | Layar Jual berjalan di browser dan memakai `tulisRupiah` dkk.; Next.js menolak kode server ikut ke browser | Menyalin fungsi penulisan (aturan di dua tempat) | SPEC 4.8, #8 |
+| Setelah Simpan, layar langsung pindah ke Struk dengan tombol Cetak sudah terfokus; bila harga berubah, tetap di layar Jual dengan tombol Buka Struk | Struk siap dicetak dengan satu Enter (NF-03); pemberitahuan harga berubah tidak hilang sebelum dibaca | Dialog cetak otomatis (mengejutkan); selalu tetap di layar Jual (langkah tambahan) | SPEC 4.8, 4.9, #10 |
+| Tinggi kertas Struk diukur sesaat sebelum mencetak | Gulungan 58 mm panjangnya bebas, tetapi browser butuh ukuran pasti; `58mm auto` ditolak Chromium | Tinggi tetap (kertas kosong terbuang) | SPEC 4.9, #10 |
+| "Hari ini" untuk daftar Penjualan dihitung database (tampilan `penjualan_hari_ini`) | Admin boleh membaca semua Penjualan, jadi tetap perlu disaring; aturan WIB tetap di satu tempat dan dites (00.30 dan 23.30 WIB) | Menghitung batas jam di TypeScript (aturan di dua tempat) | SPEC 4.9, #10 |
+| Nama obat di Struk dibaca lewat fungsi kecil berhak pemilik (`rincian_struk`) | Obat yang diarsipkan setelah terjual tetap bernama di Struk cetak ulang Kasir | Menyalin nama ke `item_penjualan` (mengubah #8); nama kosong | SPEC 4.9, #10 |
+| Alamat apotek contoh di `lib/apotek.ts`, Struk mencetak "(alamat contoh)" | ApotikKu bukan apotek sungguhan; alamat bukan rahasia | Variabel lingkungan (langkah tambahan tanpa manfaat) | SPEC 4.9, #10 |
 
 ## Jawaban cepat untuk pertanyaan yang paling mungkin muncul
 
@@ -132,3 +137,6 @@ Istilah domain apotek (Penjualan, Obat keras, Status stok, dll.) ada di [`CONTEX
 | `RAISE EXCEPTION` | Perintah di fungsi database untuk berhenti dengan pesan; semua langkah sebelumnya dibatalkan | Menarik rem darurat: kereta berhenti dan perjalanan dibatalkan |
 | Security invoker (tampilan) | Tampilan yang membaca tabel dengan hak si pembaca, jadi RLS tabelnya tetap berlaku | Jendela yang tetap mengikuti kunci loker si pembaca |
 | QRIS / MDR | Kode QR pembayaran standar Bank Indonesia; MDR = potongan biaya yang ditanggung penjual | Satu colokan listrik standar untuk semua merek / biaya admin transfer |
+| CSS cetak (`@media print`, `@page`) | Aturan tampilan yang hanya berlaku saat halaman dicetak: menyembunyikan menu, mengatur ukuran kertas | Pengaturan mesin fotokopi: ukuran kertas dan bagian yang ikut difotokopi |
+| `beforeprint` | Tanda dari browser sesaat sebelum mencetak, sehingga halaman sempat bersiap (di sini: mengukur tinggi Struk) | Kasir merapikan kertas sebelum menekan tombol cetak |
+| Fokus (keyboard) | Tombol atau kolom yang sedang "dipilih", sehingga Enter langsung menekannya | Kursor yang berkedip di tempat kita akan mengetik |
