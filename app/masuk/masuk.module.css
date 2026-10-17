@@ -1,10 +1,9 @@
 /* Halaman masuk: satu etiket di kertas (ADR 0004).
-   Etiket diletakkan dengan jarak TETAP dari atas, bukan di tengah layar.
-   Di HP, tinggi layar menyusut saat keyboard muncul; kalau etiket dibuat
-   di tengah (atau jaraknya dihitung dari tinggi layar), ia ikut melompat,
-   saran email Chrome ikut berpindah, dan keyboard berkedip (#26).
-   Jarak hanya bergantung pada LEBAR layar, yang tidak berubah saat
-   keyboard muncul. */
+   Di layar lebar (laptop/tablet), etiket tepat di tengah layar.
+   Di HP, etiket diletakkan dekat bagian atas: keyboard HP menutupi kira-kira
+   separuh bawah layar, jadi kalau etiket di tengah, kolom Password dan tombol
+   Masuk tertutup keyboard (#29). Kedipan saran email saat mengetik adalah
+   perilaku Chrome/keyboard HP, bukan karena posisi etiket (#26). */
 .halaman {
   display: flex;
   flex-direction: column;
@@ -14,7 +13,9 @@
 
 @media (min-width: 48rem) {
   .halaman {
-    padding-top: 6rem;
+    min-height: 100svh;
+    justify-content: center;
+    padding: 2rem 1rem;
   }
 }
 
