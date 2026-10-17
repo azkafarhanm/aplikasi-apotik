@@ -158,3 +158,16 @@
   font-size: 1.1rem;
   font-weight: 600;
 }
+
+/* Cetak (Struk #10, Laporan #12): pita dan menu tidak ikut tercetak. */
+@media print {
+  .pita,
+  .menu {
+    display: none;
+  }
+
+  .isi {
+    max-width: none;
+    padding: 0;
+  }
+}

@@ -51,3 +51,73 @@ export type HasilPenjualan = {
 export function bisaDijual(obat: ObatJual): boolean {
   return obat.status_stok !== "habis";
 }
+
+// ---------------------------------------------------------------------------
+// Struk dan Penjualan hari ini (tiket #10, SPEC 4.2 dan 4.9)
+// ---------------------------------------------------------------------------
+
+export type StatusPenjualan = "selesai" | "dibatalkan";
+
+export const tulisanStatusPenjualan: Record<StatusPenjualan, string> = {
+  selesai: "Selesai",
+  dibatalkan: "Dibatalkan",
+};
+
+/** Satu baris tampilan penjualan_hari_ini (RLS: Kasir miliknya, Admin semua). */
+export type BarisPenjualanHariIni = {
+  nomor: string;
+  waktu: string;
+  total: number;
+  metode_bayar: CaraBayar;
+  status: StatusPenjualan;
+  nama_kasir: string | null;
+};
+
+/** Semua yang tercetak di Struk. Harga = harga saat terjual (salinan). */
+export type StrukPenjualan = {
+  nomor: string;
+  waktu: string;
+  namaKasir: string;
+  total: number;
+  metode_bayar: CaraBayar;
+  uang_diterima: number | null;
+  kembalian: number | null;
+  status: StatusPenjualan;
+  item: Array<{ nama: string; satuan_jual: string; jumlah: number; harga_satuan: number; subtotal: number }>;
+};
+
+/** Nomor Penjualan yang sah, misalnya PJ-000123 (lebih dari 999.999 menjadi 7 digit). */
+export function nomorSah(nomor: string): boolean {
+  return /^PJ-\d{6,}$/.test(nomor);
+}
+
+// Waktu selalu ditulis menurut WIB, apa pun zona waktu server atau komputer
+// Kasir (SPEC 4.3: "hari ini" selalu menurut WIB).
+const zonaWib = "Asia/Jakarta";
+
+/** "17 Okt 2026 14.05 WIB" */
+export function tulisWaktuWib(waktu: string): string {
+  const tanggal = new Date(waktu).toLocaleDateString("id-ID", {
+    timeZone: zonaWib,
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  return `${tanggal} ${tulisJamWib(waktu)} WIB`;
+}
+
+/** "14.05" */
+export function tulisJamWib(waktu: string): string {
+  return new Date(waktu).toLocaleTimeString("id-ID", { timeZone: zonaWib, hour: "2-digit", minute: "2-digit" });
+}
+
+/** "Jumat, 17 Oktober 2026" */
+export function tulisTanggalWib(waktu: Date): string {
+  return waktu.toLocaleDateString("id-ID", {
+    timeZone: zonaWib,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}

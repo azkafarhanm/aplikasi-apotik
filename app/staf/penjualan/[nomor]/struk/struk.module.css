@@ -1,0 +1,212 @@
+/* Struk 58 mm (SPEC 4.9).
+   Printer kasir 58 mm hanya bisa mencetak selebar ±48 mm; sisanya pinggiran
+   yang tidak terjangkau kepala printer. Jadi kertas 58 mm, tulisan 48 mm
+   (jarak kiri-kanan 5 mm). Semua ukuran di dalam Struk memakai em, sehingga
+   Struk di layar adalah versi besar yang persis sama dengan hasil cetak:
+   cukup mengganti --ukuran (15 px di layar, 8 pt di kertas). */
+
+/* --- Layar: Struk sebagai potongan kertas di atas meja ------------------ */
+
+/* Judul, tombol, dan pemberitahuan: tampil di layar, tidak ikut tercetak. */
+.layarSaja {
+  justify-self: stretch;
+}
+
+.halaman {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+}
+
+.tersimpan {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--hijau-apotek);
+  border-left: 8px solid var(--hijau-apotek);
+  border-radius: 3px;
+  background: var(--etiket);
+  font-size: 1.1rem;
+}
+
+.tersimpan strong {
+  font-family: var(--huruf-angka);
+}
+
+.aksi {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.cetak,
+.tautan {
+  padding: 0.7rem 1.2rem;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cetak {
+  border: none;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+}
+
+.tautan {
+  border: 1.5px solid var(--tinta);
+  background: var(--etiket);
+  color: var(--tinta);
+}
+
+.tidakAda {
+  max-width: 32rem;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--tinta);
+  border-left: 8px solid var(--habis);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.tidakAda p {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* --- Struk ----------------------------------------------------------- */
+
+.struk {
+  --ukuran: 15px;
+  position: relative;
+  /* 58 mm pada huruf 8 pt (1 em = 2,822 mm); jarak kiri-kanan 5 mm. */
+  width: 20.55em;
+  padding: 1.2em 1.77em;
+  font-family: var(--huruf-angka), ui-monospace, monospace;
+  font-size: var(--ukuran);
+  line-height: 1.35;
+  color: #000;
+  background: #fff;
+  border: 1px solid var(--garis);
+  box-shadow: 0 0.3em 0 var(--garis);
+  /* Halaman cetak bernama "struk": ukurannya hanya berlaku untuk Struk, tidak
+     ikut ke halaman lain (misalnya Laporan A4 di tiket #12). */
+  page: struk;
+}
+
+.struk p,
+.struk dl,
+.struk dd,
+.struk ul {
+  margin: 0;
+  padding: 0;
+}
+
+.struk ul {
+  list-style: none;
+}
+
+.kepala {
+  text-align: center;
+}
+
+.namaApotek {
+  font-size: 1.5em;
+  letter-spacing: 0.08em;
+}
+
+.kecil {
+  font-size: 0.85em;
+}
+
+/* Garis putus-putus pemisah, seperti nota kasir. */
+.bagian {
+  margin-top: 0.6em !important;
+  padding-top: 0.6em !important;
+  border-top: 0.1em dashed #000;
+}
+
+.pasangan {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6em;
+}
+
+.pasangan dd {
+  overflow-wrap: anywhere;
+}
+
+.item li + li {
+  margin-top: 0.35em;
+}
+
+.baris {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6em;
+}
+
+.baris span:last-child {
+  white-space: nowrap;
+}
+
+.total {
+  font-size: 1.2em;
+}
+
+.penutup {
+  text-align: center;
+}
+
+/* Penjualan Dibatalkan (tiket #13): tanda besar di atas Struk, tetap jelas
+   walau dicetak hitam-putih. */
+.batal {
+  margin: 0 0 0.6em !important;
+  padding: 0.25em 0;
+  border: 0.2em solid #000;
+  font-size: 1.6em;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+/* Dipakai TombolCetak sesaat sebelum mencetak untuk mengukur tinggi Struk
+   dalam ukuran cetaknya. */
+.ukur {
+  --ukuran: 8pt;
+  border: 0;
+}
+
+/* --- Cetak ----------------------------------------------------------- */
+
+/* Cadangan bila JavaScript belum berjalan; TombolCetak menimpa tingginya. */
+@page struk {
+  size: 58mm 150mm;
+  margin: 0;
+}
+
+@media print {
+  :global(body) {
+    background: #fff;
+  }
+
+  .halaman {
+    display: block;
+  }
+
+  .layarSaja,
+  .tersimpan,
+  .aksi {
+    display: none;
+  }
+
+  .struk {
+    --ukuran: 8pt;
+    border: 0;
+    box-shadow: none;
+  }
+}
