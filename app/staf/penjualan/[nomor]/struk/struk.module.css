@@ -210,3 +210,10 @@
     box-shadow: none;
   }
 }
+
+/* Kapan, oleh siapa, dan kenapa dibatalkan, tepat di bawah tanda DIBATALKAN
+   (tiket #13). Sedikit lebih kecil supaya tanda besarnya tetap paling menonjol. */
+.infoBatal {
+  margin: 0 0 0.6em !important;
+  font-size: 0.9em;
+}

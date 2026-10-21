@@ -1,5 +1,5 @@
-// /staf/penjualan: Penjualan hari ini (Kasir: miliknya, Admin: semua; F-08,
-// SPEC 4.2). Tombol Batalkan untuk Admin menyusul di tiket #13.
+// /staf/penjualan: Penjualan hari ini (Kasir: miliknya, Admin: semua dengan
+// tombol Batalkan; F-08, F-14, SPEC 4.2).
 //
 // Isinya dibaca dari tampilan penjualan_hari_ini: "hari ini menurut WIB"
 // dihitung database, dan RLS menentukan Penjualan siapa yang terlihat.
@@ -42,7 +42,7 @@ async function DaftarPenjualan() {
       <p className={styles.keterangan}>
         {tulisTanggalWib(new Date())} · {admin ? "Semua Kasir" : "Penjualan yang Anda catat"}
       </p>
-      <TabelPenjualan daftar={daftar} tampilkanKasir={admin} />
+      <TabelPenjualan daftar={daftar} admin={admin} />
     </>
   );
 }
@@ -52,7 +52,7 @@ async function ambilPenjualanHariIni(): Promise<BarisPenjualanHariIni[]> {
   const supabase = await buatSupabaseServer();
   const { data, error } = await supabase
     .from("penjualan_hari_ini")
-    .select("nomor, waktu, total, metode_bayar, status, nama_kasir")
+    .select("nomor, waktu, total, metode_bayar, status, nama_kasir, dibatalkan_pada, alasan_batal, nama_pembatal")
     .order("waktu", { ascending: false });
 
   if (error) {
