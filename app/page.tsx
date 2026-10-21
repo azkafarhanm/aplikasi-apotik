@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { KartuEtiket } from "@/components/KartuEtiket";
+import { LogoApotikKu } from "@/components/LogoApotikKu";
 import type { ObatKatalog } from "@/lib/katalog";
 import { buatSupabaseServer } from "@/lib/supabase/server";
 import styles from "./page.module.css";
@@ -18,7 +19,10 @@ export default function HalamanKatalog() {
       <header className={styles.papanNama}>
         <div className={styles.lebar}>
           <div className={styles.barisMerek}>
-            <p className={styles.merek}>ApotikKu</p>
+            <p className={styles.merek}>
+              <LogoApotikKu />
+              <span className={styles.namaMerek}>ApotikKu</span>
+            </p>
             {/* Tautan untuk Staf, di atas supaya tidak perlu menggulir melewati
                 semua kartu obat (#24). Sengaja kecil dan pudar agar tidak
                 mengalihkan Pengunjung. Bukan pengamanan apa pun: Area staf
