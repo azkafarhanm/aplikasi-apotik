@@ -270,14 +270,24 @@ describe("Penjualan ditolak", () => {
   });
 
   it("utuh atau tidak sama sekali: satu obat Habis membatalkan seluruh keranjang (NF-06)", async () => {
-    const jumlahSebelum = await admin.supabase.from("penjualan").select("id", { count: "exact", head: true });
+    // Yang dihitung hanya Item penjualan obat uji-jual-bebas, bukan semua
+    // Penjualan: file tes lain (misalnya pembatalan.test.ts) berjalan bersamaan
+    // dan mencatat Penjualan di database uji yang sama (#38). Obat ini hanya
+    // dijual oleh file ini, dan tes di dalam satu file berjalan berurutan.
+    const hitungItem = () =>
+      admin.supabase
+        .from("item_penjualan")
+        .select("id", { count: "exact", head: true })
+        .eq("obat_id", idObat["uji-jual-bebas"]);
+    const jumlahSebelum = await hitungItem();
+    expect(jumlahSebelum.error).toBeNull();
 
     const { error } = await jual(kasir.supabase, [isi("uji-jual-bebas", 2), isi("uji-stok-0", 1)]);
     expect(error?.message).toBe("Stok Uji Stok 0 habis.");
 
-    // Obat yang valid tidak ikut berkurang, dan tidak ada Penjualan baru.
+    // Obat yang valid tidak ikut berkurang, dan tidak ada Item penjualan baru.
     expect(await stok("uji-jual-bebas")).toBe(100);
-    const jumlahSesudah = await admin.supabase.from("penjualan").select("id", { count: "exact", head: true });
+    const jumlahSesudah = await hitungItem();
     expect(jumlahSesudah.count).toBe(jumlahSebelum.count);
   });
 });
