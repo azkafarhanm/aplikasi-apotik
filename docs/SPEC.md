@@ -268,7 +268,7 @@ Semua fungsi di bawah **mengecek sendiri** siapa pemanggilnya (Staf aktif? Admin
 |---|---|---|---|
 | `private.peran_saya()` | Aturan RLS | Mengembalikan `admin`/`kasir` untuk Staf aktif yang sedang login, atau kosong | (tidak pernah menolak; dipakai sebagai alat bantu). Tinggal di skema `private` sehingga tidak bisa dipanggil lewat API; berjalan dengan hak pemiliknya (*security definer*) karena aturan RLS `profil_staf` sendiri memakainya |
 | `catat_penjualan(keranjang, metode_bayar, uang_diterima, cek_resep)` | Layar Jual | Mengunci baris obat yang dibeli, mengecek semuanya, mengambil harga dari database, menghitung total dan kembalian, menyimpan Penjualan + Item penjualan, mengurangi stok. Mengembalikan nomor Penjualan | Bukan Staf aktif; keranjang kosong; jumlah ≤ 0; obat diarsipkan, Habis, atau Sudah kedaluwarsa; stok kurang; ada Obat keras tetapi `cek_resep` tidak dicentang; tunai tetapi uang kurang; QRIS/transfer tetapi uang diterima diisi |
-| `batalkan_penjualan(nomor, alasan)` | Halaman Penjualan (Admin) | Mengubah status menjadi Dibatalkan, mencatat siapa, kapan, dan alasannya, lalu mengembalikan stok setiap Item penjualan | Bukan Admin; Penjualan tidak ada; sudah Dibatalkan; alasan kosong |
+| `batalkan_penjualan(nomor, alasan)` | Halaman Penjualan (Admin) | Mengubah status menjadi Dibatalkan, mencatat siapa, kapan, dan alasannya, lalu mengembalikan stok setiap Item penjualan. Mengembalikan rincian stok yang kembali | Bukan Admin; alasan kosong atau lebih dari 200 huruf; Penjualan tidak ada; sudah Dibatalkan; bukan Penjualan hari ini (#13) |
 | `ringkasan()` | Halaman Ringkasan (Admin) | Pendapatan dan jumlah Penjualan hari ini, daftar Hampir habis, Segera kedaluwarsa, Sudah kedaluwarsa | Bukan Admin |
 | `laporan_pendapatan(dari, sampai)` | Halaman Laporan (Admin) | Total pendapatan dan jumlah Penjualan (status selesai saja), rincian per hari, dan rincian per obat (jumlah terjual, pendapatan) | Bukan Admin; `dari` lebih besar dari `sampai` |
 
@@ -306,6 +306,28 @@ Pesan penolakan (diuji kata per kata di `tests/penjualan.test.ts`):
 | Tunai, uang kurang | Uang diterima kurang. Total Rp12.500. |
 | QRIS/transfer dengan uang diterima | QRIS/transfer tidak memakai uang diterima. |
 
+Ditambahkan 21 Oktober 2026 (tiket #13, migrasi `…_pembatalan.sql`, [penjelasan](penjelasan/06-pembatalan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Penjualan yang bisa dibatalkan | **Hanya Penjualan hari ini (WIB)**, juga untuk Admin | Pembatalan adalah koreksi sebelum tutup kasir (*void*). Obat Penjualan kemarin sudah dibawa pulang, jadi "mengembalikan stok" membuat angka tidak cocok dengan rak; uang kemarin sudah dihitung dan Laporannya bisa berubah diam-diam ([riset](riset/pembatalan-hari-ini.md)) | Kapan saja (stok dan Laporan lama tidak cocok kenyataan); batas 7 hari (angka asal pilih, masalahnya sama). Retur hari sebelumnya di luar versi 1 |
+| Urutan cek | Admin aktif → alasan → **kunci baris Penjualan** → ada? → sudah Dibatalkan? → hari ini? → **kunci baris obat urut id** (ADR 0005) → kembalikan stok → tandai Dibatalkan | Peran dicek paling awal, jadi Kasir mendapat pesan yang sama untuk nomor ada atau tidak (tidak bisa menebak nomor). Pengecekan tanpa data sebelum mengunci. Mengunci Penjualan membuat dua Admin yang membatalkan bersamaan antre: yang kedua melihat "sudah dibatalkan", stok hanya kembali sekali | — |
+| Alasan | Wajib; spasi, tab, dan baris kosong di ujung dibuang; paling panjang 200 huruf; yang disimpan sudah rapi | 200 huruf cukup untuk satu kalimat penjelasan dan tetap muat di daftar dan Struk. Dicek di database karena layar bisa dilewati (ADR 0003); layar ikut membatasi 200 huruf | Tanpa batas (teks sangat panjang merusak tampilan); minimal sekian huruf ("salah" pun bermakna, jadi angkanya asal pilih) |
+| Obat diarsipkan/kedaluwarsa | Stok tetap dikembalikan | Stok adalah jumlah fisik di rak; strip yang batal dijual memang kembali. Arsip hanya menyembunyikan obat | Menolak pembatalan (kesalahan tidak bisa diperbaiki); membatalkan tanpa mengembalikan stok (angka tidak cocok rak) |
+| Nilai kembalian | JSON berisi `nomor`, `dibatalkan_pada`, `alasan`, dan `item` (nama, Satuan jual, jumlah yang kembali) | Layar langsung menulis "PJ-000123 dibatalkan. Stok dikembalikan: Parasetamol 500 mg +2 strip." tanpa bertanya lagi | Tanpa nilai kembalian (Admin harus membuka layar lain untuk memastikan stoknya kembali) |
+| Izin | `security definer`, `search_path` kosong, hanya `authenticated` boleh memanggil; tetap **tidak ada izin UPDATE** ke `penjualan` untuk siapa pun, termasuk Admin | Satu pintu, satu aturan; diuji: Admin yang mencoba mengubah tabel langsung ditolak. Pemeriksa keamanan Supabase memberi satu peringatan "Signed-In Users Can Execute SECURITY DEFINER Function" yang disengaja (sama dengan `catat_penjualan`) | Memberi Admin izin UPDATE (aturan di atas bisa dilewati lewat DevTools) |
+
+Pesan penolakan (diuji kata per kata di `tests/pembatalan.test.ts`):
+
+| Keadaan | Pesan |
+|---|---|
+| Bukan Admin aktif (Kasir, Staf nonaktif) | Hanya Admin yang bisa membatalkan Penjualan. |
+| Alasan kosong | Tulis alasan pembatalan. |
+| Alasan lebih dari 200 huruf | Alasan pembatalan paling panjang 200 huruf. |
+| Nomor tidak ada | Penjualan PJ-000123 tidak ditemukan. |
+| Sudah Dibatalkan | PJ-000123 sudah dibatalkan sebelumnya. |
+| Bukan hari ini | PJ-000123 bukan Penjualan hari ini, jadi tidak bisa dibatalkan. |
+
 ### 4.5 Aturan hak akses (RLS)
 
 > **RLS** = aturan di dalam database tentang siapa boleh membaca atau mengubah baris yang mana. *Analogi:* loker dengan kunci masing-masing (lihat ADR 0003).
@@ -326,7 +348,7 @@ Pesan penolakan (diuji kata per kata di `tests/penjualan.test.ts`):
 | | Hapus | ❌ | ❌ | ❌ |
 | Tabel `item_penjualan` | Baca | ❌ | ✅ (milik Penjualannya) | ✅ (semua) |
 | | Tambah / ubah / hapus | ❌ | 🔧 / ❌ / ❌ | 🔧 / ❌ / ❌ |
-| Tampilan `penjualan_hari_ini` (#10) | Baca | ❌ | ✅ (miliknya, hari ini) | ✅ (semua, hari ini) |
+| Tampilan `penjualan_hari_ini` (#10; kolom Pembatalan #13) | Baca | ❌ | ✅ (miliknya, hari ini; nama Admin pembatal tidak terbaca) | ✅ (semua, hari ini) |
 | Tampilan `rincian_struk` (#10) | Baca | ❌ | ✅ (milik Penjualannya) | ✅ (semua) |
 | Ringkasan, Laporan | Panggil | ❌ | ❌ | 🔧 |
 
@@ -412,6 +434,18 @@ Ditambahkan 17 Oktober 2026 (tiket #10, migrasi `…_struk_penjualan_hari_ini.sq
 | Baris jumlah | "N Penjualan · Rp…" di atas daftar; Penjualan Dibatalkan tetap tampil (abu-abu, dicoret) tetapi tidak dihitung | Kasir mengecek pekerjaannya (user story 43) tanpa menjumlah sendiri; angka itu sudah terlihat per baris, jadi tidak membuka data baru | Tanpa jumlah; dipisah tunai vs QRIS (tidak ada di PRD) |
 | Tanggal lain | Tidak ada pilihan tanggal. Admin tetap bisa membuka Struk lama lewat alamatnya | F-08 = hari ini; tanggal lain adalah tugas Laporan (#12) | Pemilih tanggal untuk Admin (fitur Laporan masuk ke tiket yang salah) |
 | Nama obat di Struk | Tampilan `rincian_struk` membaca nama dan Satuan jual lewat `private.obat_untuk_struk` (security definer) | Kasir tidak boleh membaca obat yang diarsipkan; tanpa ini, obat yang diarsipkan Admin (#9) siang hari hilang namanya dari Struk yang dicetak ulang sore harinya. Yang terbuka hanya nama dan satuan, untuk Item penjualan yang memang boleh dibaca | Menyalin nama ke `item_penjualan` (mengubah tabel dan `catat_penjualan` dari #8); membiarkan nama kosong |
+
+Ditambahkan 21 Oktober 2026 (tiket #13, [penjelasan](penjelasan/06-pembatalan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Letak tombol Batalkan | Kolom terakhir daftar Penjualan hari ini, hanya untuk Admin dan hanya untuk Penjualan yang belum Dibatalkan. Tidak ada di halaman Struk | Hanya Penjualan hari ini yang bisa dibatalkan (4.4), dan daftar ini memang berisi Penjualan hari ini; satu tempat saja | Tombol juga di Struk (Struk lama tetap bisa dibuka Admin, padahal tidak bisa dibatalkan) |
+| Konfirmasi | Jendela di tengah layar (`<dialog>` bawaan browser): Nomor, jam, Kasir, total, akibatnya, tautan "Lihat Struk dulu", kolom **Alasan pembatalan** (sudah terfokus, penghitung 0/200), tombol gelap **Batalkan PJ-…** dan tombol **Jangan batalkan**. Esc = jangan batalkan. Bila ditolak, pesan tampil di jendela dan kursor kembali ke kolom alasan | NF-03 dan user story 64: tombol berbahaya minta konfirmasi; issue #13: alasan wajib "di dalam halaman". Jendela di tengah nyaman di HP maupun laptop. Tombol memakai tinta gelap, bukan merah, karena merah khusus tanda Obat keras (ADR 0004) | `confirm()` bawaan browser (tidak bisa diberi kolom alasan, tampilannya tidak bisa diatur, bisa dimatikan browser); panel di bawah baris (sempit di HP karena tabel bergeser ke samping) |
+| Setelah berhasil | Jendela tertutup, daftar dimuat ulang, dan pesan "PJ-… dibatalkan. Stok dikembalikan: … +2 strip." tampil di atas daftar | Admin langsung melihat stoknya benar-benar kembali | Pindah ke halaman lain |
+| Jejak di daftar | Baris kecil di bawah Penjualan Dibatalkan: "Dibatalkan pukul 14.05 oleh Admin · Alasan: …" | Issue #13: tanda yang jelas beserta siapa, kapan, alasan | Hanya kata "Dibatalkan" |
+| Jejak di Struk | Di bawah tanda DIBATALKAN: Batal (waktu), Oleh, Alasan | Kasir yang mencetak ulang tahu kenapa Penjualannya dibatalkan | Hanya tanda DIBATALKAN |
+| Nama pembatal untuk Kasir | Kasir tidak boleh membaca profil Staf lain (RLS), jadi namanya kosong dan layar menulis "Admin" | Hanya Admin yang bisa membatalkan, jadi tulisan itu pasti benar, tanpa membuka data baru | Fungsi khusus yang membuka nama Admin ke Kasir (pintu baru tanpa kebutuhan) |
+| Daftar kosong | Di bawah "Belum ada Penjualan hari ini." ada keterangan "Penjualan hari sebelumnya tetap tersimpan. Admin bisa melihatnya di Laporan." | Pengguna sendiri sempat mengira 3 Penjualan kemarin terhapus, padahal hanya bukan "hari ini" (disetujui 21 Oktober 2026). Kasir tetap hanya melihat Penjualan miliknya hari ini; Admin melihat hari lain lewat Laporan (#12) | Pemilih tanggal di halaman ini (tugas Laporan, lihat baris "Tanggal lain" di atas) |
 
 ### 4.10 Halaman Obat (Admin)
 
@@ -508,10 +542,15 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - Admin membuka Struk siapa pun, termasuk Penjualan kemarin.
 - Pengunjung ditolak membaca kedua tampilan; Staf nonaktif mendapat daftar kosong.
 
-**Pembatalan (F-14)**
-- Admin membatalkan: status Dibatalkan, stok kembali, siapa/kapan/alasan tercatat.
-- Ditolak: membatalkan dua kali, alasan kosong.
-- Penjualan Dibatalkan tidak dihitung di Ringkasan dan Laporan.
+**Pembatalan (F-14; tiket #13, `tests/pembatalan.test.ts`)**
+- Admin membatalkan: status Dibatalkan, stok setiap Item penjualan kembali, siapa/kapan/alasan tercatat; total Penjualan tetap tercatat apa adanya.
+- Alasan disimpan tanpa spasi di ujung; tepat 200 huruf diterima.
+- Stok tetap kembali walau obatnya sudah diarsipkan.
+- Penjualan Dibatalkan tetap tampil di `penjualan_hari_ini` beserta alasannya; Admin melihat nama pembatalnya, Kasir tidak.
+- Ditolak dengan pesan kata per kata: alasan kosong (juga hanya spasi/baris kosong), alasan > 200 huruf, nomor tidak ada, membatalkan dua kali (stok hanya kembali sekali), Penjualan hari sebelumnya.
+- **Dua Admin bersamaan**: dua sesi Admin uji membatalkan Penjualan yang sama serentak, 3 ronde; tepat satu berhasil dan stok kembali sekali.
+- Kasir (juga untuk Penjualannya sendiri dan nomor yang tidak ada), Staf nonaktif, dan Pengunjung ditolak; Admin pun tidak bisa mengubah tabel `penjualan` langsung.
+- Penjualan Dibatalkan tidak dihitung di Ringkasan dan Laporan: **diuji di #11 dan #12**, saat fungsi `ringkasan` dan `laporan_pendapatan` dibuat (keduanya belum ada di #13).
 
 **Status stok dan kedaluwarsa (aturan bisnis 1–2)**
 - Batas stok: 0 → Habis, 1 → Hampir habis, 20 → Hampir habis, 21 → Tersedia.
@@ -531,6 +570,7 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - **Tes yang mengubah data** (Penjualan, kelola obat) mulai tiket #6 dan #8 berjalan sebagai Staf uji dan membersihkan atau memakai data miliknya sendiri, supaya tes bisa diulang.
 - **Tes Penjualan bisa diulang** (16 Oktober 2026, tiket #8): sebelum setiap tes, stok dan harga obat `uji-jual-*` dikembalikan ke angka awal lewat fungsi `public.uji_atur_obat`. Fungsi ini **hanya ada di project uji** (dipasang `data-uji.sql`, bukan migrasi), hanya bisa dipanggil Admin uji, dan hanya untuk slug `uji-jual-*`. Penjualan uji tidak dihapus (aturan bisnis 7); mereka menumpuk di project uji dan tidak mengganggu, karena setiap tes mencari Penjualannya sendiri lewat Nomor Penjualan. `data-uji.sql` tidak lagi menghapus obat, karena obat yang pernah terjual dirujuk Item penjualan. Ditolak: jadwal pg_cron penyetel stok (bisa bertabrakan dengan tes yang sedang berjalan); membuat obat baru per tes (Admin belum boleh menambah obat sampai #9, dan tabel menumpuk).
 - **Penjualan berjam tetap** (17 Oktober 2026, tiket #10): `data-uji.sql` menyimpan empat Penjualan uji (Kasir uji pukul 00.30 dan 23.30 WIB hari ini, 23.30 WIB kemarin; Admin uji pukul 12.00 WIB hari ini). Waktunya disegarkan setiap menit oleh jadwal pg_cron, seperti tanggal kedaluwarsa. Pukul 00.30 WIB = 17.30 UTC kemarin, jadi kalau "hari ini" salah dihitung dengan UTC, tes langsung gagal. Tes #10 **tidak mencatat Penjualan baru**, supaya tidak mengganggu angka stok tes Penjualan yang berjalan bersamaan. Ditolak: mencatat Penjualan di dalam tes (waktunya selalu "sekarang", jadi batas jam tidak bisa diuji).
+- **Tes Pembatalan** (21 Oktober 2026, tiket #13): memakai obat khusus `uji-jual-batal-*` (A, B, Arsip), terpisah dari obat tes Penjualan, karena file tes berjalan bersamaan dan masing-masing menyetel ulang stok obatnya sendiri. Slug berawalan `uji-jual-` supaya `uji_atur_obat` bisa langsung dipakai. Setiap tes mencatat Penjualannya sendiri lalu membatalkannya; Penjualan uji berjam tetap (#10) tidak disentuh. Untuk tes obat yang diarsipkan, `data-uji.sql` menambah fungsi `uji_arsipkan_obat` dengan penjaga yang sama (hanya project uji, hanya Admin, hanya `uji-jual-*`). Ditolak: menambah parameter ke `uji_atur_obat` (perlu menghapus fungsi lama, dan perintah hapus lewat connector menunggu konfirmasi sehingga tertahan).
 - **Tes dua Kasir bersamaan**: dua sesi berbeda (Kasir uji dan Admin uji) memanggil `catat_penjualan` serentak untuk obat ber-stok 1, diulang 3 ronde. Ditolak: akun Kasir uji kedua (perlu dasbor dan secret baru, padahal yang diuji adalah penguncian stoknya, bukan perannya).
 
 > **pg_cron** = penjadwal tugas di dalam PostgreSQL. *Analogi:* alarm yang setiap menit mengingatkan petugas mengganti kertas tanggal di papan.
@@ -587,6 +627,9 @@ Karena semua aturan yang kalau salah merugikan (hak akses, stok, harga, laporan)
 
 **"Kenapa satu obat hanya satu Keluhan?"**
 Data awal kami tidak membutuhkan lebih, dan satu kolom jauh lebih sederhana. Bila nanti dibutuhkan, bisa diubah lewat migrasi baru tanpa merombak aplikasi.
+
+**"Kenapa Penjualan kemarin tidak bisa dibatalkan, padahal Admin pemilik apotek?"**
+Pembatalan di ApotikKu sama dengan *void* di mesin kasir: koreksi sebelum tutup kasir. Obat Penjualan kemarin sudah dibawa pulang pembeli, jadi kalau stoknya "dikembalikan", angka di aplikasi lebih besar daripada isi rak. Uang kemarin juga sudah dihitung, dan Laporannya bisa berubah diam-diam. Pengembalian barang hari sebelumnya adalah retur, yaitu transaksi baru, dan belum dibutuhkan di versi 1 ([riset](riset/pembatalan-hari-ini.md)).
 
 **"Kenapa `status_stok` disimpan di skema `private`, bukan `public`?"**
 Karena tampilan `katalog` dibaca Pengunjung, dan PostgreSQL mengecek izin fungsi di dalam tampilan memakai hak Pengunjung. Jadi Pengunjung harus boleh menjalankan `status_stok`. Kalau fungsinya di `public`, Supabase otomatis membukanya sebagai alamat API, dan siapa pun bisa memanggilnya langsung. Di `private`, fungsi itu hanya bisa dipakai dari dalam database. Kesalahan ini justru ditemukan oleh tes otomatis pertama kami.
