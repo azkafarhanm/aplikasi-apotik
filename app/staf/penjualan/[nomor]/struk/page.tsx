@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { tulisRupiah } from "@/lib/katalog";
-import { nomorSah, type StrukPenjualan } from "@/lib/penjualan";
+import { nomorSah, tulisPembatal, type StrukPenjualan } from "@/lib/penjualan";
 import { wajibStaf } from "@/lib/staf";
 import { buatSupabaseServer } from "@/lib/supabase/server";
 import stylesStaf from "@/app/staf/staf.module.css";
@@ -93,7 +93,7 @@ async function ambilStruk(nomor: string): Promise<StrukPenjualan | null> {
   const { data: penjualan, error } = await supabase
     .from("penjualan")
     .select(
-      "id, nomor, waktu, total, metode_bayar, uang_diterima, kembalian, status, kasir:profil_staf!penjualan_kasir_id_fkey(nama_tampilan)",
+      "id, nomor, waktu, total, metode_bayar, uang_diterima, kembalian, status, dibatalkan_pada, alasan_batal, kasir:profil_staf!penjualan_kasir_id_fkey(nama_tampilan), pembatal:profil_staf!penjualan_dibatalkan_oleh_fkey(nama_tampilan)",
     )
     .eq("nomor", nomor)
     .maybeSingle();
@@ -118,6 +118,9 @@ async function ambilStruk(nomor: string): Promise<StrukPenjualan | null> {
   }
 
   const kasir = penjualan.kasir as unknown as { nama_tampilan: string } | null;
+  // Kasir tidak boleh membaca profil Admin (RLS), jadi pembatal bisa kosong;
+  // tulisPembatal lalu menulis "Admin", yang pasti benar (tiket #13).
+  const pembatal = penjualan.pembatal as unknown as { nama_tampilan: string } | null;
   return {
     nomor: penjualan.nomor,
     waktu: penjualan.waktu,
@@ -127,6 +130,14 @@ async function ambilStruk(nomor: string): Promise<StrukPenjualan | null> {
     uang_diterima: penjualan.uang_diterima,
     kembalian: penjualan.kembalian,
     status: penjualan.status,
+    pembatalan:
+      penjualan.status === "dibatalkan"
+        ? {
+            waktu: penjualan.dibatalkan_pada,
+            oleh: tulisPembatal(pembatal?.nama_tampilan ?? null),
+            alasan: penjualan.alasan_batal,
+          }
+        : null,
     item: item as StrukPenjualan["item"],
   };
 }

@@ -71,6 +71,11 @@ export type BarisPenjualanHariIni = {
   metode_bayar: CaraBayar;
   status: StatusPenjualan;
   nama_kasir: string | null;
+  /** Terisi ketiganya bila Dibatalkan (tiket #13). */
+  dibatalkan_pada: string | null;
+  alasan_batal: string | null;
+  /** Kosong bila yang membaca Kasir (RLS profil_staf); layar menulis "Admin". */
+  nama_pembatal: string | null;
 };
 
 /** Semua yang tercetak di Struk. Harga = harga saat terjual (salinan). */
@@ -83,8 +88,44 @@ export type StrukPenjualan = {
   uang_diterima: number | null;
   kembalian: number | null;
   status: StatusPenjualan;
+  /** Hanya untuk Penjualan Dibatalkan (tiket #13). */
+  pembatalan: Pembatalan | null;
   item: Array<{ nama: string; satuan_jual: string; jumlah: number; harga_satuan: number; subtotal: number }>;
 };
+
+// ---------------------------------------------------------------------------
+// Pembatalan (tiket #13, SPEC 4.4)
+// ---------------------------------------------------------------------------
+
+/** Batas panjang alasan. Database menolak yang lebih panjang; layar ikut membatasi. */
+export const panjangAlasanMaks = 200;
+
+/** Kapan, oleh siapa, dan kenapa sebuah Penjualan dibatalkan. */
+export type Pembatalan = {
+  waktu: string;
+  /** Nama tampilan Admin, atau "Admin" bila tidak boleh dibaca (Kasir). */
+  oleh: string;
+  alasan: string;
+};
+
+/** Nama yang membatalkan. Hanya Admin yang bisa membatalkan, jadi "Admin" pasti benar. */
+export function tulisPembatal(nama: string | null): string {
+  return nama ?? "Admin";
+}
+
+/** Yang dikembalikan batalkan_penjualan: stok yang kembali per obat. */
+export type HasilPembatalan = {
+  nomor: string;
+  dibatalkan_pada: string;
+  alasan: string;
+  item: Array<{ nama: string; satuan_jual: string; jumlah: number }>;
+};
+
+/** "PJ-000123 dibatalkan. Stok dikembalikan: Parasetamol 500 mg +2 strip." */
+export function tulisHasilPembatalan(hasil: HasilPembatalan): string {
+  const stok = hasil.item.map((i) => `${i.nama} +${i.jumlah} ${i.satuan_jual}`).join(", ");
+  return stok ? `${hasil.nomor} dibatalkan. Stok dikembalikan: ${stok}.` : `${hasil.nomor} dibatalkan.`;
+}
 
 /** Nomor Penjualan yang sah, misalnya PJ-000123 (lebih dari 999.999 menjadi 7 digit). */
 export function nomorSah(nomor: string): boolean {

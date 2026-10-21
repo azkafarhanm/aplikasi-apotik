@@ -11,6 +11,16 @@ export function Struk({ struk }: { struk: StrukPenjualan }) {
   return (
     <article id="struk" className={styles.struk} aria-label={`Struk ${struk.nomor}`}>
       {dibatalkan && <p className={styles.batal}>DIBATALKAN</p>}
+      {struk.pembatalan && (
+        <dl className={`${styles.pasangan} ${styles.infoBatal}`}>
+          <dt>Batal</dt>
+          <dd>{tulisWaktuWib(struk.pembatalan.waktu)}</dd>
+          <dt>Oleh</dt>
+          <dd>{struk.pembatalan.oleh}</dd>
+          <dt>Alasan</dt>
+          <dd>{struk.pembatalan.alasan}</dd>
+        </dl>
+      )}
 
       <header className={styles.kepala}>
         <p className={styles.namaApotek}>{apotek.nama}</p>

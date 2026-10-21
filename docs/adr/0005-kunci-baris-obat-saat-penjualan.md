@@ -55,7 +55,7 @@ Pada contoh di atas: Kasir 1 mengunci Amoksisilin lebih dulu. Kasir 2 **menunggu
 
 **Yang harus diterima**
 - Kasir kedua menunggu sampai Penjualan Kasir pertama selesai. Satu Penjualan hanya berisi beberapa obat dan selesai dalam hitungan milidetik, jadi tunggu ini tidak terasa. Obat yang berbeda tidak saling menunggu.
-- Fungsi lain yang kelak mengubah stok (Pembatalan #13, Kelola obat #9) juga harus mengunci baris obat **urut id**, supaya aturan antre ini tetap berlaku.
+- Fungsi lain yang kelak mengubah stok (Pembatalan #13, Kelola obat #9) juga harus mengunci baris obat **urut id**, supaya aturan antre ini tetap berlaku. Sudah diterapkan di `batalkan_penjualan` (#13), yang lebih dulu mengunci baris Penjualannya lalu baris obat urut id.
 
 ## Kalau dosen bertanya…
 

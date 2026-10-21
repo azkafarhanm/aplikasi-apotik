@@ -111,5 +111,9 @@ Konfirmasi Kasir bahwa pembeli membawa resep dokter saat Penjualan berisi Obat k
 _Hindari_: validasi resep, input resep
 
 **Pembatalan**:
-Tindakan Admin menandai Penjualan sebagai Dibatalkan: stok dikembalikan, Penjualan tetap tercatat, dan tidak dihitung sebagai pendapatan.
+Tindakan Admin menandai Penjualan hari ini sebagai Dibatalkan dengan menuliskan alasannya: stok dikembalikan, Penjualan tetap tercatat, dan tidak dihitung sebagai pendapatan. Penjualan hari sebelumnya tidak bisa dibatalkan.
 _Hindari_: void, refund, hapus transaksi, retur
+
+**Dibatalkan**:
+Status Penjualan setelah Pembatalan, lawan dari Selesai. Penjualan Dibatalkan tetap tampil beserta kapan, oleh siapa, dan alasannya, tetapi tidak ikut dijumlahkan.
+_Hindari_: batal, void, terhapus

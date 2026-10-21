@@ -13,6 +13,16 @@
   color: var(--tinta-lembut);
 }
 
+.kosong p {
+  margin: 0;
+}
+
+/* Penjualan kemarin tidak hilang, hanya bukan "hari ini" (tiket #13). */
+.kosongKecil {
+  margin-top: 0.35rem !important;
+  font-size: 0.9rem;
+}
+
 .jumlah {
   margin: 0 0 0.75rem;
   font-size: 1.1rem;
@@ -101,4 +111,157 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Pembatalan (tiket #13)
+   --------------------------------------------------------------------------- */
+
+/* Kapan, oleh siapa, dan kenapa: baris kecil di bawah Penjualan Dibatalkan. */
+.barisAlasan td {
+  padding-top: 0 !important;
+  border-top: none !important;
+  background: var(--etiket-habis);
+  color: var(--habis);
+  font-size: 0.9rem;
+  white-space: normal;
+}
+
+.tombolBatal {
+  padding: 0.25rem 0.6rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tombolBatal:hover {
+  background: var(--kertas);
+}
+
+/* Pesan hasil, seperti potongan nota (sama dengan panel hasil layar Jual). */
+.berhasil {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1.5px solid var(--hijau-apotek);
+  border-left: 8px solid var(--hijau-apotek);
+  border-radius: 3px;
+  background: var(--etiket);
+  font-weight: 600;
+}
+
+/* Jendela konfirmasi: kartu etiket di tengah layar. Tombol "Batalkan" memakai
+   tinta gelap, bukan merah, karena merah dipakai khusus tanda Obat keras
+   (ADR 0004); bedanya dengan tombol hijau tetap jelas. */
+.jendela {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+  color: var(--tinta);
+}
+
+.jendela::backdrop {
+  background: rgb(28 33 30 / 0.45);
+}
+
+.jendelaJudul {
+  margin: 0 0 0.75rem;
+  font-family: var(--huruf-judul);
+  font-size: 1.3rem;
+}
+
+.ringkas {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.75rem;
+  margin: 0 0 0.75rem;
+}
+
+.ringkas dt {
+  color: var(--tinta-lembut);
+}
+
+.ringkas dd {
+  margin: 0;
+}
+
+.jendelaCatatan {
+  margin: 0 0 1rem;
+  color: var(--tinta-lembut);
+  font-size: 0.95rem;
+}
+
+.labelAlasan {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+}
+
+.alasan {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: #fff;
+  font: inherit;
+  resize: vertical;
+}
+
+.sisa {
+  margin: 0.2rem 0 0.75rem;
+  color: var(--tinta-lembut);
+  font-family: var(--huruf-angka);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.gagal {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid var(--tinta);
+  border-left: 8px solid var(--habis);
+  border-radius: 3px;
+  background: var(--etiket-habis);
+  font-weight: 600;
+}
+
+.jendelaAksi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.tombolYakin,
+.tombolKembali {
+  flex: 1 1 10rem;
+  padding: 0.7rem;
+  border-radius: 3px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tombolYakin {
+  border: 1.5px solid var(--tinta);
+  background: var(--tinta);
+  color: var(--etiket);
+}
+
+.tombolKembali {
+  border: 1.5px solid var(--hijau-apotek);
+  background: var(--etiket);
+  color: var(--hijau-apotek);
+}
+
+.tombolYakin:disabled,
+.tombolKembali:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
