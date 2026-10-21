@@ -1,6 +1,7 @@
 // Logo ApotikKu (ADR 0006): kotak hijau apotek tua, palang putih etiket, sudut
-// kanan atas terlipat seperti kertas etiket. Bentuknya sama persis dengan
-// app/icon.svg (ikon tab) dan logo di dokumen SKPL/Figma.
+// kanan atas terlipat seperti kertas etiket. Bentuknya sama dengan logo di
+// dokumen SKPL/Figma. app/icon.svg (ikon tab) memakai badan yang sama dengan
+// palang lebih tebal supaya tajam di 16 piksel; bila logo berubah, ubah keduanya.
 //
 // Kepala halaman berlatar hijau yang sama dengan badan logo, jadi logo diberi
 // garis tepi warna etiket supaya tidak tenggelam. Logo selalu ditemani tulisan
