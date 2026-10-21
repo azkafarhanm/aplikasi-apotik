@@ -13,6 +13,14 @@ on:
 permissions:
   contents: read
 
+# Semua jalannya tes memakai SATU project uji yang sama, dan setiap file tes
+# mengatur ulang stok/harga obat uji. Dua PR yang dites bersamaan saling
+# menimpa data (#38), jadi tes dijalankan bergiliran: yang datang belakangan
+# menunggu, tidak dibatalkan.
+concurrency:
+  group: tes-database-apotikku-uji
+  cancel-in-progress: false
+
 jobs:
   tes:
     runs-on: ubuntu-latest
