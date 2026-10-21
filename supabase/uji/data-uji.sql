@@ -33,7 +33,13 @@ with data (nama, bentuk, keluhan, golongan, satuan_jual, isi_per_satuan,
     ('Uji Jual Stok 1', 'tablet', 'demam_nyeri', 'bebas',          'strip', '10 tablet', 1000, 1000, 1,   date '2099-12-31', false),
     -- Terpisah dari 'Uji Kedaluwarsa Hari Ini' supaya penjualan uji tidak
     -- menggerus stok baris yang dipakai tes Status stok di katalog.test.ts.
-    ('Uji Jual Kedaluwarsa Hari Ini', 'sirup', 'batuk_flu', 'bebas', 'botol', '60 ml', 1000, 1000, 50, private.hari_ini(), false)
+    ('Uji Jual Kedaluwarsa Hari Ini', 'sirup', 'batuk_flu', 'bebas', 'botol', '60 ml', 1000, 1000, 50, private.hari_ini(), false),
+    -- Tes Pembatalan (tiket #13, tests/pembatalan.test.ts). Terpisah dari obat
+    -- tes Penjualan, karena kedua file tes berjalan bersamaan dan masing-masing
+    -- menyetel ulang stok obatnya sendiri sebelum setiap tes.
+    ('Uji Jual Batal A',     'tablet', 'demam_nyeri', 'bebas',          'strip', '10 tablet', 3000, 3000, 100, date '2099-12-31', false),
+    ('Uji Jual Batal B',     'sirup',  'batuk_flu',   'bebas_terbatas', 'botol', '60 ml',     4000, 4000, 100, date '2099-12-31', false),
+    ('Uji Jual Batal Arsip', 'salep',  'luka_kulit',  'bebas',          'tube',  '5 g',       2000, 2000, 100, date '2099-12-31', false)
 ),
 diperbarui as (
   update public.obat o
@@ -125,6 +131,32 @@ $$;
 
 revoke all on function public.uji_atur_obat(text, integer, integer) from public, anon;
 grant execute on function public.uji_atur_obat(text, integer, integer) to authenticated;
+
+-- uji_arsipkan_obat: mengarsipkan atau mengembalikan obat uji (tiket #13),
+-- untuk tes "stok tetap kembali walau obatnya sudah diarsipkan". Dijaga sama
+-- dengan uji_atur_obat: hanya di project uji, hanya Admin, hanya uji-jual-*.
+create or replace function public.uji_arsipkan_obat(slug_obat text, diarsipkan_baru boolean)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if private.peran_saya() is distinct from 'admin' then
+    raise exception 'Hanya Admin uji yang boleh mengatur obat uji.';
+  end if;
+  if slug_obat not like 'uji-jual-%' then
+    raise exception 'Hanya obat uji-jual-* yang boleh diatur.';
+  end if;
+  update public.obat set diarsipkan = diarsipkan_baru where slug = slug_obat;
+  if not found then
+    raise exception 'Obat uji % tidak ada.', slug_obat;
+  end if;
+end;
+$$;
+
+revoke all on function public.uji_arsipkan_obat(text, boolean) from public, anon;
+grant execute on function public.uji_arsipkan_obat(text, boolean) to authenticated;
 
 -- Satu Penjualan lama milik Kasir uji, untuk tes "Kasir tidak bisa melihat
 -- Penjualan kemarin". Ditulis langsung (bukan lewat catat_penjualan) karena
