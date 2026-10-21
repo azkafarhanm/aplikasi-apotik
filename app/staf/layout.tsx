@@ -5,6 +5,7 @@
 // bagian itu dibungkus <Suspense>: pita kosong tampil seketika, isinya menyusul.
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { LogoApotikKu } from "@/components/LogoApotikKu";
 import { MenuStaf } from "@/components/staf/MenuStaf";
 import { tulisanPeran, wajibStaf } from "@/lib/staf";
 import styles from "./staf.module.css";
@@ -69,7 +70,10 @@ function PitaAtas({ children }: { children?: React.ReactNode }) {
     <header className={styles.pita}>
       <div className={styles.lebar}>
         <p className={styles.merek}>
-          ApotikKu <span className={styles.merekKecil}>Area staf</span>
+          <LogoApotikKu />
+          <span>
+            ApotikKu <span className={styles.merekKecil}>Area staf</span>
+          </span>
         </p>
         <div className={styles.kanan}>{children}</div>
       </div>

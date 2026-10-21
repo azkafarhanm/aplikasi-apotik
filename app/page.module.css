@@ -17,12 +17,24 @@
 }
 
 .merek {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   margin: 0;
   font-family: var(--huruf-judul);
   font-weight: 700;
   font-size: 0.85rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+/* Logo tidak ikut menyusut saat ruang sempit di HP. */
+.merek svg {
+  flex-shrink: 0;
+}
+
+/* Hanya tulisannya yang dipudarkan; logo tetap penuh warnanya. */
+.namaMerek {
   opacity: 0.85;
 }
 

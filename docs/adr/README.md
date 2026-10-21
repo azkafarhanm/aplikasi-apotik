@@ -9,6 +9,7 @@ Setiap file di folder ini mencatat **satu** keputusan penting: konteks, keputusa
 | [0003](0003-peran-admin-kasir-rls.md) | Peran Admin & Kasir, RLS sejak awal | Diterima |
 | [0004](0004-visual-etiket-apotek.md) | Visual "etiket apotek" | Diterima |
 | [0005](0005-kunci-baris-obat-saat-penjualan.md) | Stok dijaga dengan mengunci baris obat saat Penjualan | Diterima |
+| [0006](0006-logo.md) | Logo ApotikKu: palang putih di kotak hijau bersudut terlipat | Diterima |
 
 ## Aturan menulis ADR baru
 
