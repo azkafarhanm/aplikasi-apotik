@@ -25,7 +25,7 @@ Setiap fitur dan teknologi harus menyelesaikan masalah yang tercatat di [`PRD.md
 | 3c | **Tanpa pendaftaran akun umum** | Mencegah orang asing mencoba masuk | Pendaftaran terbuka + persetujuan Admin (mengundang spam) | [ADR 0003](adr/0003-peran-admin-kasir-rls.md) |
 | 4 | Visual **"etiket apotek"**, tanpa foto, tanpa mode gelap | Orang belum mengenali logo golongan obat (M-06); tampilan versi 1 generik | Bootstrap/template (tanpa identitas), gaya "template AI", foto produk (hak cipta, berat), mode gelap (biaya uji dua kali tanpa masalah nyata) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
 | 4a | Tata letak Katalog: **kartu etiket + laci Keluhan** (hasil prototipe) | Pengunjung ada yang tahu nama obat, ada yang hanya tahu keluhannya; harga harus ketemu ≤ 2 langkah | Laci keluhan saja (satu langkah lebih banyak), papan daftar harga (terasa seperti tabel) | [ADR 0004](adr/0004-visual-etiket-apotek.md) |
-| 4b | **Logo**: palang putih di kotak hijau apotek tua, sudut kanan atas terlipat seperti etiket | Dokumen tugas sudah memakai logo, website masih palang polos; logo harus langsung dikenali dan punya ciri ApotikKu | Palang merah (dilindungi UU No. 1/2018, dan merah = Obat keras), etiket + huruf A (perlu dijelaskan), A + palang (terbaca "nilai A+"), label harga gantung (hilang di latar hijau), palang polos (terlalu umum) | [ADR 0006](adr/0006-logo.md) |
+| 4b | **Logo**: palang putih di kotak hijau apotek tua, sudut kanan atas terlipat seperti etiket; di ikon tab lipatannya lebih kecil supaya tidak muncul garis gelap di layar skala 125% (#36) | Dokumen tugas sudah memakai logo, website masih palang polos; logo harus langsung dikenali dan punya ciri ApotikKu | Palang merah (dilindungi UU No. 1/2018, dan merah = Obat keras), etiket + huruf A (perlu dijelaskan), A + palang (terbaca "nilai A+"), label harga gantung (hilang di latar hijau), palang polos (terlalu umum) | [ADR 0006](adr/0006-logo.md) |
 
 ## Keputusan teknis di SPEC
 
@@ -117,6 +117,7 @@ Istilah domain apotek (Penjualan, Obat keras, Status stok, dll.) ada di [`CONTEX
 | Migrasi | File berurutan berisi perubahan struktur database | Resep masakan langkah demi langkah |
 | Favicon / ikon tab | Gambar kecil di samping judul halaman pada tab browser | Papan nama kecil di pintu toko |
 | SVG | Gambar yang disimpan sebagai rumus bentuk, sehingga tajam di ukuran berapa pun | Resep kue dibanding foto kue |
+| Resampling | Menghitung ulang warna piksel saat gambar diubah ukurannya; sebagian cara menajamkan tepi dan meninggalkan bayangan gelap | Fotokopi dari fotokopi: tepi tulisan jadi berbayang |
 | Transaksi database | Sekumpulan langkah yang berhasil semua atau batal semua (beda dengan "Penjualan") | Transfer bank: uang keluar dan masuk harus bersamaan |
 | Fungsi database (RPC) | Perintah yang disimpan dan dijalankan di dalam database | Prosedur tetap di gudang yang dijalankan petugas gudang, bukan oleh pembeli |
 | Repo (repository) | Folder project yang setiap perubahannya tercatat | Buku harian project |
