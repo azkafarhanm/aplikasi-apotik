@@ -2,6 +2,7 @@
 
 Sistem informasi satu apotek: **Katalog** publik untuk Pengunjung (tanpa login) dan **Area staf** untuk Admin dan Kasir. Project mata kuliah Rekayasa Perangkat Lunak.
 
+- **Cara mengerjakan dan mengecek perubahan: [`docs/PANDUAN.md`](docs/PANDUAN.md)** ← mulai dari sini
 - Produk dan kebutuhan: [`docs/PRD.md`](docs/PRD.md)
 - Cara membangun: [`docs/SPEC.md`](docs/SPEC.md)
 - Alasan setiap keputusan: [`docs/KENAPA.md`](docs/KENAPA.md) dan [`docs/adr/`](docs/adr/)
