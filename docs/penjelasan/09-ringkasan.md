@@ -75,15 +75,18 @@ Tes untuk tiket ini punya satu kesulitan yang tidak dimiliki tiket sebelumnya.
 
 File tes di project ini berjalan **bersamaan**. Sementara `tests/ringkasan.test.ts` berjalan, `penjualan.test.ts` dan `pembatalan.test.ts` terus mencatat Penjualan baru hari ini. Artinya angka "pendapatan hari ini" **berubah terus** selama tes berjalan, jadi tidak bisa dibandingkan dengan angka tetap.
 
-Jalan keluarnya: yang diuji bukan angkanya, melainkan **selisihnya**.
+Percobaan pertama kami adalah menguji **selisihnya**: catat pendapatan, jual Rp6.000, lalu pastikan pendapatannya naik minimal Rp6.000. Cara itu **gagal di CI**, dan kegagalannya mengajarkan sesuatu: tes lain bukan hanya *menambah* Penjualan, tetapi juga *membatalkan* Penjualan. Jadi angka pendapatan bisa naik **dan turun** sendiri selama tes berjalan, sehingga tidak ada arah selisih yang aman.
 
-1. Baca Ringkasan, catat pendapatannya.
-2. Catat satu Penjualan senilai Rp6.000.
-3. Baca Ringkasan lagi: pendapatannya harus **bertambah minimal Rp6.000**.
-4. Batalkan Penjualan itu.
-5. Baca lagi: pendapatannya harus **berkurang minimal Rp6.000**.
+Jalan keluarnya: **bandingkan dengan hitungan sendiri**.
 
-Dengan cara ini, tesnya tetap membuktikan dua hal penting (Penjualan baru dihitung, Penjualan Dibatalkan tidak dihitung) tanpa ikut rusak gara-gara tes lain.
+1. Jumlahkan sendiri Penjualan hari ini langsung dari tabel.
+2. Panggil `ringkasan()`.
+3. Jumlahkan lagi dari tabel.
+4. Kalau hasil langkah 1 dan 3 **sama persis**, berarti tidak ada tes lain yang menyelipkan perubahan di tengah, dan angka dari `ringkasan()` boleh dibandingkan dengan tepat. Kalau berbeda, ulangi (sampai 6 kali).
+
+Lalu diperiksa tiga hal sekaligus: pendapatan sama dengan jumlah Penjualan berstatus selesai, sama dengan (semua Penjualan − yang Dibatalkan), dan jumlah Penjualannya cocok. Tes ini sengaja membatalkan satu Penjualan lebih dulu, supaya pemeriksaan "Dibatalkan tidak dihitung" benar-benar ada isinya.
+
+*Analogi:* seperti menghitung uang di laci saat kasir masih melayani pembeli. Daripada menebak dari selisih, kita menunggu satu jeda singkat ketika tidak ada transaksi, lalu menghitung dan mencocokkan.
 
 Ada satu jebakan yang kami temukan justru **setelah** tesnya dijalankan di CI. Mula-mula tes ini menjual obat milik tes Pembatalan. Hasilnya `pembatalan.test.ts` gagal: ia menyetel stok obat itu ke 100, menjual 2, lalu memastikan stoknya tepat 98 — padahal tes Ringkasan diam-diam menjual 2 lagi, jadi angkanya 96. Perbaikannya: tes Ringkasan memakai obat **miliknya sendiri**, `Uji Jual Ringkasan`, dengan stok sangat besar. Aturannya jadi jelas untuk tiket berikutnya: *setiap file tes yang mengubah stok harus punya obat sendiri.*
 

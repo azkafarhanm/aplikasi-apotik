@@ -122,49 +122,93 @@ describe("Obat yang diarsipkan", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Pendapatan: diuji lewat SELISIH, karena tes lain ikut mencatat Penjualan
+// Pendapatan: dibandingkan dengan penjumlahan langsung dari tabel penjualan
 // ---------------------------------------------------------------------------
+//
+// Selisih sebelum/sesudah TIDAK bisa dipakai: file tes lain berjalan bersamaan
+// dan ikut mencatat Penjualan BARU maupun MEMBATALKAN Penjualan, jadi angka
+// pendapatan bisa naik dan turun sendiri selama tes ini berjalan.
+//
+// Cara yang dipakai: membandingkan angka dari ringkasan() dengan penjumlahan
+// yang dihitung tes ini sendiri dari tabel penjualan. Supaya perbandingannya
+// adil, tabel dibaca SEBELUM dan SESUDAH memanggil ringkasan(); bila kedua
+// bacaan sama persis, berarti tidak ada tes lain yang menyelipkan perubahan di
+// tengah, dan angkanya boleh dibandingkan dengan tepat. Bila berubah, dicoba
+// lagi beberapa kali.
+
+type JumlahTabel = { semua: number; dibatalkan: number; selesai: number; banyakSelesai: number };
+
+/** Menjumlahkan sendiri Penjualan hari ini (WIB) langsung dari tabel. */
+async function jumlahkanDariTabel(): Promise<JumlahTabel> {
+  const { data, error } = await admin.supabase
+    .from("penjualan_hari_ini")
+    .select("total, status");
+  expect(error).toBeNull();
+
+  const baris = data as { total: number; status: "selesai" | "dibatalkan" }[];
+  const selesai = baris.filter((p) => p.status === "selesai");
+  return {
+    semua: baris.reduce((j, p) => j + p.total, 0),
+    dibatalkan: baris.filter((p) => p.status === "dibatalkan").reduce((j, p) => j + p.total, 0),
+    selesai: selesai.reduce((j, p) => j + p.total, 0),
+    banyakSelesai: selesai.length,
+  };
+}
+
+/**
+ * Mengambil ringkasan bersama penjumlahan tabel yang stabil: diulang sampai
+ * bacaan tabel sebelum dan sesudah sama, artinya tidak ada tes lain yang
+ * mengubah data di antaranya.
+ */
+async function ringkasanDanTabelYangTenang(): Promise<{ r: Ringkasan; t: JumlahTabel }> {
+  for (let percobaan = 0; percobaan < 6; percobaan++) {
+    const sebelum = await jumlahkanDariTabel();
+    const r = await ambilRingkasan();
+    const sesudah = await jumlahkanDariTabel();
+
+    if (JSON.stringify(sebelum) === JSON.stringify(sesudah)) {
+      return { r, t: sesudah };
+    }
+  }
+  throw new Error(
+    "Penjualan hari ini terus berubah selama 6 percobaan, jadi angkanya tidak bisa dibandingkan dengan tepat.",
+  );
+}
 
 describe("Pendapatan hari ini", () => {
-  it("bertambah sebesar Penjualan yang baru dicatat, lalu berkurang lagi saat dibatalkan", async () => {
-    const sebelum = await ambilRingkasan();
-
-    // Obat MILIK TES INI SENDIRI (uji-jual-ringkasan). Memakai obat tes lain
-    // akan merusak tes itu: file tes berjalan bersamaan, dan tes Penjualan
-    // serta Pembatalan memeriksa angka stok yang tepat. Stoknya sangat besar,
-    // jadi tidak perlu disetel ulang dan tidak pernah masuk daftar Hampir habis.
+  it("sama dengan penjumlahan Penjualan selesai hari ini, dan Penjualan Dibatalkan tidak ikut", async () => {
+    // Pastikan hari ini benar-benar ADA Penjualan yang Dibatalkan, supaya tes
+    // ini bermakna. Obatnya milik tes ini sendiri (uji-jual-ringkasan): tes
+    // Penjualan dan Pembatalan memeriksa angka stok yang tepat, dan file tes
+    // berjalan bersamaan. Stoknya sangat besar, jadi tidak perlu disetel ulang
+    // dan tidak pernah masuk daftar Hampir habis.
     const { data: obat } = await admin.supabase
       .from("obat")
       .select("id, harga_jual")
       .eq("slug", "uji-jual-ringkasan")
       .single();
 
-    const jumlah = 2;
-    const nilai = obat!.harga_jual * jumlah;
-
     const { data: baru, error } = await kasir.supabase.rpc("catat_penjualan", {
-      keranjang: [{ obat_id: obat!.id, jumlah }],
+      keranjang: [{ obat_id: obat!.id, jumlah: 2 }],
       metode_bayar: "qris_transfer",
       uang_diterima: null,
       cek_resep: false,
     });
     expect(error).toBeNull();
-    expect(baru.total).toBe(nilai);
+    expect(baru.total).toBe(obat!.harga_jual * 2);
 
-    const sesudah = await ambilRingkasan();
-    expect(sesudah.pendapatan).toBeGreaterThanOrEqual(sebelum.pendapatan + nilai);
-    expect(sesudah.jumlah_penjualan).toBeGreaterThanOrEqual(sebelum.jumlah_penjualan + 1);
-
-    // Penjualan Dibatalkan tidak dihitung sebagai pendapatan (aturan bisnis 7).
     const batal = await admin.supabase.rpc("batalkan_penjualan", {
       nomor: baru.nomor,
       alasan: "Tes Ringkasan",
     });
     expect(batal.error).toBeNull();
 
-    const setelahBatal = await ambilRingkasan();
-    expect(setelahBatal.pendapatan).toBeLessThanOrEqual(sesudah.pendapatan - nilai);
-    expect(setelahBatal.jumlah_penjualan).toBeLessThanOrEqual(sesudah.jumlah_penjualan - 1);
+    const { r, t } = await ringkasanDanTabelYangTenang();
+
+    expect(t.dibatalkan).toBeGreaterThan(0); // tes ini memang baru membatalkan satu
+    expect(r.pendapatan).toBe(t.selesai);
+    expect(r.pendapatan).toBe(t.semua - t.dibatalkan);
+    expect(r.jumlah_penjualan).toBe(t.banyakSelesai);
   });
 
   it("berupa bilangan bulat rupiah, tidak pernah negatif", async () => {
