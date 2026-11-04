@@ -16,6 +16,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
 
 ## Dokumen
 
+- `docs/PANDUAN.md`: alur kerja satu tiket, cara mengecek tiap jenis perubahan, perintah yang sering dipakai
 - `docs/PRD.md`: produk, aktor, fitur (F-xx), non-fungsional (NF-xx), aturan bisnis, cakupan
 - `CONTEXT.md`: glosarium istilah domain
 - `docs/SPEC.md`: cara membangun (skema database, route, fungsi, RLS, rencana uji)
