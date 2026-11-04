@@ -53,7 +53,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
    7. ~~#10 Struk dan Penjualan hari ini~~ (selesai)
    8. ~~#13 Pembatalan~~ (selesai)
    9. #9 Kelola obat
-   10. #11 Ringkasan
+   10. ~~#11 Ringkasan~~ (selesai)
    11. #12 Laporan
    12. ~~#4 Cari, laci Keluhan, "Tanpa resep"~~ (selesai)
    13. ~~#5 Detail obat dan WhatsApp~~ (selesai)

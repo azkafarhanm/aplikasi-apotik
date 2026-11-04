@@ -328,6 +328,19 @@ Pesan penolakan (diuji kata per kata di `tests/pembatalan.test.ts`):
 | Sudah Dibatalkan | PJ-000123 sudah dibatalkan sebelumnya. |
 | Bukan hari ini | PJ-000123 bukan Penjualan hari ini, jadi tidak bisa dibatalkan. |
 
+Ditambahkan 4 November 2026 (tiket #11, migrasi `…_ringkasan.sql`, `app/staf/ringkasan/`, [penjelasan](penjelasan/09-ringkasan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Satu panggilan, bukan empat | `ringkasan()` mengembalikan satu JSON berisi pendapatan, jumlah Penjualan, dan ketiga daftar | Halaman pertama Admin harus tampil cepat; satu perjalanan ke database, bukan empat | Empat kueri terpisah dari halaman (empat kali waktu tunggu, dan aturan "hari ini" bisa berbeda antar kueri) |
+| Isi daftar Hampir habis | Semua obat berstok **≤ 20**, termasuk yang stoknya 0, urut dari paling sedikit | Yang dibutuhkan Admin adalah daftar "perlu dipesan ulang"; obat stok 0 justru paling mendesak. Judul di layar ditulis "Stok 20 atau kurang, termasuk yang sudah Habis" supaya tidak bertentangan dengan arti Status stok di CONTEXT.md | Hanya stok 1–20 seperti tulisan di mockup Sesi 7 (obat yang paling mendesak malah hilang); memisah jadi dua panel (dua daftar pendek yang dibaca bersamaan) |
+| Sisa hari dihitung database | `sisa_hari` dan `lewat_hari` ikut dikembalikan fungsi | "Hari ini menurut WIB" sudah dimiliki database; kalau dihitung di browser, hasilnya bergantung jam komputer Admin dan bisa meleset sehari | Menghitung selisih tanggal di TypeScript (aturan tanggal di dua tempat) |
+| Pendapatan | Hanya Penjualan berstatus `selesai` hari ini (WIB) | Penjualan Dibatalkan bukan uang yang masuk (aturan bisnis 7, #13); layar menulis "Penjualan yang Dibatalkan tidak ikut dihitung" supaya angkanya tidak disangka salah | Menjumlahkan semua Penjualan (angka tidak sesuai laci) |
+| Obat diarsipkan | Tidak ikut di ketiga daftar | Obat itu sudah tidak dijual, jadi tidak perlu dipesan ulang maupun ditarik dari rak | Ikut ditampilkan (daftar penuh hal yang tidak bisa ditindaklanjuti) |
+| Baris yang ditandai | Warna peringatan untuk stok 0, kedaluwarsa ≤ 30 hari, dan semua yang Sudah kedaluwarsa. Memakai cokelat tua (`--hampir-habis`), bukan merah | Mata Admin langsung tertuju ke yang mendesak; merah khusus tanda Obat keras (ADR 0004) | Merah (bentrok dengan arti tanda golongan); tanpa penandaan (semua baris terlihat sama penting) |
+| Tautan ke halaman ubah obat | **Belum ada di #11.** Setiap baris menampilkan nama, stok, satuan, dan tanggal kedaluwarsa, tanpa tautan | Halaman `/staf/obat/[id]` baru dibuat di #9, jadi tautannya sekarang akan berakhir di halaman yang tidak ada. `id` obat sudah ikut dikembalikan fungsi, jadi tautannya tinggal dipasang | Menautkan sekarang (tautan rusak saat demo); menunda seluruh tiket sampai #9 selesai |
+| Pemisahan tampilan | `PapanRingkasan.tsx` hanya menampilkan data; pengambilan data tetap di `page.tsx` | Tata letaknya bisa dicoba di browser tanpa login, dan pola ini sama dengan `TabelPenjualan` (#10) | Semua di `page.tsx` (tidak bisa dilihat tanpa akun Admin) |
+
 ### 4.5 Aturan hak akses (RLS)
 
 > **RLS** = aturan di dalam database tentang siapa boleh membaca atau mengubah baris yang mana. *Analogi:* loker dengan kunci masing-masing (lihat ADR 0003).
@@ -577,14 +590,22 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - Ditolak dengan pesan kata per kata: alasan kosong (juga hanya spasi/baris kosong), alasan > 200 huruf, nomor tidak ada, membatalkan dua kali (stok hanya kembali sekali), Penjualan hari sebelumnya.
 - **Dua Admin bersamaan**: dua sesi Admin uji membatalkan Penjualan yang sama serentak, 3 ronde; tepat satu berhasil dan stok kembali sekali.
 - Kasir (juga untuk Penjualannya sendiri dan nomor yang tidak ada), Staf nonaktif, dan Pengunjung ditolak; Admin pun tidak bisa mengubah tabel `penjualan` langsung.
-- Penjualan Dibatalkan tidak dihitung di Ringkasan dan Laporan: **diuji di #11 dan #12**, saat fungsi `ringkasan` dan `laporan_pendapatan` dibuat (keduanya belum ada di #13).
+- Penjualan Dibatalkan tidak dihitung di Ringkasan: diuji di #11 (`tests/ringkasan.test.ts`). Untuk Laporan, **diuji di #12** saat `laporan_pendapatan` dibuat.
 
 **Status stok dan kedaluwarsa (aturan bisnis 1–2)**
 - Batas stok: 0 → Habis, 1 → Hampir habis, 20 → Hampir habis, 21 → Tersedia.
 - Kedaluwarsa kemarin → Habis dan tidak bisa dijual; kedaluwarsa hari ini → masih bisa dijual.
 - Segera kedaluwarsa: 90 hari lagi masuk Ringkasan, 91 hari lagi tidak.
 
-**Ringkasan dan Laporan (F-09, F-11)**
+**Ringkasan (F-09; tiket #11, `tests/ringkasan.test.ts`)**
+- Daftar Hampir habis memuat stok 0, 1, dan 20; tidak memuat stok 21; urut dari stok paling sedikit; menyertakan satuan dan tanggal kedaluwarsa.
+- Batas 90 hari: kedaluwarsa 90 hari lagi masuk Segera kedaluwarsa, 91 hari lagi tidak.
+- Kedaluwarsa hari ini masuk Segera kedaluwarsa (bukan Sudah kedaluwarsa); kedaluwarsa kemarin sebaliknya.
+- Obat yang diarsipkan tidak ikut di ketiga daftar.
+- Pendapatan bertambah sebesar Penjualan yang baru dicatat, lalu berkurang lagi setelah Penjualan itu dibatalkan (diuji lewat **selisih**, karena file tes lain ikut mencatat Penjualan hari ini).
+- Kasir, Staf nonaktif, dan Pengunjung ditolak.
+
+**Laporan (F-11)**
 - Total di laporan sama dengan penjumlahan manual data uji (ukuran M-04 di PRD).
 - Penjualan pukul 23.30 WIB terhitung hari itu, bukan hari berikutnya.
 - Rincian per obat menjumlahkan jumlah terjual dengan benar.
@@ -597,6 +618,7 @@ Semua aturan yang wajib benar tinggal di database, jadi **database adalah satu-s
 - **Tes yang mengubah data** (Penjualan, kelola obat) mulai tiket #6 dan #8 berjalan sebagai Staf uji dan membersihkan atau memakai data miliknya sendiri, supaya tes bisa diulang.
 - **Tes Penjualan bisa diulang** (16 Oktober 2026, tiket #8): sebelum setiap tes, stok dan harga obat `uji-jual-*` dikembalikan ke angka awal lewat fungsi `public.uji_atur_obat`. Fungsi ini **hanya ada di project uji** (dipasang `data-uji.sql`, bukan migrasi), hanya bisa dipanggil Admin uji, dan hanya untuk slug `uji-jual-*`. Penjualan uji tidak dihapus (aturan bisnis 7); mereka menumpuk di project uji dan tidak mengganggu, karena setiap tes mencari Penjualannya sendiri lewat Nomor Penjualan. `data-uji.sql` tidak lagi menghapus obat, karena obat yang pernah terjual dirujuk Item penjualan. Ditolak: jadwal pg_cron penyetel stok (bisa bertabrakan dengan tes yang sedang berjalan); membuat obat baru per tes (Admin belum boleh menambah obat sampai #9, dan tabel menumpuk).
 - **Penjualan berjam tetap** (17 Oktober 2026, tiket #10): `data-uji.sql` menyimpan empat Penjualan uji (Kasir uji pukul 00.30 dan 23.30 WIB hari ini, 23.30 WIB kemarin; Admin uji pukul 12.00 WIB hari ini). Waktunya disegarkan setiap menit oleh jadwal pg_cron, seperti tanggal kedaluwarsa. Pukul 00.30 WIB = 17.30 UTC kemarin, jadi kalau "hari ini" salah dihitung dengan UTC, tes langsung gagal. Tes #10 **tidak mencatat Penjualan baru**, supaya tidak mengganggu angka stok tes Penjualan yang berjalan bersamaan. Ditolak: mencatat Penjualan di dalam tes (waktunya selalu "sekarang", jadi batas jam tidak bisa diuji).
+- **Tes Ringkasan** (4 November 2026, tiket #11): `data-uji.sql` menambah dua obat, `Uji Kedaluwarsa 90 Hari` dan `Uji Kedaluwarsa 91 Hari`, yang tanggalnya ikut disegarkan jadwal pg_cron setiap menit. Keduanya menguji batas 90 hari dari dua sisi. Stoknya sengaja 50 supaya tidak ikut masuk daftar Hampir habis. Angka pendapatan **tidak** dibandingkan dengan angka tetap, melainkan selisihnya sebelum dan sesudah satu Penjualan yang dicatat tes ini sendiri, karena file tes lain berjalan bersamaan dan ikut menambah Penjualan hari ini. Ditolak: menjalankan file tes satu per satu (seluruh rangkaian tes jadi jauh lebih lama).
 - **Tes Pembatalan** (21 Oktober 2026, tiket #13): memakai obat khusus `uji-jual-batal-*` (A, B, Arsip), terpisah dari obat tes Penjualan, karena file tes berjalan bersamaan dan masing-masing menyetel ulang stok obatnya sendiri. Slug berawalan `uji-jual-` supaya `uji_atur_obat` bisa langsung dipakai. Setiap tes mencatat Penjualannya sendiri lalu membatalkannya; Penjualan uji berjam tetap (#10) tidak disentuh. Untuk tes obat yang diarsipkan, `data-uji.sql` menambah fungsi `uji_arsipkan_obat` dengan penjaga yang sama (hanya project uji, hanya Admin, hanya `uji-jual-*`). Ditolak: menambah parameter ke `uji_atur_obat` (perlu menghapus fungsi lama, dan perintah hapus lewat connector menunggu konfirmasi sehingga tertahan).
 - **Tes dua Kasir bersamaan**: dua sesi berbeda (Kasir uji dan Admin uji) memanggil `catat_penjualan` serentak untuk obat ber-stok 1, diulang 3 ronde. Ditolak: akun Kasir uji kedua (perlu dasbor dan secret baru, padahal yang diuji adalah penguncian stoknya, bukan perannya).
 
