@@ -389,6 +389,19 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 - WhatsApp: nomor apotek disimpan di pengaturan aplikasi (variabel lingkungan), bukan di kode. Tombol membuka WhatsApp dengan pesan awal "Halo ApotikKu, saya mau tanya tentang [nama obat]." Nomornya juga ditulis sebagai teks biasa, supaya bisa disalin bila tombol tidak bekerja.
 - Warna merah hanya dipakai untuk tanda Obat keras. Status Habis memakai abu-abu (ADR 0004).
 
+Ditambahkan 4 November 2026 (tiket #4, `components/KatalogTersaring.tsx`, [penjelasan](penjelasan/07-cari-laci-keluhan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Tempat menyaring | Seluruh 38 obat dikirim server sekali; pencarian, laci, dan "Tanpa resep" dikerjakan di browser (Client Component `KatalogTersaring`) | Hasil muncul seketika tanpa menunggu jaringan (NF-03 ≤ 2 langkah, NF-05 < 3 detik di 4G); 38 baris jauh lebih ringan daripada satu foto; hemat kuota permintaan Supabase gratis | Menyaring di database (setiap ketikan satu permintaan: tersendat di 4G dan boros kuota). **Perlu ditinjau ulang bila obat kelak ribuan** |
+| Jumlah di setiap laci | Dihitung dari hasil saringan lain (pencarian + "Tanpa resep"), tetapi tanpa saringan laci itu sendiri | Pengunjung melihat angka yang benar-benar akan ia dapat sebelum mengetuk; angka ikut turun saat "Tanpa resep" dicentang | Menghitung dari seluruh 38 obat (angkanya berbohong saat saringan lain aktif) |
+| Laci kosong | Dimatikan (tidak bisa diketuk), kecuali laci yang sedang aktif | Tidak ada ketukan yang berujung halaman kosong; laci aktif tetap hidup supaya saringannya selalu bisa dibatalkan | Semua laci selalu bisa diketuk (ketukan sia-sia) |
+| Enam laci, tanpa tombol "Semua" | Enam laci saja, 3 kolom × 2 baris di HP; membatalkan dengan mengetuk laci yang sama (ADR 0004) | 3 × 2 pas terisi enam Keluhan; tombol "Semua" mengulang fungsi yang sudah ada dan merusak susunan itu. Prototipe tampilan Sesi 7 memakai deretan yang bisa digeser beserta tombol "Semua"; aplikasi mengikuti issue #4 | Menambah tombol "Semua" (baris ketujuh yang timpang) |
+| Kalimat jumlah | "8 obat untuk Batuk & Flu", "2 obat tanpa resep untuk \"para\" di Demam & Nyeri"; ditandai `role="status"` | Pengunjung tahu saringan apa yang sedang berlaku tanpa memeriksa tiap kontrol; pembaca layar ikut mengumumkannya | Hanya angka ("8 obat"), tanpa menyebut saringannya |
+| Tidak ada hasil | "Obat tidak ditemukan" + tombol WhatsApp berisi kata yang dicari + nomor sebagai teks + tombol "Tampilkan semua obat" | Pengunjung tidak dibiarkan buntu (M-07); nomor teks berguna bila tombolnya tidak bekerja | Hanya pesan kosong |
+| Nomor WhatsApp | Variabel lingkungan `NEXT_PUBLIC_WHATSAPP_APOTEK`; bila kosong dipakai nomor contoh dan layar menulis "(nomor contoh)" | Nomor bisa diganti tanpa mengubah kode (SPEC 4.7); tombolnya tidak pernah mati saat demo walau pengaturannya belum diisi | Menulis nomor di kode (ganti nomor = ubah program); membiarkan tombol mati bila variabel kosong |
+| Tes otomatis | Tidak ada; diuji manual di #14 | SPEC 5.1: database satu-satunya titik uji otomatis. Tiket ini tidak menyentuh database, dan akibat terburuk saringan yang salah adalah obat tidak ditemukan, bukan stok minus atau data bocor | Menambah tes tampilan (mudah rusak tiap desain berubah, SPEC 5.4) |
+
 ### 4.8 Layar Jual (Kasir)
 
 - Kotak pencarian mendapat fokus otomatis; Kasir bisa mengetik nama lalu menekan Enter untuk menambahkan hasil teratas ke keranjang.

@@ -54,7 +54,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
    9. #9 Kelola obat
    10. #11 Ringkasan
    11. #12 Laporan
-   12. #4 Cari, laci Keluhan, "Tanpa resep"
+   12. ~~#4 Cari, laci Keluhan, "Tanpa resep"~~ (selesai)
    13. #5 Detail obat dan WhatsApp
    14. #14 Uji manual dan rilis
 
