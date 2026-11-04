@@ -85,6 +85,8 @@ Jalan keluarnya: yang diuji bukan angkanya, melainkan **selisihnya**.
 
 Dengan cara ini, tesnya tetap membuktikan dua hal penting (Penjualan baru dihitung, Penjualan Dibatalkan tidak dihitung) tanpa ikut rusak gara-gara tes lain.
 
+Ada satu jebakan yang kami temukan justru **setelah** tesnya dijalankan di CI. Mula-mula tes ini menjual obat milik tes Pembatalan. Hasilnya `pembatalan.test.ts` gagal: ia menyetel stok obat itu ke 100, menjual 2, lalu memastikan stoknya tepat 98 — padahal tes Ringkasan diam-diam menjual 2 lagi, jadi angkanya 96. Perbaikannya: tes Ringkasan memakai obat **miliknya sendiri**, `Uji Jual Ringkasan`, dengan stok sangat besar. Aturannya jadi jelas untuk tiket berikutnya: *setiap file tes yang mengubah stok harus punya obat sendiri.*
+
 Daftar obatnya lain cerita: itu bisa diuji **tepat**, karena memakai obat uji yang tidak boleh diubah tes lain (`uji_atur_obat` hanya mengizinkan obat ber-slug `uji-jual-*`). Untuk menguji batas 90 hari dari dua sisi, data uji ditambah dua obat baru: `Uji Kedaluwarsa 90 Hari` (harus muncul) dan `Uji Kedaluwarsa 91 Hari` (tidak boleh muncul). Tanggal keduanya disegarkan jadwal pg_cron setiap menit, sama seperti baris "kemarin" dan "hari ini", supaya tesnya tetap benar kapan pun dijalankan.
 
 ## 7. Yang sengaja belum dikerjakan

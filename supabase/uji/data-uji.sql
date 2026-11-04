@@ -44,7 +44,13 @@ with data (nama, bentuk, keluhan, golongan, satuan_jual, isi_per_satuan,
     -- menyetel ulang stok obatnya sendiri sebelum setiap tes.
     ('Uji Jual Batal A',     'tablet', 'demam_nyeri', 'bebas',          'strip', '10 tablet', 3000, 3000, 100, date '2099-12-31', false),
     ('Uji Jual Batal B',     'sirup',  'batuk_flu',   'bebas_terbatas', 'botol', '60 ml',     4000, 4000, 100, date '2099-12-31', false),
-    ('Uji Jual Batal Arsip', 'salep',  'luka_kulit',  'bebas',          'tube',  '5 g',       2000, 2000, 100, date '2099-12-31', false)
+    ('Uji Jual Batal Arsip', 'salep',  'luka_kulit',  'bebas',          'tube',  '5 g',       2000, 2000, 100, date '2099-12-31', false),
+    -- Tes Ringkasan (tiket #11, tests/ringkasan.test.ts) ikut mencatat satu
+    -- Penjualan untuk menguji pendapatan. Obatnya HARUS milik sendiri: tes lain
+    -- memeriksa angka stok yang tepat, dan file tes berjalan bersamaan.
+    -- Stoknya sengaja sangat besar supaya tidak pernah masuk daftar Hampir
+    -- habis dan tidak perlu disetel ulang.
+    ('Uji Jual Ringkasan', 'tablet', 'demam_nyeri', 'bebas', 'strip', '10 tablet', 3000, 3000, 100000, date '2099-12-31', false)
 ),
 diperbarui as (
   update public.obat o

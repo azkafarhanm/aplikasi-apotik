@@ -129,12 +129,14 @@ describe("Pendapatan hari ini", () => {
   it("bertambah sebesar Penjualan yang baru dicatat, lalu berkurang lagi saat dibatalkan", async () => {
     const sebelum = await ambilRingkasan();
 
-    // Obat uji milik tes Pembatalan dipakai karena stoknya besar dan harganya
-    // tetap; yang diperiksa di sini hanya selisih pendapatan.
+    // Obat MILIK TES INI SENDIRI (uji-jual-ringkasan). Memakai obat tes lain
+    // akan merusak tes itu: file tes berjalan bersamaan, dan tes Penjualan
+    // serta Pembatalan memeriksa angka stok yang tepat. Stoknya sangat besar,
+    // jadi tidak perlu disetel ulang dan tidak pernah masuk daftar Hampir habis.
     const { data: obat } = await admin.supabase
       .from("obat")
       .select("id, harga_jual")
-      .eq("slug", "uji-jual-batal-a")
+      .eq("slug", "uji-jual-ringkasan")
       .single();
 
     const jumlah = 2;
