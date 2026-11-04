@@ -1,0 +1,234 @@
+/* Detail obat: satu etiket besar. HP 360 px lebih dulu (NF-04), lalu dua
+   kolom di layar lebar (harga kiri, keterangan kanan), mengikuti rancangan
+   layar di SKPL 4.3.1.1 dan konsep "etiket apotek" (ADR 0004). */
+.halaman {
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+.kembali {
+  display: inline-block;
+  margin-bottom: 0.9rem;
+  color: var(--hijau-apotek);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.kembali:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.etiket {
+  position: relative;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+  box-shadow:
+    0 1px 0 var(--garis),
+    0 3px 8px rgb(70 50 10 / 0.08);
+}
+
+/* Garis putus-putus di dalam tepi, sama dengan kartu di Katalog. */
+.etiket::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px dashed var(--garis);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.kepala {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0.5rem;
+  padding: 0.8rem 0.9rem 0.5rem;
+  border-bottom: 1.5px solid var(--hijau-apotek);
+}
+
+.keluhan {
+  font-family: var(--huruf-judul);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hijau-apotek);
+}
+
+.satuan {
+  font-size: 0.85rem;
+  color: var(--tinta-lembut);
+  text-align: right;
+}
+
+.isi {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.1rem 1.4rem 0.4rem;
+}
+
+@media (min-width: 46rem) {
+  .isi {
+    grid-template-columns: 15rem 1fr;
+    gap: 2rem;
+  }
+}
+
+.nama {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.bentuk {
+  margin: 0.15rem 0 0;
+  color: var(--tinta-lembut);
+}
+
+/* Harga: monospace besar, seperti cetakan label harga (ADR 0004). */
+.harga {
+  margin: 1rem 0 0;
+  font-family: var(--huruf-angka);
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.perSatuan {
+  margin: 0.1rem 0 0;
+  color: var(--tinta-lembut);
+  font-size: 0.95rem;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.9rem 0 0;
+  font-weight: 600;
+}
+
+.titikStatus {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--hijau-apotek);
+}
+
+.etiket[data-status="hampir_habis"] .titikStatus {
+  background: var(--hampir-habis);
+}
+
+.etiket[data-status="hampir_habis"] .status {
+  color: var(--hampir-habis);
+}
+
+.etiket[data-status="habis"] .titikStatus {
+  background: var(--habis);
+}
+
+.etiket[data-status="habis"] .status {
+  color: var(--habis);
+}
+
+.kolomKeterangan {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.bagian p {
+  margin: 0.3rem 0 0;
+}
+
+.judulBagian {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-lembut);
+}
+
+.barisGolongan {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.45rem 0 0.35rem !important;
+}
+
+.namaGolongan {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.namaGolongan[data-golongan="keras"] {
+  color: var(--golongan-keras);
+}
+
+/* Aturan bisnis 8: catatan ini selalu menemani keterangan kegunaan. */
+.catatan {
+  margin: 0.6rem 1.4rem 1.2rem;
+  padding: 0.65rem 0.85rem;
+  border-left: 4px solid var(--hijau-apotek);
+  background: var(--kertas);
+  font-size: 0.95rem;
+}
+
+.tanya {
+  margin-top: 1.5rem;
+}
+
+.tombolUtama {
+  display: inline-block;
+  margin-top: 0.55rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 3px;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tombolUtama:hover {
+  background: var(--tinta);
+}
+
+/* Nomor ditulis sebagai teks biasa supaya bisa disalin bila tombol tidak
+   bekerja (SPEC 4.7). */
+.nomor {
+  margin: 0.55rem 0 0;
+  font-family: var(--huruf-angka);
+  font-size: 0.95rem;
+  color: var(--tinta-lembut);
+}
+
+.pesan {
+  padding: 1.5rem 0;
+  font-size: 1.05rem;
+}
+
+.tidakAda {
+  padding: 1.5rem;
+  border: 1.5px dashed var(--garis);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.tidakAda p {
+  margin: 0 0 0.5rem;
+  color: var(--tinta-lembut);
+}
+
+.tidakAdaJudul {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--tinta) !important;
+}

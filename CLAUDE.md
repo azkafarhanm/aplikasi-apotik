@@ -55,7 +55,7 @@ Project mata kuliah Rekayasa Perangkat Lunak (TI25B). Pengembangnya sedang belaj
    10. #11 Ringkasan
    11. #12 Laporan
    12. ~~#4 Cari, laci Keluhan, "Tanpa resep"~~ (selesai)
-   13. #5 Detail obat dan WhatsApp
+   13. ~~#5 Detail obat dan WhatsApp~~ (selesai)
    14. #14 Uji manual dan rilis
 
 Bahan tugas dari dosen disusun di `docs/sesi/` tanpa nama/NIM; PDF yang memuat identitas dibuat di luar repo memakai template dosen.

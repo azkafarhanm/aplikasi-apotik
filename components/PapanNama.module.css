@@ -1,0 +1,93 @@
+/* Papan nama hijau tua seperti papan apotek (ADR 0004). Dipakai Katalog dan
+   Detail obat. Dirancang untuk HP 360 px lebih dulu (NF-04). */
+.lebar {
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.papanNama {
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  padding: 1.1rem 0 1.25rem;
+  border-bottom: 4px double var(--etiket);
+  box-shadow: 0 4px 0 var(--hijau-apotek);
+  margin-bottom: 1.25rem;
+}
+
+/* Papan nama tanpa judul (Detail obat) tidak perlu ruang bawah selebar itu. */
+.papanNama:not(:has(.judul)) {
+  padding-bottom: 1.1rem;
+}
+
+.merek {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Logo + nama menjadi satu tautan pulang ke Katalog. */
+.tautanMerek {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tautanMerek:hover .namaMerek {
+  opacity: 1;
+}
+
+/* Logo tidak ikut menyusut saat ruang sempit di HP. */
+.merek svg {
+  flex-shrink: 0;
+}
+
+/* Hanya tulisannya yang dipudarkan; logo tetap penuh warnanya. */
+.namaMerek {
+  opacity: 0.85;
+}
+
+.judul {
+  margin: 0.1rem 0 0;
+  font-family: var(--huruf-judul);
+  font-weight: 700;
+  font-size: 1.9rem;
+  line-height: 1.15;
+}
+
+.subjudul {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+}
+
+/* Baris "ApotikKu" + tautan Masuk Staf di pojok kanan (#24). */
+.barisMerek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.masukStaf {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.25rem;
+  margin-right: -0.25rem;
+  font-size: 0.8rem;
+  color: var(--etiket);
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.masukStaf:hover {
+  opacity: 1;
+}

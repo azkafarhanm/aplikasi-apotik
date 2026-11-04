@@ -53,6 +53,41 @@
   padding: 0.8rem 0.9rem 0.7rem 1.35rem;
 }
 
+/* Seluruh kartu bisa diketuk, tetapi yang menjadi tautan hanya nama obat
+   (#5): lapisan tak terlihat di bawah menutupi kartu. Tanda fokus keyboard
+   dipindah ke kartu supaya terlihat jelas, bukan hanya sebaris nama. */
+.tautan {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tautan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+}
+
+.kartu:hover {
+  box-shadow:
+    0 1px 0 var(--garis),
+    0 5px 14px rgb(70 50 10 / 0.16);
+}
+
+.kartu:hover .nama {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.kartu:has(.tautan:focus-visible) {
+  outline: 3px solid var(--hijau-apotek);
+  outline-offset: 2px;
+}
+
+.tautan:focus-visible {
+  outline: none;
+}
+
 .nama {
   font-family: var(--huruf-judul);
   font-size: 1.25rem;

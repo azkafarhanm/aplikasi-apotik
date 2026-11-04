@@ -402,6 +402,20 @@ Ditambahkan 4 November 2026 (tiket #4, `components/KatalogTersaring.tsx`, [penje
 | Nomor WhatsApp | Variabel lingkungan `NEXT_PUBLIC_WHATSAPP_APOTEK`; bila kosong dipakai nomor contoh dan layar menulis "(nomor contoh)" | Nomor bisa diganti tanpa mengubah kode (SPEC 4.7); tombolnya tidak pernah mati saat demo walau pengaturannya belum diisi | Menulis nomor di kode (ganti nomor = ubah program); membiarkan tombol mati bila variabel kosong |
 | Tes otomatis | Tidak ada; diuji manual di #14 | SPEC 5.1: database satu-satunya titik uji otomatis. Tiket ini tidak menyentuh database, dan akibat terburuk saringan yang salah adalah obat tidak ditemukan, bukan stok minus atau data bocor | Menambah tes tampilan (mudah rusak tiap desain berubah, SPEC 5.4) |
 
+Ditambahkan 4 November 2026 (tiket #5, `app/obat/[slug]/`, [penjelasan](penjelasan/08-detail-obat.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Sumber data | Tampilan `katalog` disaring `slug`, sama dengan Katalog | Obat yang diarsipkan Admin otomatis ikut hilang dari Detail obat tanpa kode tambahan; stok, harga acuan, dan tanggal kedaluwarsa memang tidak ikut terkirim | Membaca tabel `obat` (Pengunjung tidak punya izin, dan kolom rahasia ikut terbawa) |
+| Slug tidak ada vs obat diarsipkan | Keduanya menampilkan halaman yang **sama persis**: "Obat tidak ditemukan" + tautan ke Katalog | Orang luar tidak bisa menebak obat apa yang pernah dijual ApotikKu; pola yang sama dengan Struk (#10) | Pesan berbeda untuk obat yang diarsipkan (membocorkan keberadaannya) |
+| Kode status halaman "tidak ditemukan" | Tetap 200, isinya yang berganti (bukan `notFound()`) | Mengikuti pola Struk (#10); tidak ada kebutuhan mesin pencari di PRD, dan Katalog ditemukan lewat tautan yang dibagikan, bukan lewat pencarian | `notFound()` dengan 404 sungguhan (perlu berkas `not-found.tsx` sendiri dan penanganan metadata tambahan, tanpa manfaat yang tercatat di PRD) |
+| Judul halaman | `"{nama obat} · ApotikKu"` lewat `generateMetadata` | Judul inilah yang muncul sebagai pratinjau saat tautannya dikirim di WhatsApp (user story 15) | Judul tetap "ApotikKu" (semua tautan terlihat sama) |
+| Tanda golongan | Digambar 48 px (lebih besar daripada 40 px di kartu), disertai nama golongan **dan penjelasannya** dalam bahasa sehari-hari | Mendidik soal logo golongan obat (M-06); teks wajib ada karena warna bukan satu-satunya penanda (ADR 0004) | Hanya nama golongan seperti di kartu (tidak menambah apa pun) |
+| Penjelasan Satuan jual | Kalimat khusus untuk strip ("Strip = satu lembar kemasan berisi …. Obat dijual per strip, tidak per butir."), kalimat umum untuk botol/tube/sachet | Harga per strip sering disangka harga per butir (aturan bisnis 4) | Tidak menjelaskan (pertanyaan paling sering terbawa ke apoteker) |
+| Kartu Katalog bisa diketuk | Seluruh kartu bisa diketuk, tetapi yang menjadi tautan hanya **nama obat** (lapisan `.tautan::after` menutupi kartu); tanda fokus keyboard dipindah ke seluruh kartu | Sasaran ketuk selebar kartu untuk jari, sementara pembaca layar membaca "Ambroksol 30 mg" saja, bukan seluruh isi kartu | Membungkus seluruh kartu jadi satu tautan (pembaca layar membacakan semua isinya sebagai nama tautan) |
+| Papan nama | Dipindah ke `components/PapanNama.tsx`, dipakai Katalog dan Detail obat; di Detail obat tanpa judul besar | Pengunjung yang membuka tautan langsung dari WhatsApp tetap tahu ini apotek apa dan punya jalan pulang ke Katalog; satu halaman hanya boleh punya satu `h1`, dan di sini `h1` adalah nama obat | Menyalin markah papan nama ke halaman kedua (dua tempat yang harus diubah bersamaan) |
+| Tes otomatis | Tidak ada, sama dengan #4 | SPEC 5.1; tiket ini tidak mengubah database. Aturan yang menjaga data sudah diuji di `tests/katalog.test.ts` (obat diarsipkan tidak muncul di tampilan `katalog`, kolom rahasia tidak terkirim) | Menambah tes tampilan (SPEC 5.4) |
+
 ### 4.8 Layar Jual (Kasir)
 
 - Kotak pencarian mendapat fokus otomatis; Kasir bisa mengetik nama lalu menekan Enter untuk menambahkan hasil teratas ke keranjang.

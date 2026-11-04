@@ -1,6 +1,12 @@
 // Satu kartu obat berbentuk etiket apotek (ADR 0004, SPEC 4.7).
 // Urutan isi: Keluhan, Satuan jual + isi, tanda golongan, nama, Bentuk,
 // tulisan golongan, Status stok, harga jual.
+//
+// Seluruh kartu bisa diketuk untuk membuka Detail obat (#5). Yang menjadi
+// tautan hanyalah NAMA obat; seluruh kartu ikut bisa diketuk lewat lapisan
+// tak terlihat di CSS (.tautan::after). Dengan begitu pembaca layar dan
+// daftar tautan browser membaca "Parasetamol 500 mg", bukan seluruh isi kartu.
+import Link from "next/link";
 import {
   tulisanBentuk,
   tulisanGolongan,
@@ -29,7 +35,9 @@ export function KartuEtiket({ obat }: { obat: ObatKatalog }) {
         <TandaGolongan golongan={obat.golongan} />
         <div>
           <h2 id={`nama-${obat.slug}`} className={styles.nama}>
-            {obat.nama}
+            <Link href={`/obat/${obat.slug}`} className={styles.tautan}>
+              {obat.nama}
+            </Link>
           </h2>
           <p className={styles.bentuk}>{tulisanBentuk[obat.bentuk] ?? obat.bentuk}</p>
           <p className={styles.golongan} data-golongan={obat.golongan}>
