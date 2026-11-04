@@ -59,31 +59,8 @@
   font-size: 0.95rem;
 }
 
-.jumlah {
-  margin: 0 0 0.6rem;
-  font-size: 0.9rem;
-  color: var(--tinta-lembut);
-}
-
-.daftar {
-  list-style: none;
-  margin: 0 0 2.5rem;
-  padding: 0;
-  display: grid;
-  gap: 0.9rem;
-}
-
-@media (min-width: 40rem) {
-  .daftar {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 60rem) {
-  .daftar {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Daftar obat dan jumlahnya pindah ke KatalogTersaring.module.css (#4),
+   karena keduanya ikut berubah setiap kali saringan diubah. */
 
 .pesan {
   padding: 1.5rem 0;

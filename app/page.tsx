@@ -7,7 +7,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import { KartuEtiket } from "@/components/KartuEtiket";
+import { KatalogTersaring } from "@/components/KatalogTersaring";
 import { LogoApotikKu } from "@/components/LogoApotikKu";
 import type { ObatKatalog } from "@/lib/katalog";
 import { buatSupabaseServer } from "@/lib/supabase/server";
@@ -71,18 +71,9 @@ async function DaftarObat() {
     return <p className={styles.pesan}>Belum ada obat di Katalog.</p>;
   }
 
-  return (
-    <>
-      <p className={styles.jumlah}>{daftar.length} obat</p>
-      <ul className={styles.daftar}>
-        {daftar.map((obat) => (
-          <li key={obat.slug}>
-            <KartuEtiket obat={obat} />
-          </li>
-        ))}
-      </ul>
-    </>
-  );
+  // Penyaringan (cari, laci Keluhan, "Tanpa resep") berjalan di HP Pengunjung,
+  // jadi daftar lengkapnya cukup dikirim sekali dari sini (SPEC 4.7).
+  return <KatalogTersaring daftar={daftar} />;
 }
 
 /**

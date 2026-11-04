@@ -1,0 +1,206 @@
+/* Penyaring Katalog: kotak cari, laci Keluhan, "Tanpa resep" (#4).
+   Dirancang untuk HP 360 px lebih dulu (NF-04). Gayanya mengikuti "etiket
+   apotek" (ADR 0004): kertas off-white, garis tegas, tanpa bayangan lembut. */
+.penyaring {
+  margin-bottom: 1.1rem;
+  padding: 0.85rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.labelCari,
+.labelLaci {
+  display: block;
+  margin: 0 0 0.35rem;
+  font-family: var(--huruf-judul);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-lembut);
+}
+
+.labelLaci {
+  margin-top: 0.9rem;
+}
+
+.kotakCari {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--tinta);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.kotakCari::placeholder {
+  color: var(--tinta-lembut);
+  opacity: 0.8;
+}
+
+/* Enam laci: 3 kolom × 2 baris di HP, tetap enak ditekan jari (min 44 px). */
+.laci {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+}
+
+.tombolLaci {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  min-height: 3rem;
+  padding: 0.4rem 0.25rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--kertas);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tombolLaci:hover:not(:disabled) {
+  background: #fff;
+}
+
+/* Laci yang sedang dipakai: hijau apotek, seperti laci yang ditarik keluar. */
+.tombolLaci[aria-pressed="true"] {
+  background: var(--hijau-apotek);
+  border-color: var(--hijau-apotek);
+  color: var(--etiket);
+}
+
+.tombolLaci:disabled {
+  color: var(--habis);
+  border-color: var(--garis);
+  cursor: not-allowed;
+}
+
+.namaLaci {
+  font-weight: 700;
+}
+
+.isiLaci {
+  font-family: var(--huruf-angka);
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.barisTanpaResep {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.centang {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--hijau-apotek);
+}
+
+.barisTanpaResep label {
+  cursor: pointer;
+}
+
+.barisJumlah {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+}
+
+.jumlah {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tinta-lembut);
+}
+
+/* Tombol yang tampil seperti tautan: membatalkan semua saringan sekaligus. */
+.bersihkan {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--hijau-apotek);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.daftar {
+  list-style: none;
+  margin: 0 0 2.5rem;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+@media (min-width: 40rem) {
+  .daftar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .laci {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (min-width: 60rem) {
+  .daftar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tidak ada hasil: jangan buntu, langsung tawarkan bertanya ke apotek. */
+.kosong {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem;
+  border: 1.5px dashed var(--garis);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.kosong p {
+  margin: 0 0 0.5rem;
+  color: var(--tinta-lembut);
+}
+
+.kosongJudul {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--tinta) !important;
+}
+
+.tombolWhatsApp {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.55rem 1rem;
+  border-radius: 3px;
+  background: var(--hijau-apotek);
+  color: var(--etiket);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tombolWhatsApp:hover {
+  background: var(--tinta);
+}
+
+.nomor {
+  margin: 0.5rem 0 0 !important;
+  font-family: var(--huruf-angka);
+  font-size: 0.9rem;
+}
