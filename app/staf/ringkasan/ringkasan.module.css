@@ -1,0 +1,148 @@
+/* Ringkasan: papan kondisi apotek hari ini. Dirancang untuk laptop/tablet
+   (NF-04) tetapi tetap terbaca di HP, karena Admin kadang mengeceknya dari HP.
+   Gayanya mengikuti "etiket apotek" (ADR 0004): kertas, garis tegas, angka
+   monospace. */
+.tanggal {
+  margin: -0.5rem 0 1rem;
+  color: var(--tinta-lembut);
+}
+
+.angka {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 30rem) {
+  .angka {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 34rem;
+  }
+}
+
+.kotakAngka {
+  padding: 0.9rem 1.1rem;
+  border: 1.5px solid var(--tinta);
+  border-left: 8px solid var(--hijau-apotek);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.labelAngka {
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-lembut);
+}
+
+.nilaiAngka {
+  margin: 0.2rem 0 0;
+  font-family: var(--huruf-angka);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.catatanAngka {
+  margin: 0 0 1.5rem;
+  font-size: 0.85rem;
+  color: var(--tinta-lembut);
+}
+
+.daftar {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 60rem) {
+  .daftar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+.panel {
+  padding: 0.9rem 1.1rem 1.1rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+  background: var(--etiket);
+}
+
+.judulPanel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: var(--huruf-judul);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* Jumlah obat di panel: angka kecil dalam kotak, seperti stempel. */
+.jumlahPanel {
+  min-width: 1.6rem;
+  padding: 0.05rem 0.35rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: 2px;
+  background: var(--kertas);
+  font-family: var(--huruf-angka);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.keteranganPanel {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--tinta-lembut);
+}
+
+.kosong {
+  margin: 0;
+  padding: 0.75rem 0;
+  color: var(--tinta-lembut);
+}
+
+.baris {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.baris li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.75rem;
+  padding: 0.5rem 0;
+  border-top: 1px dashed var(--garis);
+}
+
+.namaObat {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.kanan {
+  font-family: var(--huruf-angka);
+  font-size: 0.95rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Tanggal kedaluwarsa: keterangan kecil di bawah nama. */
+.tanggalObat {
+  grid-column: 1 / -1;
+  font-family: var(--huruf-angka);
+  font-size: 0.8rem;
+  color: var(--tinta-lembut);
+}
+
+/* Baris yang perlu segera ditindaklanjuti. Memakai warna "hampir habis"
+   (cokelat tua), bukan merah: merah khusus tanda Obat keras (ADR 0004). */
+.perluPerhatian .kanan {
+  color: var(--hampir-habis);
+  font-weight: 700;
+}
