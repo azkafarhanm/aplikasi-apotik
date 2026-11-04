@@ -1,6 +1,7 @@
 # Analisis Perangkat Lunak: Requirement Gathering dan SKPL ApotikKu
 
 > Bahan tugas Sesi 4 mata kuliah Rekayasa Perangkat Lunak (TI25B). Versi di repo ini sengaja **tanpa nama dan NIM**; PDF yang memuat identitas kelompok dibuat di luar repo memakai format tugas dosen.
+> Versi yang dikumpulkan (revisi 18 Okt 2026) diisi langsung ke file template `SKPL.docx` dari dosen: judul bab mengikuti template, hasil *requirement gathering* menjadi Lampiran A, dan sampulnya memakai logo ApotikKu (#33).
 > Isi dokumen ini disusun ulang dari [`PRD.md`](../PRD.md) dan [`SPEC.md`](../SPEC.md) mengikuti template SKPL dari dosen (adaptasi IEEE Std 830-1993, ancangan berorientasi proses). Sumber diagram ada di [`gambar/sesi-04/`](gambar/sesi-04/).
 
 ## Soal
