@@ -5,10 +5,9 @@
 // stok selalu sesuai Penjualan terakhir. <Suspense> membuat bagian tetap
 // langsung tampil sementara daftar obat menyusul.
 import { Suspense } from "react";
-import Link from "next/link";
 import { connection } from "next/server";
-import { KartuEtiket } from "@/components/KartuEtiket";
-import { LogoApotikKu } from "@/components/LogoApotikKu";
+import { KatalogTersaring } from "@/components/KatalogTersaring";
+import { PapanNama } from "@/components/PapanNama";
 import type { ObatKatalog } from "@/lib/katalog";
 import { buatSupabaseServer } from "@/lib/supabase/server";
 import styles from "./page.module.css";
@@ -16,27 +15,7 @@ import styles from "./page.module.css";
 export default function HalamanKatalog() {
   return (
     <>
-      <header className={styles.papanNama}>
-        <div className={styles.lebar}>
-          <div className={styles.barisMerek}>
-            <p className={styles.merek}>
-              <LogoApotikKu />
-              <span className={styles.namaMerek}>ApotikKu</span>
-            </p>
-            {/* Tautan untuk Staf, di atas supaya tidak perlu menggulir melewati
-                semua kartu obat (#24). Sengaja kecil dan pudar agar tidak
-                mengalihkan Pengunjung. Bukan pengamanan apa pun: Area staf
-                dijaga login dan RLS, bukan oleh alamat yang dirahasiakan. */}
-            <Link href="/masuk" className={styles.masukStaf}>
-              Masuk Staf
-            </Link>
-          </div>
-          <h1 className={styles.judul}>Katalog obat</h1>
-          <p className={styles.subjudul}>
-            Harga, golongan, dan ketersediaan obat hari ini.
-          </p>
-        </div>
-      </header>
+      <PapanNama judul="Katalog obat" subjudul="Harga, golongan, dan ketersediaan obat hari ini." />
 
       <main className={styles.lebar}>
         <p className={styles.catatan} role="note">
@@ -71,18 +50,9 @@ async function DaftarObat() {
     return <p className={styles.pesan}>Belum ada obat di Katalog.</p>;
   }
 
-  return (
-    <>
-      <p className={styles.jumlah}>{daftar.length} obat</p>
-      <ul className={styles.daftar}>
-        {daftar.map((obat) => (
-          <li key={obat.slug}>
-            <KartuEtiket obat={obat} />
-          </li>
-        ))}
-      </ul>
-    </>
-  );
+  // Penyaringan (cari, laci Keluhan, "Tanpa resep") berjalan di HP Pengunjung,
+  // jadi daftar lengkapnya cukup dikirim sekali dari sini (SPEC 4.7).
+  return <KatalogTersaring daftar={daftar} />;
 }
 
 /**

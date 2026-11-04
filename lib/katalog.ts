@@ -26,6 +26,18 @@ export const tulisanGolongan: Record<Golongan, string> = {
   keras: "Perlu resep dokter",
 };
 
+/**
+ * Arti golongan dalam bahasa sehari-hari, untuk halaman Detail obat (#5).
+ * Tujuannya mendidik: banyak orang belum memperhatikan logo golongan (M-06).
+ */
+export const penjelasanGolongan: Record<Golongan, string> = {
+  bebas: "Boleh dibeli tanpa resep dokter. Tandanya lingkaran hijau bergaris tepi hitam.",
+  bebas_terbatas:
+    "Boleh dibeli tanpa resep dokter, tetapi jumlahnya dibatasi dan kemasannya memuat peringatan pemakaian. Tandanya lingkaran biru bergaris tepi hitam.",
+  keras:
+    "Hanya boleh diserahkan dengan resep dokter. Tandanya lingkaran merah bergaris tepi hitam dengan huruf K.",
+};
+
 export const tulisanStatusStok: Record<StatusStok, string> = {
   tersedia: "Tersedia",
   hampir_habis: "Hampir habis",
@@ -61,4 +73,16 @@ export function tulisRupiah(rupiah: number): string {
 /** "strip", "10 tablet" → "per strip · 10 tablet" */
 export function tulisSatuan(satuanJual: string, isiPerSatuan: string): string {
   return `per ${satuanJual} · ${isiPerSatuan}`;
+}
+
+/**
+ * Penjelasan Satuan jual untuk Pengunjung (#5). Banyak orang mengira harga di
+ * Katalog adalah harga per butir, padahal apotek menjual per strip
+ * (aturan bisnis 4: penjualan eceran per butir tidak didukung).
+ */
+export function jelaskanSatuan(satuanJual: string, isiPerSatuan: string): string {
+  if (satuanJual === "strip") {
+    return `Strip = satu lembar kemasan berisi ${isiPerSatuan}. Obat dijual per strip, tidak per butir.`;
+  }
+  return `Obat dijual utuh per ${satuanJual} berisi ${isiPerSatuan}, tidak dipecah lebih kecil.`;
 }

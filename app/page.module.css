@@ -1,54 +1,10 @@
-/* Dirancang untuk HP 360 px lebih dulu (NF-04), melebar di layar besar. */
+/* Katalog. Papan nama hijau pindah ke components/PapanNama.module.css (#5),
+   karena Detail obat memakai papan nama yang sama. */
 .lebar {
   width: 100%;
   max-width: 64rem;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-/* Papan nama hijau tua seperti papan apotek. */
-.papanNama {
-  background: var(--hijau-apotek);
-  color: var(--etiket);
-  padding: 1.1rem 0 1.25rem;
-  border-bottom: 4px double var(--etiket);
-  box-shadow: 0 4px 0 var(--hijau-apotek);
-  margin-bottom: 1.25rem;
-}
-
-.merek {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin: 0;
-  font-family: var(--huruf-judul);
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-/* Logo tidak ikut menyusut saat ruang sempit di HP. */
-.merek svg {
-  flex-shrink: 0;
-}
-
-/* Hanya tulisannya yang dipudarkan; logo tetap penuh warnanya. */
-.namaMerek {
-  opacity: 0.85;
-}
-
-.judul {
-  margin: 0.1rem 0 0;
-  font-family: var(--huruf-judul);
-  font-weight: 700;
-  font-size: 1.9rem;
-  line-height: 1.15;
-}
-
-.subjudul {
-  margin: 0.25rem 0 0;
-  font-size: 1rem;
 }
 
 .catatan {
@@ -59,59 +15,7 @@
   font-size: 0.95rem;
 }
 
-.jumlah {
-  margin: 0 0 0.6rem;
-  font-size: 0.9rem;
-  color: var(--tinta-lembut);
-}
-
-.daftar {
-  list-style: none;
-  margin: 0 0 2.5rem;
-  padding: 0;
-  display: grid;
-  gap: 0.9rem;
-}
-
-@media (min-width: 40rem) {
-  .daftar {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 60rem) {
-  .daftar {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 .pesan {
   padding: 1.5rem 0;
   font-size: 1.05rem;
-}
-
-/* Baris "ApotikKu" + tautan Masuk Staf di pojok kanan (#24). */
-.barisMerek {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.masukStaf {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0 0.25rem;
-  margin-right: -0.25rem;
-  font-size: 0.8rem;
-  color: var(--etiket);
-  opacity: 0.8;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  white-space: nowrap;
-}
-
-.masukStaf:hover {
-  opacity: 1;
 }

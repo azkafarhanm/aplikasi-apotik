@@ -389,6 +389,33 @@ Keputusan tata letak ada di ADR 0004 (kartu etiket + laci Keluhan). Perilakunya:
 - WhatsApp: nomor apotek disimpan di pengaturan aplikasi (variabel lingkungan), bukan di kode. Tombol membuka WhatsApp dengan pesan awal "Halo ApotikKu, saya mau tanya tentang [nama obat]." Nomornya juga ditulis sebagai teks biasa, supaya bisa disalin bila tombol tidak bekerja.
 - Warna merah hanya dipakai untuk tanda Obat keras. Status Habis memakai abu-abu (ADR 0004).
 
+Ditambahkan 4 November 2026 (tiket #4, `components/KatalogTersaring.tsx`, [penjelasan](penjelasan/07-cari-laci-keluhan.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Tempat menyaring | Seluruh 38 obat dikirim server sekali; pencarian, laci, dan "Tanpa resep" dikerjakan di browser (Client Component `KatalogTersaring`) | Hasil muncul seketika tanpa menunggu jaringan (NF-03 ≤ 2 langkah, NF-05 < 3 detik di 4G); 38 baris jauh lebih ringan daripada satu foto; hemat kuota permintaan Supabase gratis | Menyaring di database (setiap ketikan satu permintaan: tersendat di 4G dan boros kuota). **Perlu ditinjau ulang bila obat kelak ribuan** |
+| Jumlah di setiap laci | Dihitung dari hasil saringan lain (pencarian + "Tanpa resep"), tetapi tanpa saringan laci itu sendiri | Pengunjung melihat angka yang benar-benar akan ia dapat sebelum mengetuk; angka ikut turun saat "Tanpa resep" dicentang | Menghitung dari seluruh 38 obat (angkanya berbohong saat saringan lain aktif) |
+| Laci kosong | Dimatikan (tidak bisa diketuk), kecuali laci yang sedang aktif | Tidak ada ketukan yang berujung halaman kosong; laci aktif tetap hidup supaya saringannya selalu bisa dibatalkan | Semua laci selalu bisa diketuk (ketukan sia-sia) |
+| Enam laci, tanpa tombol "Semua" | Enam laci saja, 3 kolom × 2 baris di HP; membatalkan dengan mengetuk laci yang sama (ADR 0004) | 3 × 2 pas terisi enam Keluhan; tombol "Semua" mengulang fungsi yang sudah ada dan merusak susunan itu. Prototipe tampilan Sesi 7 memakai deretan yang bisa digeser beserta tombol "Semua"; aplikasi mengikuti issue #4 | Menambah tombol "Semua" (baris ketujuh yang timpang) |
+| Kalimat jumlah | "8 obat untuk Batuk & Flu", "2 obat tanpa resep untuk \"para\" di Demam & Nyeri"; ditandai `role="status"` | Pengunjung tahu saringan apa yang sedang berlaku tanpa memeriksa tiap kontrol; pembaca layar ikut mengumumkannya | Hanya angka ("8 obat"), tanpa menyebut saringannya |
+| Tidak ada hasil | "Obat tidak ditemukan" + tombol WhatsApp berisi kata yang dicari + nomor sebagai teks + tombol "Tampilkan semua obat" | Pengunjung tidak dibiarkan buntu (M-07); nomor teks berguna bila tombolnya tidak bekerja | Hanya pesan kosong |
+| Nomor WhatsApp | Variabel lingkungan `NEXT_PUBLIC_WHATSAPP_APOTEK`; bila kosong dipakai nomor contoh dan layar menulis "(nomor contoh)" | Nomor bisa diganti tanpa mengubah kode (SPEC 4.7); tombolnya tidak pernah mati saat demo walau pengaturannya belum diisi | Menulis nomor di kode (ganti nomor = ubah program); membiarkan tombol mati bila variabel kosong |
+| Tes otomatis | Tidak ada; diuji manual di #14 | SPEC 5.1: database satu-satunya titik uji otomatis. Tiket ini tidak menyentuh database, dan akibat terburuk saringan yang salah adalah obat tidak ditemukan, bukan stok minus atau data bocor | Menambah tes tampilan (mudah rusak tiap desain berubah, SPEC 5.4) |
+
+Ditambahkan 4 November 2026 (tiket #5, `app/obat/[slug]/`, [penjelasan](penjelasan/08-detail-obat.md)):
+
+| Hal | Keputusan | Alasan | Ditolak |
+|---|---|---|---|
+| Sumber data | Tampilan `katalog` disaring `slug`, sama dengan Katalog | Obat yang diarsipkan Admin otomatis ikut hilang dari Detail obat tanpa kode tambahan; stok, harga acuan, dan tanggal kedaluwarsa memang tidak ikut terkirim | Membaca tabel `obat` (Pengunjung tidak punya izin, dan kolom rahasia ikut terbawa) |
+| Slug tidak ada vs obat diarsipkan | Keduanya menampilkan halaman yang **sama persis**: "Obat tidak ditemukan" + tautan ke Katalog | Orang luar tidak bisa menebak obat apa yang pernah dijual ApotikKu; pola yang sama dengan Struk (#10) | Pesan berbeda untuk obat yang diarsipkan (membocorkan keberadaannya) |
+| Kode status halaman "tidak ditemukan" | Tetap 200, isinya yang berganti (bukan `notFound()`) | Mengikuti pola Struk (#10); tidak ada kebutuhan mesin pencari di PRD, dan Katalog ditemukan lewat tautan yang dibagikan, bukan lewat pencarian | `notFound()` dengan 404 sungguhan (perlu berkas `not-found.tsx` sendiri dan penanganan metadata tambahan, tanpa manfaat yang tercatat di PRD) |
+| Judul halaman | `"{nama obat} · ApotikKu"` lewat `generateMetadata` | Judul inilah yang muncul sebagai pratinjau saat tautannya dikirim di WhatsApp (user story 15) | Judul tetap "ApotikKu" (semua tautan terlihat sama) |
+| Tanda golongan | Digambar 48 px (lebih besar daripada 40 px di kartu), disertai nama golongan **dan penjelasannya** dalam bahasa sehari-hari | Mendidik soal logo golongan obat (M-06); teks wajib ada karena warna bukan satu-satunya penanda (ADR 0004) | Hanya nama golongan seperti di kartu (tidak menambah apa pun) |
+| Penjelasan Satuan jual | Kalimat khusus untuk strip ("Strip = satu lembar kemasan berisi …. Obat dijual per strip, tidak per butir."), kalimat umum untuk botol/tube/sachet | Harga per strip sering disangka harga per butir (aturan bisnis 4) | Tidak menjelaskan (pertanyaan paling sering terbawa ke apoteker) |
+| Kartu Katalog bisa diketuk | Seluruh kartu bisa diketuk, tetapi yang menjadi tautan hanya **nama obat** (lapisan `.tautan::after` menutupi kartu); tanda fokus keyboard dipindah ke seluruh kartu | Sasaran ketuk selebar kartu untuk jari, sementara pembaca layar membaca "Ambroksol 30 mg" saja, bukan seluruh isi kartu | Membungkus seluruh kartu jadi satu tautan (pembaca layar membacakan semua isinya sebagai nama tautan) |
+| Papan nama | Dipindah ke `components/PapanNama.tsx`, dipakai Katalog dan Detail obat; di Detail obat tanpa judul besar | Pengunjung yang membuka tautan langsung dari WhatsApp tetap tahu ini apotek apa dan punya jalan pulang ke Katalog; satu halaman hanya boleh punya satu `h1`, dan di sini `h1` adalah nama obat | Menyalin markah papan nama ke halaman kedua (dua tempat yang harus diubah bersamaan) |
+| Tes otomatis | Tidak ada, sama dengan #4 | SPEC 5.1; tiket ini tidak mengubah database. Aturan yang menjaga data sudah diuji di `tests/katalog.test.ts` (obat diarsipkan tidak muncul di tampilan `katalog`, kolom rahasia tidak terkirim) | Menambah tes tampilan (SPEC 5.4) |
+
 ### 4.8 Layar Jual (Kasir)
 
 - Kotak pencarian mendapat fokus otomatis; Kasir bisa mengetik nama lalu menekan Enter untuk menambahkan hasil teratas ke keranjang.
