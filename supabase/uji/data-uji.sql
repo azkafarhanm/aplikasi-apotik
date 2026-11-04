@@ -23,7 +23,12 @@ with data (nama, bentuk, keluhan, golongan, satuan_jual, isi_per_satuan,
     -- Kedaluwarsa: tanggalnya disegarkan setiap menit oleh jadwal di bawah.
     ('Uji Kedaluwarsa Kemarin',  'sirup', 'batuk_flu', 'bebas', 'botol', '60 ml', 1000, 1000, 50, private.hari_ini() - 1, false),
     ('Uji Kedaluwarsa Hari Ini', 'sirup', 'batuk_flu', 'bebas', 'botol', '60 ml', 1000, 1000, 50, private.hari_ini(),     false),
-    -- Diarsipkan: tidak boleh muncul di katalog dan tidak bisa dijual.
+    -- Batas Segera kedaluwarsa (tiket #11): 90 hari lagi masuk Ringkasan,
+    -- 91 hari lagi tidak. Tanggalnya ikut disegarkan jadwal di bawah.
+    ('Uji Kedaluwarsa 90 Hari', 'tablet', 'demam_nyeri', 'bebas', 'strip', '10 tablet', 1000, 1000, 50, private.hari_ini() + 90, false),
+    ('Uji Kedaluwarsa 91 Hari', 'tablet', 'demam_nyeri', 'bebas', 'strip', '10 tablet', 1000, 1000, 50, private.hari_ini() + 91, false),
+    -- Diarsipkan: tidak boleh muncul di katalog, tidak bisa dijual, dan tidak
+    -- ikut di ketiga daftar Ringkasan (#11) walau stoknya besar.
     ('Uji Diarsipkan', 'salep', 'luka_kulit', 'bebas', 'tube', '5 g', 1000, 1000, 50, date '2099-12-31', true),
     -- Tes Penjualan (tiket #8, tests/penjualan.test.ts). Stok dan harganya
     -- dikembalikan ke angka awal sebelum setiap tes lewat uji_atur_obat (di bawah).
@@ -59,9 +64,12 @@ select nama, bentuk, keluhan, golongan, satuan_jual, isi_per_satuan, 'Baris uji.
   from data
  where nama not in (select nama from diperbarui);
 
--- Tanggal "kemarin" dan "hari ini" (WIB) berubah setiap hari, sedangkan data
--- tersimpan dengan tanggal tetap. Jadwal ini menyegarkan dua baris tersebut
--- setiap menit, supaya tes kedaluwarsa selalu benar kapan pun dijalankan.
+-- Tanggal "kemarin", "hari ini", "+90 hari", dan "+91 hari" (WIB) berubah
+-- setiap hari, sedangkan data tersimpan dengan tanggal tetap. Jadwal ini
+-- menyegarkan baris-baris itu setiap menit, supaya tes kedaluwarsa selalu
+-- benar kapan pun dijalankan. Memasang ulang file ini akan menolak jadwal yang
+-- sudah ada; jalankan dulu select cron.unschedule('uji-segarkan-tanggal-kedaluwarsa')
+-- bila isinya berubah.
 create extension if not exists pg_cron;
 
 select cron.schedule(
@@ -72,6 +80,10 @@ select cron.schedule(
      where slug = 'uji-kedaluwarsa-kemarin';
     update public.obat set tanggal_kedaluwarsa = private.hari_ini()
      where slug in ('uji-kedaluwarsa-hari-ini', 'uji-jual-kedaluwarsa-hari-ini');
+    update public.obat set tanggal_kedaluwarsa = private.hari_ini() + 90
+     where slug = 'uji-kedaluwarsa-90-hari';
+    update public.obat set tanggal_kedaluwarsa = private.hari_ini() + 91
+     where slug = 'uji-kedaluwarsa-91-hari';
   $$
 );
 

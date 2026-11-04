@@ -1,0 +1,199 @@
+// Tes database untuk Ringkasan (tiket #11, SPEC 4.4, 4.5, 5.2).
+//
+// Gayanya mengikuti tests/penjualan.test.ts (SPEC 5.5): menguji perilaku yang
+// terlihat dari luar, lewat jalur yang sama dengan halaman Ringkasan
+// (supabase.rpc("ringkasan")).
+//
+// CATATAN PENTING soal berjalan bersamaan: file tes berjalan paralel, dan
+// penjualan.test.ts serta pembatalan.test.ts terus mencatat Penjualan baru
+// hari ini. Jadi angka pendapatan TIDAK bisa dibandingkan dengan angka tetap.
+// Yang diuji di sini adalah SELISIHNYA sebelum dan sesudah satu Penjualan yang
+// dicatat tes ini sendiri. Daftar obat tetap bisa diuji tepat, karena memakai
+// obat uji yang tidak boleh diubah tes lain (uji_atur_obat hanya mengizinkan
+// slug uji-jual-*).
+import { beforeAll, describe, expect, it } from "vitest";
+import { buatPenghubung, masukSebagai, type StafUji } from "./bantu";
+
+const pengunjung = buatPenghubung();
+let admin: StafUji;
+let kasir: StafUji;
+let nonaktif: StafUji;
+
+type BarisObat = {
+  id: number;
+  nama: string;
+  stok: number;
+  satuan_jual: string;
+  tanggal_kedaluwarsa: string;
+};
+
+type Ringkasan = {
+  pendapatan: number;
+  jumlah_penjualan: number;
+  hampir_habis: BarisObat[];
+  segera_kedaluwarsa: BarisObat[];
+  sudah_kedaluwarsa: BarisObat[];
+};
+
+beforeAll(async () => {
+  [admin, kasir, nonaktif] = await Promise.all([
+    masukSebagai("admin"),
+    masukSebagai("kasir"),
+    masukSebagai("nonaktif"),
+  ]);
+});
+
+async function ambilRingkasan(): Promise<Ringkasan> {
+  const { data, error } = await admin.supabase.rpc("ringkasan");
+  expect(error).toBeNull();
+  return data as Ringkasan;
+}
+
+/** Nama obat di sebuah daftar, untuk pemeriksaan "ada" / "tidak ada". */
+function nama(daftar: BarisObat[]): string[] {
+  return daftar.map((o) => o.nama);
+}
+
+// ---------------------------------------------------------------------------
+// Daftar obat: diuji tepat, memakai obat uji yang tidak diubah tes lain
+// ---------------------------------------------------------------------------
+
+describe("Daftar Hampir habis", () => {
+  it("memuat obat berstok 20 ke bawah, termasuk yang stoknya 0", async () => {
+    const r = await ambilRingkasan();
+    expect(nama(r.hampir_habis)).toEqual(
+      expect.arrayContaining(["Uji Stok 0", "Uji Stok 1", "Uji Stok 20"]),
+    );
+  });
+
+  it("tidak memuat obat berstok 21", async () => {
+    const r = await ambilRingkasan();
+    expect(nama(r.hampir_habis)).not.toContain("Uji Stok 21");
+  });
+
+  it("urut dari stok paling sedikit", async () => {
+    const r = await ambilRingkasan();
+    const stok = r.hampir_habis.map((o) => o.stok);
+    expect(stok).toEqual([...stok].sort((a, b) => a - b));
+  });
+
+  it("menyertakan satuan dan tanggal kedaluwarsa untuk setiap obat", async () => {
+    const r = await ambilRingkasan();
+    const satu = r.hampir_habis.find((o) => o.nama === "Uji Stok 20");
+    expect(satu).toMatchObject({ stok: 20, satuan_jual: "strip" });
+    expect(satu!.tanggal_kedaluwarsa).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(typeof satu!.id).toBe("number");
+  });
+});
+
+describe("Daftar kedaluwarsa", () => {
+  it("batas 90 hari: 90 hari lagi masuk, 91 hari lagi tidak", async () => {
+    const r = await ambilRingkasan();
+    expect(nama(r.segera_kedaluwarsa)).toContain("Uji Kedaluwarsa 90 Hari");
+    expect(nama(r.segera_kedaluwarsa)).not.toContain("Uji Kedaluwarsa 91 Hari");
+  });
+
+  it("kedaluwarsa hari ini masuk Segera kedaluwarsa, bukan Sudah kedaluwarsa", async () => {
+    const r = await ambilRingkasan();
+    expect(nama(r.segera_kedaluwarsa)).toContain("Uji Kedaluwarsa Hari Ini");
+    expect(nama(r.sudah_kedaluwarsa)).not.toContain("Uji Kedaluwarsa Hari Ini");
+  });
+
+  it("kedaluwarsa kemarin masuk Sudah kedaluwarsa, bukan Segera kedaluwarsa", async () => {
+    const r = await ambilRingkasan();
+    expect(nama(r.sudah_kedaluwarsa)).toContain("Uji Kedaluwarsa Kemarin");
+    expect(nama(r.segera_kedaluwarsa)).not.toContain("Uji Kedaluwarsa Kemarin");
+  });
+
+  it("urut dari tanggal paling dekat", async () => {
+    const r = await ambilRingkasan();
+    const tanggal = r.segera_kedaluwarsa.map((o) => o.tanggal_kedaluwarsa);
+    expect(tanggal).toEqual([...tanggal].sort());
+  });
+});
+
+describe("Obat yang diarsipkan", () => {
+  it("tidak ikut di ketiga daftar, walau stoknya besar dan tanggalnya jauh", async () => {
+    const r = await ambilRingkasan();
+    for (const daftar of [r.hampir_habis, r.segera_kedaluwarsa, r.sudah_kedaluwarsa]) {
+      expect(nama(daftar)).not.toContain("Uji Diarsipkan");
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pendapatan: diuji lewat SELISIH, karena tes lain ikut mencatat Penjualan
+// ---------------------------------------------------------------------------
+
+describe("Pendapatan hari ini", () => {
+  it("bertambah sebesar Penjualan yang baru dicatat, lalu berkurang lagi saat dibatalkan", async () => {
+    const sebelum = await ambilRingkasan();
+
+    // Obat uji milik tes Pembatalan dipakai karena stoknya besar dan harganya
+    // tetap; yang diperiksa di sini hanya selisih pendapatan.
+    const { data: obat } = await admin.supabase
+      .from("obat")
+      .select("id, harga_jual")
+      .eq("slug", "uji-jual-batal-a")
+      .single();
+
+    const jumlah = 2;
+    const nilai = obat!.harga_jual * jumlah;
+
+    const { data: baru, error } = await kasir.supabase.rpc("catat_penjualan", {
+      keranjang: [{ obat_id: obat!.id, jumlah }],
+      metode_bayar: "qris_transfer",
+      uang_diterima: null,
+      cek_resep: false,
+    });
+    expect(error).toBeNull();
+    expect(baru.total).toBe(nilai);
+
+    const sesudah = await ambilRingkasan();
+    expect(sesudah.pendapatan).toBeGreaterThanOrEqual(sebelum.pendapatan + nilai);
+    expect(sesudah.jumlah_penjualan).toBeGreaterThanOrEqual(sebelum.jumlah_penjualan + 1);
+
+    // Penjualan Dibatalkan tidak dihitung sebagai pendapatan (aturan bisnis 7).
+    const batal = await admin.supabase.rpc("batalkan_penjualan", {
+      nomor: baru.nomor,
+      alasan: "Tes Ringkasan",
+    });
+    expect(batal.error).toBeNull();
+
+    const setelahBatal = await ambilRingkasan();
+    expect(setelahBatal.pendapatan).toBeLessThanOrEqual(sesudah.pendapatan - nilai);
+    expect(setelahBatal.jumlah_penjualan).toBeLessThanOrEqual(sesudah.jumlah_penjualan - 1);
+  });
+
+  it("berupa bilangan bulat rupiah, tidak pernah negatif", async () => {
+    const r = await ambilRingkasan();
+    expect(Number.isInteger(r.pendapatan)).toBe(true);
+    expect(r.pendapatan).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(r.jumlah_penjualan)).toBe(true);
+    expect(r.jumlah_penjualan).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Hak akses (SPEC 4.5): hanya Admin aktif
+// ---------------------------------------------------------------------------
+
+describe("Hak akses Ringkasan", () => {
+  it("Kasir ditolak", async () => {
+    const { data, error } = await kasir.supabase.rpc("ringkasan");
+    expect(data).toBeNull();
+    expect(error?.code).toBe("P0001");
+    expect(error?.message).toBe("Hanya Admin yang bisa melihat Ringkasan.");
+  });
+
+  it("Staf nonaktif ditolak", async () => {
+    const { error } = await nonaktif.supabase.rpc("ringkasan");
+    expect(error?.message).toBe("Hanya Admin yang bisa melihat Ringkasan.");
+  });
+
+  it("Pengunjung tidak bisa memanggil ringkasan", async () => {
+    const { data, error } = await pengunjung.rpc("ringkasan");
+    expect(data).toBeNull();
+    expect(["42501", "PGRST202"]).toContain(error?.code);
+  });
+});
