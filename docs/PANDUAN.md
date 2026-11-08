@@ -151,8 +151,7 @@ Tiga hal yang sering bikin bingung:
 
 Dirangkum dari [`CLAUDE.md`](../CLAUDE.md) supaya mudah diingat:
 
-1. **Jangan simpan nama lengkap atau NIM di repo.** Repo ini publik. PDF tugas yang memuat identitas dibuat di luar repo.
-2. **Jangan tulis password di repo atau di chat.** Password akun uji hanya di *secrets* GitHub dan `.env.local`.
-3. **Data tidak pernah dihapus.** Obat diarsipkan, Penjualan dibatalkan.
-4. **Setiap keputusan harus punya alasan tertulis**, termasuk pilihan yang ditolak, supaya siap ditanya dosen.
-5. **Claude tidak pernah merge PR sendiri.** Itu keputusan pemilik repo.
+1. **Jangan tulis password di repo atau di chat.** Password akun uji hanya di *secrets* GitHub dan `.env.local`.
+2. **Data tidak pernah dihapus.** Obat diarsipkan, Penjualan dibatalkan.
+3. **Setiap keputusan harus punya alasan tertulis**, termasuk pilihan yang ditolak.
+4. **Claude tidak pernah merge PR sendiri.** Itu keputusan pemilik repo.
